@@ -1,0 +1,15 @@
+{
+  "name": "miniage-v2-preview",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Превью Miniage v2: настоящий PHP 8.1 (wasm) + SQLite, без установленных PHP/MySQL",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "dependencies": {
+    "php-wasm": "0.2.0",
+    "php-wasm-sqlite": "0.2.0"
+  }
+}

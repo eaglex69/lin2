@@ -1,0 +1,35 @@
+# Miniage v2 — всё на единый front controller
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # существующие файлы/папки отдаём напрямую (assets, favicon)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# безопасность
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "same-origin"
+</IfModule>
+
+# запрет листинга
+Options -Indexes
+
+# кэш статики
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType text/javascript "access plus 7 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+# не отдавать служебные файлы
+<FilesMatch "\.(sql|md|env|log|sqlite)$">
+    Require all denied
+</FilesMatch>
