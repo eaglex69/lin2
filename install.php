@@ -600,6 +600,9 @@ function lin2i_validate($in)
     if ($in['db_mode'] === 'fresh') {
         if (!preg_match('~^[A-Za-z0-9]{4,10}$~', $in['admin_nick'])) {
             $err[] = 'Ник администратора: от 4 до 10 латинских букв и цифр (как у персонажей в игре).';
+        } elseif (is_numeric($in['admin_nick'])) {
+            // enter.php принимает числовой логин за номер аккаунта (is_numeric): войти под таким ником было бы нельзя
+            $err[] = 'Ник администратора не должен состоять только из цифр и не должен выглядеть как число (например, 1e5): форма входа принимает такой логин за номер аккаунта.';
         }
         if (!preg_match('~^[A-Za-z0-9]{6,15}$~', $in['admin_pass'])) {
             $err[] = 'Пароль администратора: от 6 до 15 латинских букв и цифр (форма входа в игру принимает до 15 символов).';
@@ -930,7 +933,7 @@ function lin2i_form_page($vals, $errors, $checks, $conflict)
     $b .= '<fieldset id="admin_box"><legend>2. Администратор</legend>'
         . '<div class="hint">Создаётся аккаунт и персонаж с доступом к админ-панели (<code>adm_panel.php</code>). Под этим ником и паролем вы войдёте в игру.</div>'
         . '<label>Ник</label><input type="text" name="admin_nick" maxlength="10" value="' . lin2i_h($vals['admin_nick']) . '">'
-        . '<div class="hint">4-10 латинских букв и цифр.</div>'
+        . '<div class="hint">4-10 латинских букв и цифр, не одни цифры.</div>'
         . '<label>Пароль</label><input type="password" name="admin_pass" maxlength="15" value="" autocomplete="new-password">'
         . '<div class="hint">6-15 латинских букв и цифр.</div>'
         . '<label>Пароль ещё раз</label><input type="password" name="admin_pass2" maxlength="15" value="" autocomplete="new-password">'

@@ -182,6 +182,8 @@ async function runVersion(version) {
   const bad = [
     [{ admin_nick: 'ab' }, 'Ник администратора'],
     [{ admin_nick: 'Bad nick!' }, 'Ник администратора'],
+    [{ admin_nick: '123456' }, 'только из цифр'],
+    [{ admin_nick: '12e3' }, 'только из цифр'],
     [{ admin_pass: 'short', admin_pass2: 'short' }, 'Пароль администратора: от 6'],
     [{ admin_pass2: 'Different1' }, 'не совпадают'],
     [{ admin_pass: 'пароль1234', admin_pass2: 'пароль1234' }, 'Пароль администратора: от 6'],
