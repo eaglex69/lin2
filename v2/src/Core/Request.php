@@ -24,6 +24,9 @@ final class Request
     ) {
     }
 
+    /** Максимальный размер тела запроса (защита от DoS). */
+    public const MAX_BODY = 1048576; // 1 MiB
+
     public static function fromGlobals(): self
     {
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';

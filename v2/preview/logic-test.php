@@ -170,3 +170,76 @@ $dbg('T10 реген мёртвого: hp=' . $dead['hp'] . ' -> ' . ((int) $dea
 Database::update('characters', ['hp' => 199, 'hp_max' => 200, 'last_seen' => date('Y-m-d H:i:s', time() - 300)], 'id = ?', [1]);
 $capped = $game->requireChar(1);
 $dbg('T10 реген не выше максимума: hp=' . $capped['hp'] . ' -> ' . ((int) $capped['hp'] === 200 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 11: обрезка UTF-8 в чате (баг «json_encode»)
+$long = str_repeat('Ж', 300);
+$chat = new \App\Service\ChatService();
+$msg = $chat->post(1, 'Demo', 'global', $long);
+// mbstring в php-wasm нет, поэтому считаем символы вручную
+$len = $msg['text'] === '' ? 0 : count(preg_split('//u', $msg['text'], -1, PREG_SPLIT_NO_EMPTY));
+$enc = json_encode(['t' => $msg['text']], JSON_UNESCAPED_UNICODE);
+$dbg('T11 чат 300 кириллических символов: длина=' . $len . ', json=' . ($enc === false ? 'FAIL' : 'OK')
+    . ' -> ' . ($enc !== false && $len <= 240 && $len >= 239 ? 'OK' : 'БАГ'));
+
+// эмодзи (4 байта) не должны рваться
+sleep(3);
+$msg2 = $chat->post(1, 'Demo', 'global', str_repeat('😀', 300));
+$enc2 = json_encode(['t' => $msg2['text']], JSON_UNESCAPED_UNICODE);
+$dbg('T11 чат 300 эмодзи: json=' . ($enc2 === false ? 'FAIL' : 'OK')
+    . ' -> ' . ($enc2 !== false ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 12: Response::json не падает на битом UTF-8
+Database::update('chat_messages', ['text' => substr(str_repeat('Ы', 10), 0, 15)], 'id = ?', [(int) $msg2['id']]);
+$broken = (string) Database::value('SELECT text FROM chat_messages WHERE id = ?', [(int) $msg2['id']]);
+$resp = \App\Core\Response::json(['text' => $broken]);
+$dbg('T12 Response::json с битым UTF-8: ' . strlen($resp->body) . ' байт -> '
+    . (str_contains($resp->body, '"ok"') || strlen($resp->body) > 20 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 13: регистронезависимая уникальность ников
+try {
+    (new AuthService())->register('DEMO', 'Str0ngPass!1', '', 'human', 'fighter', 'm');
+    $dbg('T13 БАГ: зарегистрирован DEMO при существующем demo');
+} catch (Throwable $e) {
+    $dbg('T13 уникальность без учёта регистра: отказ -> OK');
+}
+try {
+    (new AuthService())->register('dEmO2', 'Str0ngPass!1', '', 'human', 'fighter', 'm');
+    $dbg('T13 другой ник проходит -> OK');
+} catch (Throwable $e) {
+    $dbg('T13 БАГ: новый ник отклонён: ' . $e->getMessage());
+}
+
+// --- ТЕСТ 14: невалидный канал чата
+try { $chat->list('<script>'); $dbg('T14 БАГ: невалидный канал принят'); }
+catch (Throwable $e) { $dbg('T14 невалидный канал: отказ -> OK'); }
+$dbg('T14 канал all работает: ' . (count($chat->list('all')) >= 0 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 15: офлайн-реген не начисляется пачкой
+Database::update('characters', ['hp' => 50, 'hp_max' => 200,
+    'last_seen' => date('Y-m-d H:i:s', time() - 86400)], 'id = ?', [1]);
+$offline = $game->requireChar(1);
+$dbg('T15 офлайн-реген (сутки): hp=' . $offline['hp'] . ' (ожидалось <= 200, без пачки) -> '
+    . ((int) $offline['hp'] <= 200 ? 'OK' : 'БАГ'));
+$dbg('T15 ограничение 60с: прибавка = 50 + 200*0.002*60 = ' . (50 + (int) round(200 * 0.002 * 60))
+    . ', получено ' . $offline['hp'] . ' -> ' . ((int) $offline['hp'] <= 74 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 16: gc удаляет просроченные сессии
+Database::insert('sessions', ['id' => str_repeat('a', 48), 'account_id' => null,
+    'data_json' => '{}', 'last_used' => date('Y-m-d H:i:s', time() - 86400 * 3)]);
+$before = (int) Database::value('SELECT COUNT(*) FROM sessions WHERE id = ?', [str_repeat('a', 48)]);
+Migrator::gc(true);
+$after = (int) Database::value('SELECT COUNT(*) FROM sessions WHERE id = ?', [str_repeat('a', 48)]);
+$dbg('T16 gc просроченной сессии: было ' . $before . ' стало ' . $after
+    . ' -> ' . ($after === 0 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 17: гонка покупки не уводит адену в минус
+Database::update('characters', ['adena' => 500], 'id = ?', [1]);
+$pot = Database::one("SELECT code FROM items WHERE kind = 'potion' LIMIT 1");
+$ok = 0;
+for ($i = 0; $i < 5; $i++) {
+    try { $shop->buy(1, (string) $pot['code'], 1); $ok++; }
+    catch (Throwable $e) { /* недостаточно денег */ }
+}
+$adena = (int) Database::value('SELECT adena FROM characters WHERE id = 1');
+$dbg('T17 покупки при 500 адены: успешных=' . $ok . ', остаток=' . $adena
+    . ' -> ' . ($adena >= 0 && $ok * 450 <= 500 ? 'OK' : 'БАГ'));

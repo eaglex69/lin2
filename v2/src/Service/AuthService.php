@@ -48,11 +48,29 @@ final class AuthService
             throw new \InvalidArgumentException('Некорректный email.');
         }
         $t = Database::table('accounts');
-        if (Database::one("SELECT id FROM {$t} WHERE nick = ?", [$nick]) !== null) {
+        // Регистронезависимая проверка: MySQL сравнивает ник без учёта регистра
+        // (utf8mb4_unicode_ci), а SQLite — с учётом. Из-за этого в превью можно
+        // было завести «demo», «Demo» и «DEMO» как разных игроков.
+        $norm = self::normalizeNick($nick);
+        $taken = false;
+        foreach (Database::all("SELECT nick FROM {$t}") as $row) {
+            if (self::normalizeNick((string) $row['nick']) === $norm) {
+                $taken = true;
+                break;
+            }
+        }
+        if ($taken) {
             throw new \InvalidArgumentException('Такой логин уже занят.');
         }
         $ct = Database::table('characters');
-        if (Database::one("SELECT id FROM {$ct} WHERE name = ?", [$nick]) !== null) {
+        $charTaken = false;
+        foreach (Database::all("SELECT name FROM {$ct}") as $row) {
+            if (self::normalizeNick((string) $row['name']) === $norm) {
+                $charTaken = true;
+                break;
+            }
+        }
+        if ($charTaken) {
             throw new \InvalidArgumentException('Такой персонаж уже существует.');
         }
 
@@ -87,6 +105,16 @@ final class AuthService
         $this->assertNotLockedOut($nick);
 
         $acc = Database::one("SELECT * FROM {$t} WHERE nick = ?", [$nick]);
+        if ($acc === null) {
+            // запасной поиск без учёта регистра: SQLite иначе строг
+            $norm = self::normalizeNick($nick);
+            foreach (Database::all("SELECT * FROM {$t}") as $row) {
+                if (self::normalizeNick((string) $row['nick']) === $norm) {
+                    $acc = $row;
+                    break;
+                }
+            }
+        }
         if ($acc === null || !password_verify($pass, (string) $acc['pass_hash'])) {
             $this->recordFailedLogin($nick);
             // одинаковый ответ и одинаковое время для существующего/несуществующего логина
@@ -113,6 +141,14 @@ final class AuthService
         Session::set('_csrf', bin2hex(random_bytes(24)));
 
         return ['account_id' => (int) $acc['id'], 'nick' => (string) $acc['nick'], 'role' => (string) $acc['role']];
+    }
+
+    /** Ник для сравнения: без учёта регистра и краевых пробелов. */
+    private static function normalizeNick(string $nick): string
+    {
+        return function_exists('mb_strtolower')
+            ? mb_strtolower(trim($nick), 'UTF-8')
+            : strtolower(trim($nick));
     }
 
     /** @throws \InvalidArgumentException если попытки исчерпаны */

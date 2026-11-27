@@ -49,13 +49,22 @@ final class Router
 
     public function dispatch(Request $req): Response
     {
+        // Отсекаем гигантские тела до разбора JSON (иначе память/CPU зря).
+        if ($req->isPost() && strlen($req->rawBody) > Request::MAX_BODY) {
+            return Response::error('Слишком большой запрос.', 413, 'too_large');
+        }
+
         $path = rtrim($req->path, '/');
         if ($path === '') {
             $path = '/';
         }
 
+        // HEAD по стандарту обслуживается как GET, только без тела ответа.
+        // Раньше HEAD / давал 404, что ломало мониторинг и кэширующие прокси.
+        $method = $req->method === 'HEAD' ? 'GET' : $req->method;
+
         foreach ($this->routes as $route) {
-            if ($route['method'] !== $req->method) {
+            if ($route['method'] !== $method) {
                 continue;
             }
             if (!preg_match($route['regex'], $path, $m)) {
@@ -88,7 +97,7 @@ final class Router
         // статические файлы отдаём как есть (Apache/Nginx обычно делают это раньше).
         // SECURITY: путь нормализуем и жёстко ограничиваем каталогом /public —
         // иначе /../src/Core/Config.php отдаёт исходники, а /../var/*.sqlite — базу.
-        if ($req->method === 'GET') {
+        if ($method === 'GET') {
             $file = self::resolveStatic($path);
             if ($file !== null) {
                 return self::serveFile($file);

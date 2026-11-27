@@ -322,9 +322,13 @@ final class ApiController
     // -------------------------------------------------------------------- chat
     public function chatList(Request $req): Response
     {
-        $channel = $req->get('channel', 'global');
+        $channel = (string) $req->get('channel', 'global');
         $after = $req->int('after', 0);
-        return Response::ok(['messages' => $this->chat->list((string) $channel, $after)]);
+        try {
+            return Response::ok(['messages' => $this->chat->list($channel, $after)]);
+        } catch (\InvalidArgumentException $e) {
+            return Response::error($e->getMessage(), 400, 'chat_channel');
+        }
     }
 
     public function chatSend(Request $req): Response

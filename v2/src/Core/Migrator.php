@@ -25,6 +25,55 @@ final class Migrator
 
         self::upgrade();
         self::seed();
+        self::gc();
+    }
+
+    /**
+     * Сборка мусора: сессии, старые бои, попытки входа.
+     *
+     * Без этого таблицы росли бесконечно: каждая анонимная загрузка страницы
+     * создавала строку в sessions, каждый бой — строку в battles.
+     * Вызывается с вероятностью ~1/50, чтобы не бить по БД каждый запрос.
+     */
+    public static function gc(bool $force = false): void
+    {
+        static $done = false;
+        if ($done && !$force) {
+            return;
+        }
+        $done = true;
+
+        // не чаще одного раза в ~50 запросов в рамках процесса
+        if (!$force && random_int(1, 50) !== 1) {
+            return;
+        }
+
+        try {
+            $now = time();
+
+            // сессии: старше SESSION_TTL
+            $ttl = Config::int('SESSION_TTL', 86400);
+            $cutoff = date('Y-m-d H:i:s', $now - $ttl);
+            Database::exec(
+                'DELETE FROM ' . Database::table('sessions') . ' WHERE last_used < ?',
+                [$cutoff]
+            );
+
+            // бои: завершённые более суток назад
+            Database::exec(
+                'DELETE FROM ' . Database::table('battles') . ' WHERE state <> ? AND updated_at < ?',
+                ['active', $cutoff]
+            );
+
+            // попытки входа: старше суток и без активной блокировки
+            Database::exec(
+                'DELETE FROM ' . Database::table('login_attempts') . ' WHERE first_ts < ? AND (blocked_until IS NULL OR blocked_until < ?)',
+                [$now - 86400, date('Y-m-d H:i:s', $now)]
+            );
+        } catch (\Throwable $e) {
+            // уборка не должна ронять запрос
+            error_log('[miniage] gc: ' . $e->getMessage());
+        }
     }
 
     /**

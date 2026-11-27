@@ -13,6 +13,60 @@ final class ChatService
 {
     public const CHANNELS = ['global', 'trade', 'clan', 'system'];
 
+    /** Максимальная длина сообщения в символах. */
+    private const MAX_LEN = 240;
+
+    /**
+     * Обрезка строки до N символов UTF-8 без mbstring.
+     *
+     * Раньше здесь был substr()+обрезка хвостовых байт, и она ломала строку:
+     * граница символа искалась от конца уже обрезанной строки, поэтому
+     * последний символ оставался обрезанным, json_encode() падал с
+     * «Malformed UTF-8», а пользователь получал {'ok':false,'error':'json_encode'}.
+     * Теперь идём от начала и копим целые символы.
+     */
+    private static function limitUtf8(string $text, int $maxChars): string
+    {
+        $out = '';
+        $chars = 0;
+        $len = strlen($text);
+        for ($i = 0; $i < $len && $chars < $maxChars; ) {
+            $byte = ord($text[$i]);
+            if ($byte < 0x80) {
+                $size = 1;
+            } elseif (($byte & 0xE0) === 0xC0) {
+                $size = 2;
+            } elseif (($byte & 0xF0) === 0xE0) {
+                $size = 3;
+            } elseif (($byte & 0xF8) === 0xF0) {
+                $size = 4;
+            } else {
+                // битый байт — пропускаем, чтобы не тянуть мусор дальше
+                $i++;
+                continue;
+            }
+            if ($i + $size > $len) {
+                break;
+            }
+            // проверяем, что продолжения действительно 10xxxxxx
+            $valid = true;
+            for ($k = 1; $k < $size; $k++) {
+                if ((ord($text[$i + $k]) & 0xC0) !== 0x80) {
+                    $valid = false;
+                    break;
+                }
+            }
+            if (!$valid) {
+                $i++;
+                continue;
+            }
+            $out .= substr($text, $i, $size);
+            $i += $size;
+            $chars++;
+        }
+        return $out;
+    }
+
     public function post(int $charId, string $author, string $channel, string $text): array
     {
         $channel = in_array($channel, self::CHANNELS, true) ? $channel : 'global';
@@ -29,20 +83,13 @@ final class ChatService
         if ($text === '') {
             throw new \InvalidArgumentException('Сообщение пустое.');
         }
-        // mbstring может отсутствовать (сборка php-wasm) — безопасный fallback
+        // mbstring может отсутствовать (сборка php-wasm) — свой безопасный обрез.
         if (function_exists('mb_strlen')) {
-            if (mb_strlen($text, 'UTF-8') > 240) {
-                $text = mb_substr($text, 0, 240, 'UTF-8');
+            if (mb_strlen($text, 'UTF-8') > self::MAX_LEN) {
+                $text = mb_substr($text, 0, self::MAX_LEN, 'UTF-8');
             }
         } else {
-            if (strlen($text) > 240) {
-                $text = substr($text, 0, 240);
-                // не рвём многобайтовый символ
-                while ($text !== '' && (ord($text[strlen($text) - 1]) & 0xC0) === 0x80) {
-                    $text = substr($text, 0, -1);
-                }
-                $text = rtrim($text);
-            }
+            $text = self::limitUtf8($text, self::MAX_LEN);
         }
 
         $t = Database::table('chat_messages');
@@ -75,6 +122,15 @@ final class ChatService
     /** @return array<int,array<string,mixed>> */
     public function list(string $channel = 'global', int $afterId = 0, int $limit = 50): array
     {
+        // Неизвестный канал раньше молча возвращал пустой список — клиент
+        // выглядел «пустым чатом» вместо ошибки.
+        if ($channel !== 'all' && !in_array($channel, self::CHANNELS, true)) {
+            throw new \InvalidArgumentException('Неизвестный канал чата.');
+        }
+        if ($afterId < 0) {
+            $afterId = 0;
+        }
+
         $t = Database::table('chat_messages');
         $limit = max(1, min(100, $limit));
 

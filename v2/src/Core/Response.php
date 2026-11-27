@@ -26,11 +26,63 @@ final class Response
     {
         $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
         $body = json_encode($data, $flags);
+
+        if ($body === false) {
+            // Битые UTF-8 последовательности (например, обрезанный на середине
+            // символа текст) роняли ответ в бесполезное {"error":"json_encode"}.
+            // Пробуем «починить» данные, а затем — заменить невалидные байты.
+            error_log('[miniage] json_encode: ' . json_last_error_msg());
+            $clean = self::scrubUtf8($data);
+            $body = json_encode($clean, $flags);
+            if ($body === false) {
+                $body = json_encode(
+                    ['ok' => false, 'error' => 'Ошибка кодирования ответа', 'code' => 'encode'],
+                    $flags | JSON_INVALID_UTF8_SUBSTITUTE
+                );
+                $status = 500;
+            }
+        }
+
         return new self(
-            $body === false ? '{"ok":false,"error":"json_encode"}' : $body,
+            (string) $body,
             $status,
             ['Content-Type' => 'application/json; charset=utf-8', 'Cache-Control' => 'no-store']
         );
+    }
+
+    /**
+     * Рекурсивно заменяет невалидные UTF-8 байты на символ замены,
+     * чтобы json_encode мог собрать ответ.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private static function scrubUtf8(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            $out = [];
+            foreach ($value as $k => $v) {
+                $out[is_string($k) ? self::scrubString($k) : $k] = self::scrubUtf8($v);
+            }
+            return $out;
+        }
+        if (is_string($value)) {
+            return self::scrubString($value);
+        }
+        return $value;
+    }
+
+    private static function scrubString(string $s): string
+    {
+        if (!function_exists('mb_check_encoding')) {
+            // mbstring нет: используем json с подстановкой как быстрый фильтр
+            $probe = json_encode($s, JSON_INVALID_UTF8_SUBSTITUTE);
+            return is_string($probe) ? (string) json_decode($probe, true) : $s;
+        }
+        if (mb_check_encoding($s, 'UTF-8')) {
+            return $s;
+        }
+        return (string) mb_convert_encoding($s, 'UTF-8', 'UTF-8');
     }
 
     /** @param array<string,mixed> $data */
@@ -75,7 +127,8 @@ final class Response
                 header($name . ': ' . $value);
             }
         }
-        if ($this->body !== '') {
+        // HEAD: заголовки отдаём, тело — нет (стандарт HTTP)
+        if ($this->body !== '' && (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'HEAD')) {
             echo $this->body;
         }
     }
