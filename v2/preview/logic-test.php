@@ -700,3 +700,34 @@ $present = $reqGet->get('a', 0);
 $dbg('T52 get(): missing с дефолтом 0 = ' . var_export($defaultInt, true)
     . ', есть = ' . var_export($present, true) . ' -> '
     . ($defaultInt === '0' && $present === '5' ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 53: отрицательная награда моба не уводит опыт/адену в минус
+$ngA = Migrator::createAccount('negrew', 'Str0ngPass!1');
+$ngC = Migrator::createCharacter($ngA, 'negrew', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($ngC);
+$ngMob = Database::one("SELECT id FROM mobs WHERE zone = 'Giran' ORDER BY level LIMIT 1");
+$ngMobOrig = Database::one('SELECT exp_reward, adena_reward FROM mobs WHERE id = ?', [(int) $ngMob['id']]);
+Database::update('mobs', ['exp_reward' => -5000, 'adena_reward' => -5000], 'id = ?', [(int) $ngMob['id']]);
+Database::update('characters', [
+    'exp' => 100, 'adena' => 1000, 'p_atk' => 500, 'p_def' => 5000, 'hp' => 1000, 'hp_max' => 1000,
+], 'id = ?', [$ngC]);
+$ngBattle = $game->startBattle($ngC, (int) $ngMob['id']);
+$ngSt = null;
+for ($i = 0; $i < 40; $i++) {
+    $ngSt = $game->attack($ngC, (int) $ngBattle['id']);
+    if (in_array($ngSt['state'], ['won', 'lost'], true)) {
+        break;
+    }
+}
+$ngAfter = Database::one('SELECT exp, adena FROM characters WHERE id = ?', [$ngC]);
+Database::update('mobs', [
+    'exp_reward' => (int) $ngMobOrig['exp_reward'],
+    'adena_reward' => (int) $ngMobOrig['adena_reward'],
+], 'id = ?', [(int) $ngMob['id']]);
+$dbg('T53 награда -5000: exp=' . var_export($ngAfter['exp'], true) . ', адена=' . var_export($ngAfter['adena'], true)
+    . ' -> ' . ((float) $ngAfter['exp'] >= 0 && (float) $ngAfter['adena'] >= 0 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 54: HSTS не выдаётся по поддельному X-Forwarded-Proto
+$hstsSrc = (string) file_get_contents('/tmp/v2/public/index.php');
+$hstsGuarded = str_contains($hstsSrc, 'isTrustedProxy') && !preg_match('/X_FORWARDED_PROTO.*=== .https.\s*\)\s*\{\s*header\(.Strict/', $hstsSrc);
+$dbg('T54 HSTS за доверенным прокси: ' . ($hstsGuarded ? 'OK (проверка есть)' : 'БАГ (заголовок без проверки)'));

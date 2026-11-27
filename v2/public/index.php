@@ -81,8 +81,17 @@ if (!headers_sent()) {
         . "img-src 'self' data:; connect-src 'self'; "
         . "frame-ancestors 'self'; base-uri 'none'; form-action 'self'; object-src 'none'"
     );
-    if ((($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off')
-        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')) {
+    // БАГ: HSTS выдавался по X-Forwarded-Proto от кого угодно. Достаточно было
+    // прислать 'X-Forwarded-Proto: https' и сервер вешал
+    // Strict-Transport-Security с includeSubDomains на год — на HTTP это
+    // ломает доступ к сайту на год вперёд, а заголовок подконтролен клиенту.
+    // Заголовок учитываем только от доверенного прокси (TRUSTED_PROXIES).
+    $httpsDirect = ($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off';
+    $httpsProxy = false;
+    if (!$httpsDirect && strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https') {
+        $httpsProxy = Request::isTrustedProxy((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
+    }
+    if ($httpsDirect || $httpsProxy) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
     }
 }

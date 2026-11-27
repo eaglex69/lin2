@@ -437,9 +437,16 @@ final class GameService
     /** @return array{exp:int,adena:int,levelup:bool,level:int} */
     private function applyRewards(array $char, array $mob): array
     {
+        // БАГ: награда бралась из БД как есть. Моб с отрицательным
+        // exp_reward/adena_reward (порча данных, ошибка импорта) уводил опыт
+        // и адену в минус — проверено: exp=-4900, адена=-99899. Отрицательный
+        // опыт ломает расчёт процента до уровня и таблицу уровней.
+        // Награда не может быть отрицательной, а итог — ниже нуля.
+        $expReward = max(0, (int) $mob['exp_reward']);
+        $adenaReward = max(0, (int) $mob['adena_reward']);
         // та же причина, что и в requireChar: (int) от больших сумм врёт
-        $exp = (float) $char['exp'] + (int) $mob['exp_reward'];
-        $adena = (float) $char['adena'] + (int) $mob['adena_reward'];
+        $exp = max(0.0, (float) $char['exp']) + $expReward;
+        $adena = max(0.0, (float) $char['adena']) + $adenaReward;
         $level = (int) $char['level'];
         $levelup = false;
 
@@ -474,7 +481,7 @@ final class GameService
             ], 'id = ?', [(int) $char['id']]);
         }
 
-        return ['exp' => (int) $mob['exp_reward'], 'adena' => (int) $mob['adena_reward'], 'levelup' => $levelup, 'level' => $level];
+        return ['exp' => $expReward, 'adena' => $adenaReward, 'levelup' => $levelup, 'level' => $level];
     }
 
     public function battleState(array $battle): array
