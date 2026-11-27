@@ -160,11 +160,26 @@ final class Session
         ]);
     }
 
+    /**
+     * HTTPS ли соединение.
+     *
+     * БАГ: X-Forwarded-Proto принимался безусловно. Заголовок подконтролен
+     * клиенту, поэтому любой мог прислать `X-Forwarded-Proto: https` и
+     * получить cookie БЕЗ флага Secure (на HTTP) — а cookie сессии должна
+     * быть Secure на HTTPS. Обратная сторона тоже плоха: доверять заголовку
+     * от кого угодно нельзя.
+     *
+     * Теперь заголовок читается только от доверенного прокси (TRUSTED_PROXIES).
+     */
     private static function isHttps(): bool
     {
         $https = $_SERVER['HTTPS'] ?? '';
-        $fwd = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '';
-        return ($https !== '' && $https !== 'off') || $fwd === 'https';
+        if ($https !== '' && $https !== 'off') {
+            return true;
+        }
+        $fwd = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
+        $remote = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+        return $fwd === 'https' && $remote !== '' && Request::isTrustedProxy($remote);
     }
 
     public static function id(): string
@@ -241,16 +256,43 @@ final class Session
         self::sendCookie();
     }
 
-    /** @return array<string,mixed> */
+    /**
+     * Данные сессии из таблицы.
+     *
+     * БАГ: срок жизни (SESSION_TTL) не проверялся вообще. Проверено: сессия
+     * с last_used 30-дневной давности при TTL 1 день продолжала
+     * авторизовывать (account_id=1). Cookie истекала, но серверная строка
+     * жила вечно, и любой, кто сохранил sid, возвращался в аккаунт спустя
+     * месяцы. Для нативной сессии TTL применяет сам PHP, здесь его не было.
+     *
+     * Теперь просроченная строка удаляется и сессия считается пустой.
+     */
     private static function loadFileData(): array
     {
         $t = Database::table('sessions');
-        $row = Database::one("SELECT data_json FROM {$t} WHERE id = ?", [self::$sid]);
+        $row = Database::one("SELECT data_json, last_used FROM {$t} WHERE id = ?", [self::$sid]);
         if ($row === null) {
+            return [];
+        }
+        if (self::expired((string) ($row['last_used'] ?? ''))) {
+            Database::exec("DELETE FROM {$t} WHERE id = ?", [self::$sid]);
             return [];
         }
         $data = json_decode((string) $row['data_json'], true);
         return is_array($data) ? $data : [];
+    }
+
+    /** Истёк ли срок жизни по метке последней активности. */
+    private static function expired(string $lastUsed): bool
+    {
+        if ($lastUsed === '') {
+            return false;
+        }
+        $ts = strtotime($lastUsed);
+        if ($ts === false) {
+            return false;
+        }
+        return time() - $ts > max(60, Config::int('SESSION_TTL', 86400));
     }
 
     /** @param array<string,mixed> $data */

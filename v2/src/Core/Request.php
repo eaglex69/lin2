@@ -57,10 +57,21 @@ final class Request
         return strtolower($x) === 'xmlhttprequest' || str_contains($accept, 'application/json');
     }
 
-    public function get(string $key, ?string $default = null): ?string
+    /**
+     * Значение из query/body как строка.
+     *
+     * БАГ: подпись требовала ?string, поэтому вызов get('age', 0) с числовым
+     * дефолтом падал ФАТАЛЬНО (TypeError) и запрос отдавал 500 — достаточно
+     * было опечатки в одном контроллере. Сделали тип mixed, поведение
+     * прежнее: скаляр приводится к строке, остальное даёт дефолт.
+     */
+    public function get(string $key, mixed $default = null): ?string
     {
         $v = $this->get[$key] ?? $this->post[$key] ?? $default;
-        return is_scalar($v) ? (string) $v : $default;
+        if (is_scalar($v)) {
+            return (string) $v;
+        }
+        return is_scalar($default) ? (string) $default : null;
     }
 
     public function int(string $key, int $default = 0): int
@@ -176,7 +187,7 @@ final class Request
     }
 
     /** Доверенный ли прокси-адрес (список в конфиге, через запятую). */
-    private static function isTrustedProxy(string $remote): bool
+    public static function isTrustedProxy(string $remote): bool
     {
         $list = Config::get('TRUSTED_PROXIES', '');
         if ($list === '') {

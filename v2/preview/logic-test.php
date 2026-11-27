@@ -652,3 +652,51 @@ $dbg('T48 /config.json: APP_ENV=' . $cfgEnv . ', DB_PASS=' . var_export($cfgPass
     . ', SEED_DEMO_PASS=' . $cfgSeed . ' -> '
     . ($cfgEnv === 'testing' && $cfgPass !== 'attacker' && $cfgSeed !== 'pwned' ? 'OK' : 'БАГ'));
 @unlink('/config.json');
+
+// --- ТЕСТ 49: истёкшая сессия не авторизует (SESSION_TTL)
+Session::resetState();
+Session::start(new \App\Core\Request('GET', '/', [], [], [], [], '', []));
+$expSid = Session::id();
+Session::set('account_id', 1);
+// состариваем на 30 дней при TTL 1 день
+Database::update('sessions', ['last_used' => date('Y-m-d H:i:s', time() - 30 * 86400)], 'id = ?', [$expSid]);
+Session::resetState();
+Session::start(new \App\Core\Request('GET', '/', [], [], ['miniage_sid' => $expSid], [], '', []));
+$expAcc = Session::get('account_id');
+$expRow = Database::one('SELECT id FROM sessions WHERE id = ?', [$expSid]);
+$dbg('T49 сессия 30 дней при TTL 1 день: account_id=' . var_export($expAcc, true)
+    . ', строка ' . ($expRow === null ? 'удалена' : 'есть') . ' -> '
+    . ($expAcc === null && $expRow === null ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 50: свежая сессия работает
+Session::resetState();
+Session::start(new \App\Core\Request('GET', '/', [], [], [], [], '', []));
+$liveSid = Session::id();
+Session::set('account_id', 77);
+Session::resetState();
+Session::start(new \App\Core\Request('GET', '/', [], [], ['miniage_sid' => $liveSid], [], '', []));
+$dbg('T50 свежая сессия: account_id=' . var_export(Session::get('account_id'), true) . ' -> '
+    . (Session::get('account_id') === 77 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 51: X-Forwarded-Proto не подделывается клиентом
+$_SERVER['HTTPS'] = '';
+$_SERVER['REMOTE_ADDR'] = '5.5.5.5';
+$_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+$isHttps = new \ReflectionMethod(Session::class, 'isHttps');
+$isHttps->setAccessible(true);
+$clientClaim = $isHttps->invoke(null);
+Config::set('TRUSTED_PROXIES', '5.5.5.5');
+$proxyClaim = $isHttps->invoke(null);
+Config::set('TRUSTED_PROXIES', '');
+unset($_SERVER['HTTP_X_FORWARDED_PROTO'], $_SERVER['HTTPS'], $_SERVER['REMOTE_ADDR']);
+$dbg('T51 XFP от клиента: isHttps=' . var_export($clientClaim, true) . ', от прокси: '
+    . var_export($proxyClaim, true) . ' -> '
+    . ($clientClaim === false && $proxyClaim === true ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 52: Request::get с числовым дефолтом не падает
+$reqGet = new \App\Core\Request('GET', '/', ['a' => '5'], [], [], [], '', []);
+$defaultInt = $reqGet->get('missing', 0);
+$present = $reqGet->get('a', 0);
+$dbg('T52 get(): missing с дефолтом 0 = ' . var_export($defaultInt, true)
+    . ', есть = ' . var_export($present, true) . ' -> '
+    . ($defaultInt === '0' && $present === '5' ? 'OK' : 'БАГ'));
