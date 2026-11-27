@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -18,9 +18,9 @@ $taim = 150;
 $date = time();
 $timeout = $date - $taim;
 ////////////////
-if ($udata[dostup]>3){
+if ($udata['dostup']>3){
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo "<p><b><font color=grey>Редакторы вещей</font></b></p>";
@@ -48,7 +48,7 @@ echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
 
 case 'shop_chat_del':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -63,7 +63,7 @@ break;
 
 
 case 'shop_chat_red':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -72,8 +72,8 @@ $req = mysql_query("SELECT * FROM `shop_chat` WHERE `id`='$_GET[id]' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
-if(empty($_POST[name])){
-echo '<form action="redshmot.php?mod=shop_chat_red&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="redshmot.php?mod=shop_chat_red&amp;id='.$_GET['id'].'" method="post">';
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
 echo"Цена<br/>
@@ -137,7 +137,7 @@ mysql_query("UPDATE `shop_chat` SET
         `soul` = '$_POST[soul]',
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 }
 echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
@@ -158,7 +158,7 @@ echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
 
 case 'shop_ny_del':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -173,7 +173,7 @@ break;
 
 
 case 'shop_ny_red':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -182,8 +182,8 @@ $req = mysql_query("SELECT * FROM `shop_ny` WHERE `id`='$_GET[id]' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
-if(empty($_POST[name])){
-echo '<form action="redshmot.php?mod=shop_ny_red&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="redshmot.php?mod=shop_ny_red&amp;id='.$_GET['id'].'" method="post">';
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
 echo"Цена<br/>
@@ -247,7 +247,7 @@ mysql_query("UPDATE `shop_ny` SET
         `soul` = '$_POST[soul]',
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 }
 echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
@@ -269,7 +269,7 @@ echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
 
 case 'shop_gold_del':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -284,7 +284,7 @@ break;
 
 
 case 'shop_gold_red':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -293,8 +293,8 @@ $req = mysql_query("SELECT * FROM `shop_gold` WHERE `id`='$_GET[id]' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
-if(empty($_POST[name])){
-echo '<form action="redshmot.php?mod=shop_gold_red&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="redshmot.php?mod=shop_gold_red&amp;id='.$_GET['id'].'" method="post">';
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
 echo"Цена<br/>
@@ -358,7 +358,7 @@ mysql_query("UPDATE `shop_gold` SET
         `soul` = '$_POST[soul]',
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 }
 echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
@@ -380,7 +380,7 @@ echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
 
 case 'shop_lux_del':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -395,7 +395,7 @@ break;
 
 
 case 'shop_lux_red':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -404,8 +404,8 @@ $req = mysql_query("SELECT * FROM `shop_lux` WHERE `id`='$_GET[id]' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
-if(empty($_POST[name])){
-echo '<form action="redshmot.php?mod=shop_lux_red&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="redshmot.php?mod=shop_lux_red&amp;id='.$_GET['id'].'" method="post">';
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
 echo"Цена<br/>
@@ -469,7 +469,7 @@ mysql_query("UPDATE `shop_lux` SET
         `soul` = '$_POST[soul]',
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 }
 echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
@@ -490,7 +490,7 @@ echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
 
 case 'shop_vip_del':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -505,7 +505,7 @@ break;
 
 
 case 'shop_vip_red':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -514,8 +514,8 @@ $req = mysql_query("SELECT * FROM `shop_vip` WHERE `id`='$_GET[id]' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
-if(empty($_POST[name])){
-echo '<form action="redshmot.php?mod=shop_vip_red&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="redshmot.php?mod=shop_vip_red&amp;id='.$_GET['id'].'" method="post">';
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
 echo"Цена<br/>
@@ -579,7 +579,7 @@ mysql_query("UPDATE `shop_vip` SET
         `soul` = '$_POST[soul]',
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 }
 echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
@@ -600,7 +600,7 @@ echo"<a href=\"redshmot.php?\">Назад</a>";
 break;
 
 case 'shop_del':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -615,7 +615,7 @@ break;
 
 
 case 'shop_red':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -624,8 +624,8 @@ $req = mysql_query("SELECT * FROM `shop` WHERE `id`='$_GET[id]' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
-if(empty($_POST[name])){
-echo '<form action="redshmot.php?mod=shop_red&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="redshmot.php?mod=shop_red&amp;id='.$_GET['id'].'" method="post">';
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
 echo"Цена<br/>
@@ -689,7 +689,7 @@ mysql_query("UPDATE `shop` SET
         `soul` = '$_POST[soul]',
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 }
 echo"<a href=\"redshmot.php?\">Назад</a>";
 break;

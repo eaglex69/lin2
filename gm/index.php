@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -13,28 +13,28 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-if (isset($_GET[chat_off]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['chat_off']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `chat` = 'off' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[reg_off]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['reg_off']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `reg` = 'off' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[serv_off]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['serv_off']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `igra` = 'off' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[reit_off]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['reit_off']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `reit` = 'off' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[reit_on]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['reit_on']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `reit` = 'on' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[chat_on]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['chat_on']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `chat` = 'on' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[reg_on]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['reg_on']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `reg` = 'on' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
-if (isset($_GET[serv_on]) and $udata[dostup]>=5){ //Отключить
+if (isset($_GET['serv_on']) and $udata['dostup']>=5){ //Отключить
 mysql_query("UPDATE `option_game` SET `igra` = 'on' WHERE `id` = '1'");
 header ("Location: /gm/index.php?",false);exit;}
 
@@ -45,9 +45,9 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup]==5){
+if ($udata['dostup']==5){
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo "<div class=adm>";
@@ -74,23 +74,23 @@ echo "</div>";
 
 $in_chat = mysql_query("SELECT * FROM option_game WHERE id = 1");
 $iiii =mysql_fetch_array ($in_chat);
-if ($iiii[reg]=='on'){
+if ($iiii['reg']=='on'){
 echo'<a href="index.php?reg_off">&#187; Закрыть регу</a><br/>';
 }else{
 echo'<a href="index.php?reg_on">&#187; Открыть регу</a><br/>';
 }
 
-if ($iiii[chat]=='on'){
+if ($iiii['chat']=='on'){
 echo'<a href="index.php?chat_off">&#187; Закрыть чат</a><br/>';
 }else{
 echo'<a href="index.php?chat_on">&#187; Открыть чат</a><br/>';
 }
-if ($iiii[igra]=='on'){
+if ($iiii['igra']=='on'){
 echo'<a href="index.php?serv_off">&#187; Закрыть сервер</a><br/>';
 }else{
 echo'<a href="index.php?serv_on">&#187; Открыть сервер</a><br/>';
 }
-if ($iiii[reit]=='on'){
+if ($iiii['reit']=='on'){
 echo'<a href="index.php?reit_off">&#187; Выключить множитель х2</a><br/>';
 }else{
 echo'<a href="index.php?reit_on">&#187; Включить множитель х2</a><br/>';

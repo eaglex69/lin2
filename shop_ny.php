@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shopelexirs';//фикс. места
@@ -17,7 +17,7 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -66,9 +66,9 @@ break;
 
 case 'sell':
 
-if (empty($_POST[result])){
+if (empty($_POST['result'])){
 echo "Вы не выбрали вещь!";include($path.'inc/down.php');exit;}
-$_GET[id]=$_POST['result'];
+$_GET['id']=$_POST['result'];
 $req = mysql_query("SELECT * FROM `shop_ny` WHERE `id`='$_GET[id]'");
 $avto=mysql_num_rows($req);
 if($avto==0){
@@ -77,7 +77,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-$nmoney = $udata[ig]-$mag[cena];
+$nmoney = $udata['ig']-$mag['cena'];
 if($nmoney<0){
 echo'Нехватает Иголок!';
 include($path.'inc/down.php');

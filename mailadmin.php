@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'mailadmin';//фикс. места

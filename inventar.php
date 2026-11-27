@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'inventar';//фикс. места
@@ -16,20 +16,20 @@ include($path.'inc/zag.php');
 
 
 //------------выкунуть вещ-----------------------
-if(!empty($_GET[off])){
+if(!empty($_GET['off'])){
 
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not' and `id`='$_GET[off]'");
 $avto=mysql_num_rows($req);
 if($avto==1){
 $item = mysql_fetch_array($req);
-if (!isset($_GET[yes])){
+if (!isset($_GET['yes'])){
 
 echo"<div class=msg><p><span style=color:#f4d06e;>Выкинуть вещь <b>$item[name]</b>?</p></span>";
 
 echo "<div class=inoy><a href=\"inventar.php?mod=item&o=$_GET[o]&off=$item[id]&yes\"><span style=color:#ffffcc;>Да</span></a>";
 echo "<a href=\"inventar.php?mod=item&o=$_GET[o]\"><span style=color:#ff4040;>Нет</span></a></div></div>";
 }
-if (isset($_GET[yes])){
+if (isset($_GET['yes'])){
 
 $time = date("H:i d.m.y");
 $text = " [$time] Игрок <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> выкинул вещь <b>$item[name]</b> ";
@@ -41,22 +41,23 @@ mysql_query("DELETE FROM `item` WHERE usr='$log' and `image`='not' and `id`='$_G
 
 //---------
 //------------ выкинуть ресурс	-----------------
-if (!empty($_GET[ofr])){
+if (!empty($_GET['ofr'])){
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `id`='$_GET[ofr]' LIMIT 1");
 $avto=mysql_num_rows($req);
 if($avto==1){
 $res = mysql_fetch_array($req);
 
-if (!isset($_GET[yes])){
+if (!isset($_GET['yes'])){
 
 echo"<div class=msg><p><span style=color:#f4d06e;>Выкинуть <b>$res[name]</b>?</p></span>";
 
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 echo "<div class=inoy><a href=\"inventar.php?mod=res&tip=res&ofr=$res[id]&yes&page=$page\"><span style=color:#ffffcc;>Да</span></a>";
 echo "<a href=\"inventar.php?mod=res&tip=res&page=$page\"><span style=color:#ff4040;>Нет</span></a></div></div>";
 }
 
 
-if (isset($_GET[yes])){
+if (isset($_GET['yes'])){
 $time = date("H:i d.m.y");
 $text = " [$time] Игрок <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> выкинул ресурс <b>$res[name]</b> ";
 mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'offres', '$text')");
@@ -71,7 +72,7 @@ echo"<div class=msg><p><span style=color:#f4d06e;>Ресурс <b>$res[name]</b>
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 //////считаем вещи/////////
@@ -99,14 +100,14 @@ $souls = mysql_result(mysql_query("SELECT COUNT(*) FROM soulshots WHERE usr='$lo
 
 
 echo "<p> <font color=#f4d06e>  Инвентарь: &#160 </b></font>";
-if($udata[lvl]>0 and $udata[lvl]<20) echo'Для использования вам доступны вещи NG грейда';
-if($udata[lvl]>19 and $udata[lvl]<40) echo'Для использования вам доступны вещи D грейда';
-if($udata[lvl]>39 and $udata[lvl]<52) echo'Для использования вам доступны вещи С грейда';
-if($udata[lvl]>51 and $udata[lvl]<62) echo'Для использования вам доступны вещи B грейда';
-if($udata[lvl]>61 and $udata[lvl]<76) echo'Для использования вам доступны вещи A грейда';
-if($udata[lvl]>75 and $udata[lvl]<91) echo'Для использования вам доступны вещи S грейда';
-if($udata[lvl]>90 and $udata[lvl]<111) echo'Для использования вам доступны вещи R грейда';
-if($udata[lvl]>110) echo'Для использования вам доступны вещи R111 грейда </p> </div><hr/>';
+if($udata['lvl']>0 and $udata['lvl']<20) echo'Для использования вам доступны вещи NG грейда';
+if($udata['lvl']>19 and $udata['lvl']<40) echo'Для использования вам доступны вещи D грейда';
+if($udata['lvl']>39 and $udata['lvl']<52) echo'Для использования вам доступны вещи С грейда';
+if($udata['lvl']>51 and $udata['lvl']<62) echo'Для использования вам доступны вещи B грейда';
+if($udata['lvl']>61 and $udata['lvl']<76) echo'Для использования вам доступны вещи A грейда';
+if($udata['lvl']>75 and $udata['lvl']<91) echo'Для использования вам доступны вещи S грейда';
+if($udata['lvl']>90 and $udata['lvl']<111) echo'Для использования вам доступны вещи R грейда';
+if($udata['lvl']>110) echo'Для использования вам доступны вещи R111 грейда </p> </div><hr/>';
 echo "<br/>";
 
 
@@ -147,7 +148,7 @@ echo"<img src=\"shmot/inventar/15.png\" alt='оружие'/><a href=\"inventar.p
 break;
 
 
-case 'in';
+case 'in':
 
 $req = mysql_query("SELECT * FROM `item` WHERE `id`='$_GET[id]'");
 $mag = mysql_fetch_array($req);
@@ -159,7 +160,7 @@ include($path.'inc/down.php');exit;
 }
 
 
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -171,7 +172,7 @@ $klas='Воин';
 break;
 }
 
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -213,19 +214,19 @@ $tip='Амулет';
 break;
 }
 echo "<p><font color=#f4d06e>Вещь  игрока $mag[usr]!</font></b></p> ";
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 echo"<br/><img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b><br/>
 Тип: $tip ";
 
-if ($mag[ruka]=='ydar'){echo"Ударное";}
-if ($mag[ruka]=='luk'){echo"Лук";}
-if ($mag[ruka]=='kin'){echo"Кинжал";}
-if ($mag[ruka]=='sdv'){echo"Сдвоенное";}
-if ($mag[ruka]=='kas'){echo"Кастет";}
-if ($mag[ruka]=='kniga'){echo"Книга";}
-if ($mag[ruka]=='koppik'){echo"Копьё/Пика";}
-if ($mag[ruka]=='me4'){echo"Меч";}
-if ($mag[ruka]=='rap'){echo"Рапира";}
+if ($mag['ruka']=='ydar'){echo"Ударное";}
+if ($mag['ruka']=='luk'){echo"Лук";}
+if ($mag['ruka']=='kin'){echo"Кинжал";}
+if ($mag['ruka']=='sdv'){echo"Сдвоенное";}
+if ($mag['ruka']=='kas'){echo"Кастет";}
+if ($mag['ruka']=='kniga'){echo"Книга";}
+if ($mag['ruka']=='koppik'){echo"Копьё/Пика";}
+if ($mag['ruka']=='me4'){echo"Меч";}
+if ($mag['ruka']=='rap'){echo"Рапира";}
 
 
 echo "<hr/>Характеристика</b><br/>";
@@ -256,7 +257,7 @@ echo "<p><font color=#f4d06e>Рецепты</font></p><hr/>";
 While($mag = mysql_fetch_array($req))
 {
 if($mag['unknow']=='0'){$mag['name']='Скрыт';}
-$u=explode(': ',$mag[name]);
+$u=explode(': ',$mag['name']);
 
 echo"<div class=inoy> <a href=\"inventar.php?mod=info&amp;act=res&amp;id=$mag[id]\"><img src=\"shmot/$u[1].png\" alt=\"pic\"/> $mag[name]  <font color=#ffffcc>($mag[kol] штук)</font></a></div>";
 }
@@ -269,7 +270,7 @@ case 'item':
 
 echo "<p> <font color=#f4d06e><b> &#160 Инвентарь: &#160 </b></font> </p> </div><hr/>";
 
-if($_GET[o]!=shit && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=rpoyas && $_GET[o]!=poyas && $_GET[o]!=plash && $_GET[o]!=pants && $_GET[o]!=ruki && $_GET[o]!=nogi && $_GET[o]!=amulet && $_GET[o]!=kolco && $_GET[o]!=rkolco && $_GET[o]!=weapon){
+if($_GET['o']!='shit' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='rpoyas' && $_GET['o']!='poyas' && $_GET['o']!='plash' && $_GET['o']!='pants' && $_GET['o']!='ruki' && $_GET['o']!='nogi' && $_GET['o']!='amulet' && $_GET['o']!='kolco' && $_GET['o']!='rkolco' && $_GET['o']!='weapon'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -280,9 +281,9 @@ $avto=mysql_num_rows($req);
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 
-$cena=round($mag[cena]/4);
+$cena=round($mag['cena']/4);
 
 
 echo"<img src=\"shmot/$u[0].png\"  align='left' width='32' height='32' alt='' style='margin-right:10px;border:1px solid #383838'/> <a href=\"inventar.php?mod=info&amp;id=$mag[id]\">$mag[name]</a> <br/>
@@ -309,7 +310,7 @@ echo"<a href=\"inventar.php?mod=pits&amp;o=golova\">Шлемы <font color=#ffff
 echo"<a href=\"inventar.php?mod=pits&amp;o=body\">Доспехи <font color=#ffffcc>($body)</font></a>";
 echo"<a href=\"inventar.php?mod=pits&amp;o=nogi\">Сапоги <font color=#ffffcc>($nogi)</font></a></div>";
 }else{
-if($_GET[o]!=weapon && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=nogi){
+if($_GET['o']!='weapon' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='nogi'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -341,7 +342,7 @@ exit;
 }
 
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -355,7 +356,7 @@ case 'nogi':
 $tip='Сапоги';
 break;
 }
-switch($mag[rasa]){
+switch($mag['rasa']){
 case 'not':
 $rasa='Все';
 break;
@@ -404,23 +405,23 @@ $avto=mysql_num_rows($req);
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-if ($udata[klas]=="wizard") {$k=2; $name=Spiritshot;}
-if ($udata[klas]=="fighert") {$k=1; $name=Soulshot;}
-if($mag[nlvl]==0) $gr=NG;
-if($mag[nlvl]==20) $gr=D;
-if($mag[nlvl]==40) $gr=C;
-if($mag[nlvl]==52) $gr=B;
-if($mag[nlvl]==62) $gr=A;
-if($mag[nlvl]==76) $gr=S;
-if($mag[nlvl]==91) $gr=R;
-if($mag[nlvl]==111) $gr=R111;
+if ($udata['klas']=="wizard") {$k=2; $name='Spiritshot';}
+if ($udata['klas']=="fighert") {$k=1; $name='Soulshot';}
+if($mag['nlvl']==0) $gr='NG';
+if($mag['nlvl']==20) $gr='D';
+if($mag['nlvl']==40) $gr='C';
+if($mag['nlvl']==52) $gr='B';
+if($mag['nlvl']==62) $gr='A';
+if($mag['nlvl']==76) $gr='S';
+if($mag['nlvl']==91) $gr='R';
+if($mag['nlvl']==111) $gr='R111';
 echo"<img src=\"pic/skr/$k/$mag[nlvl].jpeg\" align='left' width='32' height='32' alt='' style='margin-right:10px;border:1px solid #383838'/>$name $gr</a>
  ($mag[kol] штук)";
 echo " Для оружия $mag[nlvl] ур.<br/>";
 echo " На вас Оружие $magw[nlvl] ур.<br/>";
 
 
-if($mag[status]==0){
+if($mag['status']==0){
 echo" [<a href=\"inventar.php?mod=shot_off\"><font color=#ff4040>Выключить</font></a>]<br/>";
 }else{
 echo" [<a href=\"inventar.php?mod=shot_on\"><font color=#6fcd72>Включить</font></a>]<br/>";
@@ -465,7 +466,7 @@ break;
 
 
 case 'res':
-if(empty($_GET[tip])){
+if(empty($_GET['tip'])){
 ///
 $res = mysql_result(mysql_query("SELECT COUNT(*) FROM res WHERE usr='$log' and tip='res'"),0);
 $elexir = mysql_result(mysql_query("SELECT COUNT(*) FROM res WHERE usr='$log' and tip='elexir'"),0);
@@ -477,7 +478,7 @@ echo "<div class=inoy>";
 echo"<a href=\"inventar.php?mod=res&amp;tip=res\">Ресурсы <font color=#ffffcc>($res)</font></a> ";
 echo"<a href=\"inventar.php?mod=res&amp;tip=elexirs\">Элексиры <font color=#ffffcc>($elexir)</font></a> ";
 echo"<a href=\"inventar.php?mod=res&amp;tip=scroll\">Свитки <font color=#ffffcc>($scroll)</font></a> </div>";
-}elseif($_GET[tip]==res){
+}elseif($_GET['tip']=='res'){
 
 echo "<p> 	 Ресурсы	</p></div><hr/>";
 
@@ -523,7 +524,7 @@ echo "</p></center>";
 }else{
 echo"<b>Нет ресурсов</b><br/>";
 }
-}elseif($_GET[tip]==elexirs){
+}elseif($_GET['tip']=='elexirs'){
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `tip`='elexir'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
@@ -547,7 +548,7 @@ echo "<input type='submit' name='ok' value='Использовать' /><hr/></d
 }else{
 echo"<b>Нет элексиров</b><br/>";
 }
-}elseif($_GET[tip]==scroll){
+}elseif($_GET['tip']=='scroll'){
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `tip`='scroll'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
@@ -566,7 +567,7 @@ echo"<b>Ошибка, доступ закрыт!</b><br/>";
 echo"<br/><a href=\"inventar.php?\">Назад</a>";
 break;
 case 'info':
-if($_GET[act]==res or $_GET[act]==elexir or $_GET[act]==scroll){
+if($_GET['act']=='res' or $_GET['act']=='elexir' or $_GET['act']=='scroll'){
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `id`='$_GET[id]'");
 $avto=mysql_num_rows($req);
 if($avto==0){
@@ -575,7 +576,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'res':
 $tip='Ресурс';
 break;
@@ -597,14 +598,14 @@ echo"<b> $mag[name]</b><br/>
 
 
 //если фестиваль адена обменять
-if ($mag[lat_name] == "fish"){echo "<div class=inoy><a href=\"fish_r.php\">Разделать</a></div>";}
-if ($mag[name] == "Сундук удачи"){echo "<div class=inoy><a href=\"open_s.php\">Открыть</a></div>";}
+if ($mag['lat_name'] == "fish"){echo "<div class=inoy><a href=\"fish_r.php\">Разделать</a></div>";}
+if ($mag['name'] == "Сундук удачи"){echo "<div class=inoy><a href=\"open_s.php\">Открыть</a></div>";}
 //если фестиваль адена обменять
-if ($mag[lat_name] == "FestivalAdena"){echo "<div class=inoy><a href=\"obm_fs_ad.php\">Обменять</a></div>";}
+if ($mag['lat_name'] == "FestivalAdena"){echo "<div class=inoy><a href=\"obm_fs_ad.php\">Обменять</a></div>";}
 //////////////////////////////
 //если гном крафтер выучить
-if ($mag[tip]=='rec'){
-if ($udata[prof]=='Artisan' or $udata[prof]=='Warsmith'  or $udata[prof]=='Maestro'){ // доступ по профам
+if ($mag['tip']=='rec'){
+if ($udata['prof']=='Artisan' or $udata['prof']=='Warsmith'  or $udata['prof']=='Maestro'){ // доступ по профам
 echo "<div class=inoy><a href=\"workshop.php?mod=go&go=$mag[id]\">Записать в книгу</a></div>";
 }}
 
@@ -625,7 +626,7 @@ echo'Схема: <b>'.$mag['name'].'</b><br/>';
 echo'Количество '.$mag['kol'].'<br/>';
 echo'Цена создания: '.$mag['scena'].'<br/>';
 echo'Ресурсы: <br/>';
-$res=explode("|",$mag[nead_res]);
+$res=explode("|",$mag['nead_res']);
 $kres=count($res);
 $i=0;
 $b=1;
@@ -642,7 +643,7 @@ $b++;
 }
 if($mag['unknow']=='1'){
 
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -654,7 +655,7 @@ $klas='Воин';
 break;
 }
 
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -696,20 +697,20 @@ $tip='Амулет';
 break;
 }
 
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 echo"<br/><img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b><br/>";
 
 echo"Тип: $tip<br/>
 <b>Характеристика</b><hr/>";
 echo "Грейд:";
-if(!empty($mag[nlvl])) echo' NG ';
-if($mag[nlvl]>19 and $mag[nlvl]<40) echo' D ';
-if($mag[nlvl]>39 and $mag[nlvl]<52) echo' С ';
-if($mag[nlvl]>51 and $mag[nlvl]<62) echo' B ';
-if($mag[nlvl]>61 and $mag[nlvl]<76) echo' A ';
-if($mag[nlvl]>75 and $mag[nlvl]<91) echo' S ';
-if($mag[nlvl]>90 and $mag[nlvl]<111) echo' R ';
-if($mag[nlvl]>110) echo' R111 ';
+if(!empty($mag['nlvl'])) echo' NG ';
+if($mag['nlvl']>19 and $mag['nlvl']<40) echo' D ';
+if($mag['nlvl']>39 and $mag['nlvl']<52) echo' С ';
+if($mag['nlvl']>51 and $mag['nlvl']<62) echo' B ';
+if($mag['nlvl']>61 and $mag['nlvl']<76) echo' A ';
+if($mag['nlvl']>75 and $mag['nlvl']<91) echo' S ';
+if($mag['nlvl']>90 and $mag['nlvl']<111) echo' R ';
+if($mag['nlvl']>110) echo' R111 ';
 if ($tip=="Оружие"){
 echo "
 Физ. атака: $mag[patt]<br/>
@@ -724,7 +725,7 @@ echo "
 }
 
 
-}elseif($_GET[act]==aura){
+}elseif($_GET['act']=='aura'){
 $req = mysql_query("SELECT * FROM `item_aura` WHERE `usr` = '$log' and `id`='$_GET[id]'");
 
 $avto=mysql_num_rows($req);
@@ -735,7 +736,7 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -765,7 +766,7 @@ echo"<b>$mag[name]</b><br/>
 ";
 }
 else{
-if ($udata[dostup]>=4){
+if ($udata['dostup']>=4){
 $req = mysql_query("SELECT * FROM `item` WHERE `id`='$_GET[id]'");
 }else{
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `id`='$_GET[id]'");}
@@ -777,7 +778,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -818,7 +819,7 @@ case 'amulet':
 $tip='Амулет';
 break;
 }
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -829,21 +830,21 @@ case 'fighert':
 $klas='Воин';
 break;
 }
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 echo"<br/><img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b><br/>
 Тип: $tip<hr/>
 
 <b>Характеристика</b><br/>";
 echo"<br/>";
 echo "Грейд:";
-if($mag[nlvl]>0 and $mag[nlvl]<20) echo' NG (0 уровень) ';
-if($mag[nlvl]>19 and $mag[nlvl]<40) echo' D (20 уровень)';
-if($mag[nlvl]>39 and $mag[nlvl]<52) echo' С (40 уровень)';
-if($mag[nlvl]>51 and $mag[nlvl]<62) echo' B (52 уровень)';
-if($mag[nlvl]>61 and $mag[nlvl]<76) echo' A (62 уровень)';
-if($mag[nlvl]>75 and $mag[nlvl]<91) echo' S (76 уровень)';
-if($mag[nlvl]>90 and $mag[nlvl]<111) echo' R (91 уровень)';
-if($mag[nlvl]>110) echo' R111 (111 уровень)';
+if($mag['nlvl']>0 and $mag['nlvl']<20) echo' NG (0 уровень) ';
+if($mag['nlvl']>19 and $mag['nlvl']<40) echo' D (20 уровень)';
+if($mag['nlvl']>39 and $mag['nlvl']<52) echo' С (40 уровень)';
+if($mag['nlvl']>51 and $mag['nlvl']<62) echo' B (52 уровень)';
+if($mag['nlvl']>61 and $mag['nlvl']<76) echo' A (62 уровень)';
+if($mag['nlvl']>75 and $mag['nlvl']<91) echo' S (76 уровень)';
+if($mag['nlvl']>90 and $mag['nlvl']<111) echo' R (91 уровень)';
+if($mag['nlvl']>110) echo' R111 (111 уровень)';
 echo"<br/>";
 echo"<br/>";
 if ($tip=="Оружие"){

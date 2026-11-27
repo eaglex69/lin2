@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'col_bonus';//фикс. места
@@ -21,10 +21,10 @@ include($path.'inc/down.php');
 exit;
 }*/
 
-$col=$_GET[col];
-$alm=$_POST[alm];
+$col=$_GET['col'];
+$alm=$_POST['alm'];
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo "<b><font color=#f4d06e>Добро пожаловать в NPC Магазин!</font></b><br/><hr>";
@@ -78,10 +78,10 @@ break;
 
 */
 /////// COLOR акаунты /////
-case "color_akk";
+case "color_akk":
 
 
-if ($_GET[d]==del && $_GET[y]!==yes){// удаление после подтверждения
+if ($_GET['d']=='del' && $_GET['y']!=='yes'){// удаление после подтверждения
 echo "<p><font color=#f4d06e>Вы уверены что хотите удалить цветной аккаунт?</font><br/>
 <a href=\"col_bonus.php?mod=color_akk&d=del&y=yes\"><font color=#ff4040>Да</font></a> |
 <a href=\"col_bonus.php?mod=color_akk\"><font color=#f4d06e>Нет</font></a>
@@ -89,7 +89,7 @@ echo "<p><font color=#f4d06e>Вы уверены что хотите удали�
 }
 
 
-if ($_GET[d]==del && $_GET[y]==yes){// удаление после подтверждения
+if ($_GET['d']=='del' && $_GET['y']=='yes'){// удаление после подтверждения
 $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$log' LIMIT 1"); // защита от нескольких акк
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -106,7 +106,7 @@ $resvip = mysql_query("DELETE FROM `color_akk` WHERE `usr` = '$log' LIMIT 1");
 
 
 
-if (!empty($_POST[vip])) // если есть данные то пишем их
+if (!empty($_POST['vip'])) // если есть данные то пишем их
 {
 
 $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$log' LIMIT 1"); // защита от нескольких акк
@@ -114,9 +114,9 @@ $avto=mysql_num_rows($req222);
 if($avto==1){echo'<font color=#ff4040><p>У Вас уже есть Цветной ник!</p></font>';}else{
 
 
-		if ($_POST[vip] == '00FFFF' or $_POST[vip] == 'FF83FA')	{$cena = 300;}else {$cena = 300;}
+		if ($_POST['vip'] == '00FFFF' or $_POST['vip'] == 'FF83FA')	{$cena = 300;}else {$cena = 300;}
 		
-$nalmaz = $udata[almaz]-$cena;		
+$nalmaz = $udata['almaz']-$cena;		
 
 if($nalmaz<0){
 echo'<font color=#ff4040><p>Недостаточно Coin of Luck!</p></font>';
@@ -150,17 +150,17 @@ if($avto==1){
 $vip = mysql_fetch_array($req22);
 $del = "<a href=\"col_bonus.php?mod=color_akk&d=del\"><font color=#ff4040>[x]</font></a>";
 echo "<hr/><p> <font color=#f4d06e>Молодец! <b>Теперь твой ник такого цвета - <font color=#$vip[color]>$log</font>!</b>$del</p>";
-$vip[time]=$vip[time]-time();
+$vip['time']=$vip['time']-time();
 
-if($vip[time]<60)
+if($vip['time']<60)
 {
-if ($vip[time]<=0){$vip[time]=0;}
+if ($vip['time']<=0){$vip['time']=0;}
 echo "Осталось: $vip[time] сек.";}
 
-if ($vip[time]>60 && $vip[time]<86400){$vip[time]=round($vip[time]/3600);
+if ($vip['time']>60 && $vip['time']<86400){$vip['time']=round($vip['time']/3600);
 echo "Осталось: $vip[time] мин.";}
 
-if ($vip[time]>=86400){$vip[time]=round($vip[time]/86400);
+if ($vip['time']>=86400){$vip['time']=round($vip['time']/86400);
 echo "Осталось: $vip[time] дн.";}
 echo "</font><hr/>";
 }else{
@@ -196,9 +196,9 @@ break;
 
 
 /////// VIP акаунты /////
-case "vip_akk";
+case "vip_akk":
 
-if ($_GET[d]==del && $_GET[y]!==yes){// удаление после подтверждения
+if ($_GET['d']=='del' && $_GET['y']!=='yes'){// удаление после подтверждения
 echo "<p><font color=#f4d06e>Вы уверены что хотите удалить VIP акаунт?</font><br/>
 <a href=\"col_bonus.php?mod=vip_akk&d=del&y=yes\"><font color=#ff4040>Да</font></a> |
 <a href=\"col_bonus.php?mod=vip_akk\"><font color=#f4d06e>Нет</font></a>
@@ -206,7 +206,7 @@ echo "<p><font color=#f4d06e>Вы уверены что хотите удали�
 }
 
 
-if ($_GET[d]==del && $_GET[y]==yes){// удаление после подтверждения
+if ($_GET['d']=='del' && $_GET['y']=='yes'){// удаление после подтверждения
 $req222 = mysql_query("SELECT * FROM `vip` WHERE `usr` = '$log' LIMIT 1"); // защита от нескольких акк
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -218,7 +218,7 @@ $resvip = mysql_query("DELETE FROM `vip` WHERE `usr` = '$log' LIMIT 1");
 					}
 			}		
 
-if (!empty($_POST[vip])) // если есть данные то пишем их
+if (!empty($_POST['vip'])) // если есть данные то пишем их
 {
 
 
@@ -234,11 +234,11 @@ exit;
 
 
 
-		if ($_POST[vip] == 2)	{$cena = 10; $yesakk = 'yesgame';}
-		if ($_POST[vip] == 5)	{$cena = 50; $yesakk = 'yesgame';}
-		if ($_POST[vip] == 10)	{$cena = 100; $yesakk = 'yesgame';}
-		if ($_POST[vip] == 25)	{$cena = 200; $yesakk = 'yesgame';}
-		if ($_POST[vip] == 50)	{$cena = 300; $yesakk = 'yesgame';}
+		if ($_POST['vip'] == 2)	{$cena = 10; $yesakk = 'yesgame';}
+		if ($_POST['vip'] == 5)	{$cena = 50; $yesakk = 'yesgame';}
+		if ($_POST['vip'] == 10)	{$cena = 100; $yesakk = 'yesgame';}
+		if ($_POST['vip'] == 25)	{$cena = 200; $yesakk = 'yesgame';}
+		if ($_POST['vip'] == 50)	{$cena = 300; $yesakk = 'yesgame';}
               		
 				//мини защита желательно переписать
 		if ($yesakk !== 'yesgame'){
@@ -250,7 +250,7 @@ exit;
 
 		
 		
-$nalmaz = $udata[almaz]-$cena;		
+$nalmaz = $udata['almaz']-$cena;		
 
 if($nalmaz<0){
 echo'<font color=red><p>Недостаточно Coin of Luck!</p></font>';
@@ -283,18 +283,18 @@ $avto=mysql_num_rows($req22);
 if($avto==1){
 $vip = mysql_fetch_array($req22);
 $del = "<a href=\"col_bonus.php?mod=vip_akk&d=del\"><font color=#ff4040>[x]</font></a>";
-echo'<hr/><p> <font color=#f4d06e> Поздравляю! <b>Твой VIP Акаунт x'.$vip[tip].'!</b> '.$del.'</p>';
-$vip[time]=$vip[time]-time();
+echo'<hr/><p> <font color=#f4d06e> Поздравляю! <b>Твой VIP Акаунт x'.$vip['tip'].'!</b> '.$del.'</p>';
+$vip['time']=$vip['time']-time();
 
-if($vip[time]<60)
+if($vip['time']<60)
 {
-if ($vip[time]<=0){$vip[time]=0;}
+if ($vip['time']<=0){$vip['time']=0;}
 echo "Осталось: $vip[time] сек.";}
 
-if ($vip[time]>60 && $vip[time]<86400){$vip[time]=round($vip[time]/3600);
+if ($vip['time']>60 && $vip['time']<86400){$vip['time']=round($vip['time']/3600);
 echo "Осталось: $vip[time] мин.";}
 
-if ($vip[time]>=86400){$vip[time]=round($vip[time]/86400);
+if ($vip['time']>=86400){$vip['time']=round($vip['time']/86400);
 echo "Осталось: $vip[time] дн.";}
 echo "</font><hr/>";
 }else{
@@ -321,8 +321,8 @@ break;
 
 
 //  ////     ////// обменик Колов на опыт /////////
-case "2";
-if (empty($_GET[yes])) // если не подтвердил
+case "2":
+if (empty($_GET['yes'])) // если не подтвердил
 {
 echo "Обмен Coin of Luck на Опыт.<br/> За 1 CoL я дам тебе 200`000 EXP.<br/>";
 echo "<br/>Обменять:<br/>";
@@ -339,13 +339,13 @@ echo"<br/><a href=\"col_bonus.php?\">Назад</a>";
 }else // подтвердил
 {
 
-if ($udata[almaz]<$col or $col<=0){
+if ($udata['almaz']<$col or $col<=0){
 echo "Недостаточно Coin of Luck";
 echo "<div class=silka><a href=\"col_bonus.php?\">» Назад</a></div>";}else{
 
-$nalm=$udata[almaz]-$col;// минус колы
+$nalm=$udata['almaz']-$col;// минус колы
 $mon=200000*$col; // щитаем сколько плюсуем
-$exp=$udata[exp]+$mon; // плюсуем адену
+$exp=$udata['exp']+$mon; // плюсуем адену
 	mysql_query("UPDATE users SET almaz='$nalm',exp='$exp' WHERE usr = '$log'"); // записуем результат
 
 
@@ -358,8 +358,8 @@ break;
 
 
 //  ////     ////// обменик Колов на адену /////////
-case "1";
-if (empty($_GET[yes])) // если не подтвердил
+case "1":
+if (empty($_GET['yes'])) // если не подтвердил
 {
 echo "Обмен Coin of Luck на Адену.<br/> За 1 CoL я дам тебе 150`000 Аден.<br/>";
 echo "<br/>Обменять:<br/>";
@@ -376,13 +376,13 @@ echo"<br/><a href=\"col_bonus.php?\">Назад</a>";
 }else // подтвердил
 {
 
-if ($udata[almaz]<$col or $col<=0){
+if ($udata['almaz']<$col or $col<=0){
 echo "Недостаточно Coin of Luck";
 echo "<div class=silka><a href=\"col_bonus.php?\">» Назад</a></div>";}else{
 
-$nalm=$udata[almaz]-$col;// минус колы
+$nalm=$udata['almaz']-$col;// минус колы
 $mon=150000*$col; // щитаем сколько плюсуем
-$money=$udata[money]+$mon; // плюсуем адену
+$money=$udata['money']+$mon; // плюсуем адену
 	mysql_query("UPDATE users SET almaz='$nalm',money='$money' WHERE usr = '$log'"); // записуем результат
 
 
@@ -395,8 +395,8 @@ break;
 
 
 //  ////     ////// обменик Колов на Gold Bar /////////
-case "col_bar";
-if (empty($_GET[yes])) // если не подтвердил
+case "col_bar":
+if (empty($_GET['yes'])) // если не подтвердил
 {
 echo "Обмен Coin of Luck на Адену.<br/> За 1 CoL я дам тебе 200`000 Gold Bar.<br/>";
 echo "<br/>Обменять:<br/>";
@@ -413,13 +413,13 @@ echo"<br/><a href=\"col_bonus.php?\">Назад</a>";
 }else // подтвердил
 {
 
-if ($udata[almaz]<$col or $col<=0){
+if ($udata['almaz']<$col or $col<=0){
 echo "Недостаточно Coin of Luck";
 echo "<div class=silka><a href=\"col_bonus.php?\">» Назад</a></div>";}else{
 
-$nalm=$udata[almaz]-$col;// минус колы
+$nalm=$udata['almaz']-$col;// минус колы
 $mon=200000*$col; // щитаем сколько плюсуем
-$gold=$udata[gold]+$mon; // плюсуем адену
+$gold=$udata['gold']+$mon; // плюсуем адену
 	mysql_query("UPDATE users SET almaz='$nalm',gold='$gold' WHERE usr = '$log'"); // записуем результат
 
 
@@ -453,11 +453,11 @@ echo"<br/><a href=\"col_bonus.php?\">Назад</a>";
 break;
 //***--------------------------------------------------------------------------------------
 case 'scl_weapon':
-if($alm<='0'){echo'На 0 Coin of Luck точить нельзя!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
-if($udata[almaz]-$alm<0){echo'Недостаточно Coin of Luck!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
-$almaznew=$udata[almaz]-$alm;
+if((float)$alm<=0){echo'На 0 Coin of Luck точить нельзя!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
+if($udata['almaz']-$alm<0){echo'Недостаточно Coin of Luck!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
+$almaznew=$udata['almaz']-$alm;
 
-if (empty($_POST[result])){
+if (empty($_POST['result'])){
 echo "Вы не выбрали тип заточки!";include($path.'inc/down.php');exit;}
 
 
@@ -473,52 +473,52 @@ exit;
 
 
 //////////////////////////////////////////////////////////////////////	
-if ($_POST[result]=="patt"){ // если точить только физ атаку
+if ($_POST['result']=="patt"){ // если точить только физ атаку
 $it = mysql_fetch_array($req);
 $toch=$alm*4;
-$u = explode("|",$mag[give]);
-$npatt = $toch + $udata[patt];
-$nmatt = $udata[matt];
-$w=explode("*",$it[name]);
+$u = explode("|",$mag['give']);
+$npatt = $toch + $udata['patt'];
+$nmatt = $udata['matt'];
+$w=explode("*",$it['name']);
 if(empty($w[1])){
 $nam="$w[0]*$alm";
 }else{
 $kol=$w[1]+$alm;
 $nam="$w[0]*$kol";}
 
-$patt = $toch + $it[patt];
-$matt = $it[matt];}
+$patt = $toch + $it['patt'];
+$matt = $it['matt'];}
 ///////////////////////////////////////////////////////////////////////////
-if ($_POST[result]=="matt"){ // если точить только маг атаку
+if ($_POST['result']=="matt"){ // если точить только маг атаку
 $it = mysql_fetch_array($req);
 $toch=$alm*4;
-$u = explode("|",$mag[give]);
-$npatt =  $udata[patt];
-$nmatt = $toch + $udata[matt];
-$w=explode("*",$it[name]);
+$u = explode("|",$mag['give']);
+$npatt =  $udata['patt'];
+$nmatt = $toch + $udata['matt'];
+$w=explode("*",$it['name']);
 if(empty($w[1])){
 $nam="$w[0]*$alm";
 }else{
 $kol=$w[1]+$alm;
 $nam="$w[0]*$kol";}
 
-$patt = $it[patt];
-$matt = $toch + $it[matt];}
+$patt = $it['patt'];
+$matt = $toch + $it['matt'];}
 /////////////////////////////////////////////////////////////////////////
-if ($_POST[result]=="all"){ // если точить физ и маг атаку
+if ($_POST['result']=="all"){ // если точить физ и маг атаку
 $toch=$alm*2;
-$u = explode("|",$mag[give]);
-$npatt=$toch+$udata[patt];
-$nmatt=$toch+$udata[matt];
-$w=explode("*",$it[name]);
+$u = explode("|",$mag['give']);
+$npatt=$toch+$udata['patt'];
+$nmatt=$toch+$udata['matt'];
+$w=explode("*",$it['name']);
 if(empty($w[1])){
 $nam="$w[0]*$alm";
 }else{
 $kol=$w[1]+$alm;
 $nam="$w[0]*$kol";}
 
-$patt=$toch+$it[patt];
-$matt=$toch+$it[matt];}
+$patt=$toch+$it['patt'];
+$matt=$toch+$it['matt'];}
 /////////////////////////////////////////////////////////////////////////
 
 mysql_query("UPDATE `users` SET 
@@ -542,7 +542,7 @@ break;
 
 
 ///////////////////////////////////////
-case'4';
+case'4':
 
 $req1 = mysql_query("SELECT * FROM `baf` WHERE `usr` = '$log' LIMIT 1");
 $avto1=mysql_num_rows($req1);
@@ -563,7 +563,7 @@ echo'<a href="col_bonus.php?mod=4col">Сбросить за <b>25 CoL</b></a><br
 echo'<a href="col_bonus.php?mod=4aden">Сбросить за <b>2 500 000 000 Аден</b></a><br/>';
 break;
 
-case'4col';
+case'4col':
 
 echo'<b>Сброс параметров</b><br/>';
 $req1 = mysql_query("SELECT * FROM `baf` WHERE `usr` = '$log' LIMIT 1");
@@ -572,7 +572,7 @@ if($avto1>0){
 echo'Нельзя cбрасывать параметры под бафом!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[almaz]<25){
+if($udata['almaz']<25){
 echo'У Вас недостаточно СоL';
 include($path.'inc/down.php');
 exit;
@@ -583,22 +583,22 @@ if($avto1>0){
 echo'Нельзя cбрасывать параметры с одетыми вещами!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[storona]=="human"){$all=50;}
-if($udata[storona]=="gnom"){$all=100;}
-if($udata[storona]=="elf"){$all=60;}
-if($udata[storona]=="darkelf"){$all=75;}
-if($udata[storona]=="ork"){$all=100;}
-if($udata[storona]=="kamael"){$all=100;}
-if($udata[klas]=="wizard"){
-$hplvl=(100*$udata[lvl]);
+if($udata['storona']=="human"){$all=50;}
+if($udata['storona']=="gnom"){$all=100;}
+if($udata['storona']=="elf"){$all=60;}
+if($udata['storona']=="darkelf"){$all=75;}
+if($udata['storona']=="ork"){$all=100;}
+if($udata['storona']=="kamael"){$all=100;}
+if($udata['klas']=="wizard"){
+$hplvl=(100*$udata['lvl']);
 $mp = 100 + $all + $hplvl; $hp = 100 + $all+$hplvl;
 $patt = 23; 
 $matt = 56;
 $pdef = 63;
 $mdef = 52;
 }
-if($udata[klas]=="fighert"){
-$hplvl=100*$udata[lvl];
+if($udata['klas']=="fighert"){
+$hplvl=100*$udata['lvl'];
 $mp=80 + $all + $hplvl; $hp=120 + $all + $hplvl;
 $patt = 55;
 $matt = 21;
@@ -607,12 +607,12 @@ $mdef = 49;
 }
 mysql_query("UPDATE `users` SET `almaz` = `almaz` - 25 WHERE `usr` = '$log' ");
 mysql_query("UPDATE `users` SET `hp`='$hp',`hpall`=$hp,`mp`='$mp',`mpall`='$mp',`patt` = '$patt', `matt` = '$matt', `pdef` = '$pdef', `mdef` = '$mdef' WHERE `usr` = '$log' "); 
-$skill = ($udata[lvl]*3)+($udata[res]*603);
+$skill = ($udata['lvl']*3)+($udata['res']*603);
 mysql_query("UPDATE `users` SET `skill` = '$skill' WHERE `usr` = '$log' ");
 echo'Очки параметров успешно сброшены!';
 break;
 
-case'4aden';
+case'4aden':
 
 $req1 = mysql_query("SELECT * FROM `baf` WHERE `usr` = '$log' LIMIT 1");
 $avto1=mysql_num_rows($req1);
@@ -621,7 +621,7 @@ echo'Нельзя cбрасывать параметры под бафом!</br>
 include($path.'inc/down.php');exit;
 }
 echo'<b>Сброс параметров</b><br/>';
-if($udata[money]<2500000000){
+if($udata['money']<2500000000){
 echo'У Вас недостаточно аден';
 include($path.'inc/down.php');
 exit;
@@ -632,22 +632,22 @@ if($avto1>0){
 echo'Нельзя cбрасывать параметры с одетыми вещами!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[storona]=="human"){$all=50;}
-if($udata[storona]=="gnom"){$all=100;}
-if($udata[storona]=="elf"){$all=60;}
-if($udata[storona]=="darkelf"){$all=75;}
-if($udata[storona]=="ork"){$all=100;}
-if($udata[storona]=="kamael"){$all=100;}
-if($udata[klas]=="wizard"){
-$hplvl=100*$udata[lvl];
+if($udata['storona']=="human"){$all=50;}
+if($udata['storona']=="gnom"){$all=100;}
+if($udata['storona']=="elf"){$all=60;}
+if($udata['storona']=="darkelf"){$all=75;}
+if($udata['storona']=="ork"){$all=100;}
+if($udata['storona']=="kamael"){$all=100;}
+if($udata['klas']=="wizard"){
+$hplvl=100*$udata['lvl'];
 $mp = 100 + $all + $hplvl; $hp = 100 + $all+$hplvl;
 $patt = 23; 
 $matt = 56;
 $pdef = 63;
 $mdef = 52;
 }
-if($udata[klas]=="fighert"){
-$hplvl=100*$udata[lvl];
+if($udata['klas']=="fighert"){
+$hplvl=100*$udata['lvl'];
 $mp=80 + $all + $hplvl; $hp=120 + $all + $hplvl;
 $patt = 55;
 $matt = 21;
@@ -656,12 +656,12 @@ $mdef = 49;
 }
 mysql_query("UPDATE `users` SET `money` = `money` - 2500000000 WHERE `usr` = '$log' ");
 mysql_query("UPDATE `users` SET `hp`='$hp',`hpall`=$hp,`mp`='$mp',`mpall`='$mp',`patt` = '$patt', `matt` = '$matt', `pdef` = '$pdef', `mdef` = '$mdef' WHERE `usr` = '$log' "); 
-$skill = ($udata[lvl]*3)+($udata[res]*603);
+$skill = ($udata['lvl']*3)+($udata['res']*603);
 mysql_query("UPDATE `users` SET `skill` ='$skill' WHERE `usr` = '$log' ");
 echo'Очки параметров успешно сброшены!';
 break;
 
-case'4vote';
+case'4vote':
 
 echo'<b>Сброс параметров</b><br/>';
 $req1 = mysql_query("SELECT * FROM `baf` WHERE `usr` = '$log' LIMIT 1");
@@ -670,7 +670,7 @@ if($avto1>0){
 echo'Нельзя cбрасывать параметры под бафом!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[votecoin]<5){
+if($udata['votecoin']<5){
 echo'У Вас недостаточно VoteCoin';
 include($path.'inc/down.php');
 exit;
@@ -681,23 +681,23 @@ if($avto1>0){
 echo'Нельзя cбрасывать параметры с одетыми вещами!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[storona]=="human"){$all=50;}
-if($udata[storona]=="gnom"){$all=100;}
-if($udata[storona]=="elf"){$all=60;}
-if($udata[storona]=="darkelf"){$all=75;}
-if($udata[storona]=="ork"){$all=100;}
-if($udata[storona]=="kamael"){$all=100;}
-if($udata[klas]=="wizard"){
-$hplvl=100*$udata[lvl];
+if($udata['storona']=="human"){$all=50;}
+if($udata['storona']=="gnom"){$all=100;}
+if($udata['storona']=="elf"){$all=60;}
+if($udata['storona']=="darkelf"){$all=75;}
+if($udata['storona']=="ork"){$all=100;}
+if($udata['storona']=="kamael"){$all=100;}
+if($udata['klas']=="wizard"){
+$hplvl=100*$udata['lvl'];
 $mp = 100 + $all + $hplvl; $hp = 100 + $all+$hplvl;
 $patt = 23; 
 $matt = 56;
 $pdef = 63;
 $mdef = 52;
 }
-if($udata[klas]=="fighert"){
+if($udata['klas']=="fighert"){
 
-$hplvl=100*$udata[lvl];
+$hplvl=100*$udata['lvl'];
 $mp=80 + $all + $hplvl; $hp=120 + $all + $hplvl;
 $patt = 55;
 $matt = 21;
@@ -706,15 +706,15 @@ $mdef = 49;
 }
 mysql_query("UPDATE `users` SET `votecoin` = `votecoin` - 5 WHERE `usr` = '$log' ");
 mysql_query("UPDATE `users` SET `hp`='$hp',`hpall`=$hp,`mp`='$mp',`mpall`='$mp',`patt` = '$patt', `matt` = '$matt', `pdef` = '$pdef', `mdef` = '$mdef' WHERE `usr` = '$log' "); 
-$skill = ($udata[lvl]*3)+($udata[res]*603);
+$skill = ($udata['lvl']*3)+($udata['res']*603);
 mysql_query("UPDATE `users` SET `skill` ='$skill' WHERE `usr` = '$log' ");
 echo'Очки параметров успешно сброшены!';
 break;
 
 
-case'res';
+case'res':
 echo'<b>Ресет</b><br/>';
-if($udata[lvl]<201){
+if($udata['lvl']<201){
 echo'Вы не достигли 201 уровня!';
 include($path.'inc/down.php');
 exit;
@@ -725,7 +725,7 @@ if($avto1>0){
 echo'Нельзя делать ресет под бафом!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[almaz]==0){
+if($udata['almaz']==0){
 echo'У Вас недостаточно CoL';
 include($path.'inc/down.php');
 exit;
@@ -736,21 +736,21 @@ if($avto1>0){
 echo'Нельзя делать ресет с одетыми вещами!</br>';
 include($path.'inc/down.php');exit;
 }
-if($udata[storona]=="human"){$all=50;}
-if($udata[storona]=="gnom"){$all=100;}
-if($udata[storona]=="elf"){$all=60;}
-if($udata[storona]=="darkelf"){$all=75;}
-if($udata[storona]=="ork"){$all=100;}
-if($udata[storona]=="kamael"){$all=100;}
-if($udata[klas]=="wizard"){
+if($udata['storona']=="human"){$all=50;}
+if($udata['storona']=="gnom"){$all=100;}
+if($udata['storona']=="elf"){$all=60;}
+if($udata['storona']=="darkelf"){$all=75;}
+if($udata['storona']=="ork"){$all=100;}
+if($udata['storona']=="kamael"){$all=100;}
+if($udata['klas']=="wizard"){
 $mp = 100 + $all; $hp = 100 + $all;
 }
-if($udata[klas]=="fighert"){
+if($udata['klas']=="fighert"){
 $mp=80 + $all ; $hp=120 + $all;
 }
 //тестинг автоматической смены титула
-$titul=Дворянин;
-if ($udata[res]=="2"){
+$titul='Дворянин';
+if ($udata['res']=="2"){
 mysql_query("UPDATE `users` SET `titul` = '$titul' WHERE `usr` = '$log' ");
 mysql_query("INSERT INTO
         `item` SET
@@ -769,8 +769,8 @@ mysql_query("INSERT INTO
 }
 //конец
 //Тестинг выдачи Героя
-$titul1=Герой;
-if ($udata[res]=="9"){
+$titul1='Герой';
+if ($udata['res']=="9"){
 mysql_query("UPDATE `users` SET `titul` = '$titul1' WHERE `usr` = '$log' ");
 mysql_query("INSERT INTO
         `item` SET
@@ -793,7 +793,7 @@ mysql_query("UPDATE `users` SET `hp`='$hp',`hpall`=$hp,`mp`='$mp',`mpall`='$mp',
 echo'Ресет успешно произведен!';
 break;
 
-case 'dop';
+case 'dop':
 echo"<b>Дополнительные услуги</b><br/><br/>";
 echo"1) Заказ личного аватара/Фотографии 700 Coin of Luck , <br/>";
 echo"2) У Вас есть возможность заказать именную вещь. 

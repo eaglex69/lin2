@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'anketa';//фикс. места
@@ -11,13 +11,13 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-if(empty($_POST[nick])){
-$nick=$_GET[nick];
+if(empty($_POST['nick'])){
+$nick=$_GET['nick'];
 }else{
-$nick=$_POST[nick];}
+$nick=$_POST['nick'];}
 $nick = htmlspecialchars(stripslashes($nick));
 
-switch($_GET[go]) {
+switch($_GET['go']) {
 
 default:
 
@@ -53,19 +53,19 @@ include($path.'inc/down.php');exit;
 
 $usdata = mysql_fetch_array($req);
 
-	if($myrow[nik]==$log)
+	if($myrow['nik']==$log)
 	{
 	echo' <b><center>Моя Анкета</b></center>';
 	}
 	
-echo'<br><div class="dot">Ник: <b>'.$myrow[nik].'</b> | ';
+echo'<br><div class="dot">Ник: <b>'.$myrow['nik'].'</b> | ';
 
-echo'Имя: <b>'.$myrow[name].'</b><hr>';
+echo'Имя: <b>'.$myrow['name'].'</b><hr>';
 echo"Пол: ";
-if($usdata[pol]=="m"){echo"<b>Парень</b> | ";}else{echo"<b>Девушка</b> | ";}
+if($usdata['pol']=="m"){echo"<b>Парень</b> | ";}else{echo"<b>Девушка</b> | ";}
 
 
-$datess = str_replace("01","января",$myrow[mm]);
+$datess = str_replace("01","января",$myrow['mm']);
 $datess = str_replace("02","февраля",$datess);
 $datess = str_replace("03","марта",$datess);
 $datess = str_replace("04","апреля",$datess);
@@ -79,9 +79,9 @@ $datess = str_replace("11","ноября",$datess);
 $datess = str_replace("12","декабря",$datess);
 
 
-if ($myrow[gg]=="0"){$myrow[gg] = ".....";}else {$myrow[gg] = "$myrow[gg]г.";}
-if ($myrow[mm]=="0"){$myrow[mm] = "..";}
-if ($myrow[dd]=="0"){$myrow[dd] = "..";}
+if ($myrow['gg']=="0"){$myrow['gg'] = ".....";}else {$myrow['gg'] = "$myrow[gg]г.";}
+if ($myrow['mm']=="0"){$myrow['mm'] = "..";}
+if ($myrow['dd']=="0"){$myrow['dd'] = "..";}
 echo" Дата рождения: <b>$myrow[dd] $datess $myrow[gg]</b><hr/>";
 echo" Город: <b>$myrow[gorod]</b> | ";
 echo" ICQ: <b>$myrow[isq]</b><hr>";
@@ -99,7 +99,7 @@ echo"<a href=\"search.php?go=go&amp;nick=$nick\">Назад</a></div>";
 
 break;
 
-case '1';
+case '1':
 ////////////////////////////
 $result = mysql_query("SELECT * FROM `anketa` WHERE `nik` = '$log'");
 $myrow = mysql_fetch_array($result);
@@ -119,7 +119,7 @@ echo "
 
 // отображаем дни
 echo"<select name=\"dd\" value=\"$myrow[dd]\">";
-if(!empty($myrow[dd]))
+if(!empty($myrow['dd']))
 {echo "<option value=\"$myrow[dd]\"> $myrow[dd] </option>";}
 $dd=1;
 if ($dd<=31){
@@ -130,7 +130,7 @@ $dd++;}} echo "</select> ";
 
 // отображаем месяцы
 echo"<select name=\"mm\" value=\"$myrow[mm]\">";
-if(!empty($myrow[mm]))
+if(!empty($myrow['mm']))
 {echo "<option value=\"$myrow[mm]\"> $myrow[mm] </option>";}
 $mm=1;
 if ($mm<=12){
@@ -140,7 +140,7 @@ $mm++;}} echo "</select> ";
 
 // отображаем год
 echo"<select name=\"gg\" value=\"$myrow[gg]\">";
-if(!empty($myrow[gg]))
+if(!empty($myrow['gg']))
 {echo "<option value=\"$myrow[gg]\"> $myrow[gg] </option>";}
 $gg=1940;
 if ($gg<=2012){
@@ -181,8 +181,8 @@ case 'addank':
 $name = htmlspecialchars(addslashes($_POST['name']));
 $text = htmlspecialchars(addslashes($_POST['text']));
 
-$dd = $_POST[dd];
-$mm = $_POST[mm];
+$dd = $_POST['dd'];
+$mm = $_POST['mm'];
 //$mm = $_POST[mm];
 
 
@@ -215,7 +215,7 @@ mysql_query("UPDATE `anketa` SET
 
 	break;
 //--------------Новая анкета--------------------
-case '4';
+case '4':
 
 	//-----Создание анкеты---------
 		$ank = mysql_query("SELECT * FROM `anketa` WHERE `nik` = '$log'");
@@ -317,8 +317,8 @@ case 'add':
 $name = htmlspecialchars(addslashes($_POST['name']));
 $text = htmlspecialchars(addslashes($_POST['text']));
 
-$dd = $_POST[dd];
-$mm = $_POST[mm];
+$dd = $_POST['dd'];
+$mm = $_POST['mm'];
 //$mm = $_POST[mm];
 
 

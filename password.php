@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Востановление пароля';
@@ -10,7 +10,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 
 echo'<div class="gameBorder"><div class="menu">';
-switch($_GET[go]){
+switch($_GET['go']){
 
 default:
 
@@ -24,7 +24,7 @@ echo "<input class=\"button\" type=\"submit\" value=\"Востановить\" /
 break;
 
 case 'go':
-$name=$_POST[name];
+$name=$_POST['name'];
 if(!empty($name)){
 
 
@@ -32,11 +32,11 @@ $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$name'");
 $usr = mysql_fetch_array($req);
 
 
-$mail=$usr[email];
+$mail=$usr['email'];
 }else{echo'Вы не ввели необходимые данные<br/>';
 echo "</p></body></html>"; exit;}
 
-if($_POST[email]!==$mail || $mail=="" || $mail=="@") {echo'Вы ввели несоответствующие данные, пароль не может быть востановлен!<br/>';
+if($_POST['email']!==$mail || $mail=="" || $mail=="@") {echo'Вы ввели несоответствующие данные, пароль не может быть востановлен!<br/>';
 echo "</p></body></html>"; exit;} else {
 
 
@@ -44,7 +44,7 @@ echo "</p></body></html>"; exit;} else {
 
 
 $ip = $_SERVER['REMOTE_ADDR'];
-$agent = strtok($HTTP_USER_AGENT,'/');
+$agent = strtok(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '','/');
 $ip=htmlspecialchars(stripslashes($ip));
 $agent=htmlspecialchars(stripslashes($agent));
 $now= date("j-m-Y");
@@ -78,7 +78,7 @@ $body.="На письмо отвечать не нужно.$EOL";
 //----------------------------
 
 
-mail($usr[email],$subj, $body, $headers);
+mail($usr['email'],$subj, $body, $headers);
 
 
 

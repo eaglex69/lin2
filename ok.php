@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 include('inc/path.php');
@@ -39,7 +39,7 @@ include($path.'inc/down.php');exit;
 }
 ///////////////
 $id="$_GET[id]";
-if(empty($_GET[k])){
+if(empty($_GET['k'])){
 /////////////////////////////////////////////////////
 ////////////////////////
 $req = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$log' LIMIT 1");
@@ -59,7 +59,7 @@ if($mob['status']=='battle' or $mob['status']=='off'){
 header ('Location: okrestnosti.php?');exit; 
 }
 
-if ($mob[hp]<=0){
+if ($mob['hp']<=0){
 mysql_query("DELETE FROM `tmp` WHERE usr='$log' LIMIT 1");//выходим из боя
 mysql_query("INSERT INTO log SET usr='$log',text='Монстр $mob[name] уже убит!',kto='system',place='battle',timer='$timer'");
 header ('Location: okrestnosti.php?');exit; 
@@ -136,14 +136,14 @@ header ('Location: okrestnosti.php?');exit;
 $reqtmp = mysql_query("SELECT * FROM `tmp_zamok` WHERE `usr` = '$log' LIMIT 1");
 if (mysql_num_rows($reqtmp)>=1){header ("Location: battle.php?");exit;}
 
-if($pk[usr]==$log){
+if($pk['usr']==$log){
 $textl='Битва';
 mysql_query("INSERT INTO logpk SET usr='$udata[usr]',text='На себя напасть нельзя!',kto='user',place='battle',timer='$timer',new='1'");
 
 header ('Location: okrestnosti.php?');exit;
 }
 
-if($pk[dostup]>3){
+if($pk['dostup']>3){
 $textl='Битва';
 mysql_query("INSERT INTO logpk SET usr='$udata[usr]',text='Админа бить нельзя =)',kto='user',place='battle',timer='$timer',new='1'");
 
@@ -158,7 +158,7 @@ $mpk = mysql_fetch_array($req);
 $req = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$log'");
 $mypk = mysql_fetch_array($req);
 
-if($mpk[mesto] != $mypk[mesto] or $mpk[page] != $mypk[page] or $mpk[place] != $mypk[place]){
+if($mpk['mesto'] != $mypk['mesto'] or $mpk['page'] != $mypk['page'] or $mpk['place'] != $mypk['place']){
 $textl='Битва';
 
 mysql_query("INSERT INTO logpk SET usr='$udata[usr]',text='Игрок не рядом!',kto='user',place='battle',timer='$timer',new='1'");
@@ -214,7 +214,7 @@ header ('Location: okrestnosti.php?');exit;
 
 
 
-if($pk[lvl]<100){
+if($pk['lvl']<100){
 $textl='Битва';
 
 mysql_query("INSERT INTO logpk SET usr='$udata[usr]',text='На слабых нападать нельзя!',kto='user',place='battle',timer='$timer',new='1'");
@@ -224,7 +224,7 @@ header ('Location: okrestnosti.php?');exit;
 
 
 
-if($udata[lvl]<100){
+if($udata['lvl']<100){
 $textl='Битва';
 
 mysql_query("INSERT INTO logpk SET usr='$udata[usr]',text='PK с 100 уровня!',kto='user',place='battle',timer='$timer',new='1'");
@@ -266,17 +266,17 @@ $reqpk = mysql_query("SELECT * FROM `users` where `id`='$id'");
 $pk = mysql_fetch_array($reqpk);
 // щитаем урон
 
-if ($udata[klas]=="wizard") {$uron = $udata[matt]-$pk[mdef];}   // если маг, то  работает маг атака и маг защита
-if ($udata[klas]=="fighert") {$uron = $udata[patt]-$pk[pdef];}  // если воин, то работает физ атака и защита
+if ($udata['klas']=="wizard") {$uron = $udata['matt']-$pk['mdef'];}   // если маг, то  работает маг атака и маг защита
+if ($udata['klas']=="fighert") {$uron = $udata['patt']-$pk['pdef'];}  // если воин, то работает физ атака и защита
 
 If ($uron<0){$uron=0;} // если урон в минуса то он равен 0 иначе плюсует без этого кода
 
-$pkmoney=round($pk[money]/100);
+$pkmoney=round($pk['money']/100);
 $pkmon=rand(1,$pkmoney); // щитаем сколько забрать денег
 
-if ($pk[hp]>$uron){
+if ($pk['hp']>$uron){
 
-$nhp=$pk[hp]-$uron;
+$nhp=$pk['hp']-$uron;
 
 mysql_query("UPDATE users SET hp = '$nhp' WHERE `id` = '$id'");
 mysql_query("INSERT INTO logpk SET usr='$pk[usr]',text='Вас атаковал в PK $udata[usr] <b>-$uron</b>!',kto='enemy',place='battle',timer='$timer',new='1'");
@@ -287,18 +287,18 @@ header ('Location: okrestnosti.php?');exit;
 
 }else{
 
-$nhp=$pk[hp]-$uron;
-$nloses=$pk[loses]+1;
-$nmon2=$pk[money]-$pkmon;
+$nhp=$pk['hp']-$uron;
+$nloses=$pk['loses']+1;
+$nmon2=$pk['money']-$pkmon;
 If ($nmon2<0){$nmon2=0;} // защиту от минус значения
 mysql_query("UPDATE users SET hp = '$nhp',loses = '$nloses',money = '$nmon2' WHERE `id` = '$id'"); // пишем данные утакававшего
 
 
-$nwin=$udata[wins]+1;
-$nmon=$udata[money]+$pkmon;
+$nwin=$udata['wins']+1;
+$nmon=$udata['money']+$pkmon;
 // проверяем на совмесность в клане
 
-$nkarma=$udata[karma]+1; // карма
+$nkarma=$udata['karma']+1; // карма
 mysql_query("UPDATE users SET karma = '$nkarma',money = '$nmon',wins = '$nwin' WHERE `usr` = '$log'");
 mysql_query("INSERT INTO logpk SET usr='$pk[usr]',text='Вас убил в PK $udata[usr] <b>-$pkmon Аден</b>!',kto='enemy',place='battle',timer='$timer',new='1'");
 mysql_query("INSERT INTO logpk SET usr='$udata[usr]',text='Вы убили в PK $pk[usr] <b>+$pkmon Аден</b>!',kto='user',place='battle',timer='$timer',new='1'");
@@ -318,7 +318,7 @@ $reqev = mysql_query("SELECT * FROM `eve_pk_w` WHERE `ids` = '$udata[id]' and `u
 $eve = mysql_fetch_array($reqev);
 if(mysql_num_rows($reqev)>=1) // если уже участвует в рейтинге то дописываем
 {
-$skoko=$eve[skoko]+1;
+$skoko=$eve['skoko']+1;
 mysql_query("UPDATE eve_pk_w SET skoko='$skoko' WHERE ids='$udata[id]' and usr='$log'");} // дописываем +1 к количеству
 
 else{ // если нет игрока в рейтинге то создаем ему
@@ -338,7 +338,7 @@ $reqev = mysql_query("SELECT * FROM `eve_pk` WHERE `ids` = '$udata[id]' and `usr
 $eve = mysql_fetch_array($reqev);
 if(mysql_num_rows($reqev)>=1) // если уже участвует в рейтинге то дописываем
 {
-$skoko=$eve[skoko]+1;
+$skoko=$eve['skoko']+1;
 mysql_query("UPDATE eve_pk SET skoko='$skoko' WHERE ids='$udata[id]' and usr='$log'");} // дописываем +1 к количеству
 
 else{ // если нет игрока в рейтинге то создаем ему

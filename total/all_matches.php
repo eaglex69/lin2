@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'Тотализатор';
@@ -68,7 +68,7 @@ break;
 
 
 ########## Ставил ###
-case"stavil";
+case"stavil":
 $_GET['idm'] = intval($_GET['idm']);
 $q2=mysql_query("SELECT * FROM `tot_stavki` WHERE `idm`='".$_GET['idm']."'");
 
@@ -87,7 +87,7 @@ break;
 #####################
 
 ###### Выигравшые ####
-case"win_users";
+case"win_users":
 $_GET['idm'] = intval($_GET['idm']);
 $q=mysql_query("SELECT * FROM `tot_stavki` WHERE `kom1`=`win1` and `kom2`=`win2` and `idm`='".$_GET['idm']."'");
 if(mysql_num_rows($q) == 0)

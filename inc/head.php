@@ -37,7 +37,7 @@ Miniage - Один мир созданный с максимально реал�
 /*опции настройка тем. Если есть, то выбранную включаем, нету, стандарт*/
 
 $user_opt = mysql_fetch_array(mysql_query("SELECT theme FROM `options` where `usr`='$log' LIMIT 1"));
-if (empty($user_opt[theme])){$style = 'osn';}else{$style = $user_opt[theme];}
+if (empty($user_opt['theme'])){$style = 'osn';}else{$style = $user_opt['theme'];}
 echo "\n" . '<link rel="stylesheet" href="/theme/'.$style.'.css" type="text/css" />';
 echo "\n" . '<link rel="stylesheet" href="/theme/osn.css" type="text/css" />';
 /*------------------------------------------------------------------------------------------------------*/

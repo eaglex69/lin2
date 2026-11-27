@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Инвентарь';
@@ -12,7 +12,7 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `tip`='$_GET[tip]' and `image`='yes'");
 }else{
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `tip`='$_GET[tip]' and `image`='yes' and `id`='$_GET[id]'");
@@ -36,11 +36,11 @@ mysql_query("UPDATE `baf` SET `time` = '$timebaf'  WHERE usr = '$log'");}
 //}
 $mag = mysql_fetch_array($req);
 
-$npatt=$udata[patt]-$mag[patt];
-$nmatt=$udata[matt]-$mag[matt];
+$npatt=$udata['patt']-$mag['patt'];
+$nmatt=$udata['matt']-$mag['matt'];
 
-$npdef=$udata[pdef]-$mag[pdef];
-$nmdef=$udata[mdef]-$mag[mdef];
+$npdef=$udata['pdef']-$mag['pdef'];
+$nmdef=$udata['mdef']-$mag['mdef'];
 
 
 mysql_query("UPDATE `users` SET
@@ -50,7 +50,7 @@ mysql_query("UPDATE `users` SET
          `matt` = '$nmatt'
           WHERE usr = '$log'");
           
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 mysql_query("UPDATE item SET image = 'not' WHERE `usr` = '$log' and `tip`='$_GET[tip]' and `image`='yes'");
 }else{
 mysql_query("UPDATE item SET image = 'not' WHERE `usr` = '$log' and `tip`='$_GET[tip]' and `image`='yes' and `id`='$_GET[id]'");

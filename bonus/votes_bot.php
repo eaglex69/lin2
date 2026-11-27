@@ -142,7 +142,7 @@ function vgrInt_getVotes()
 		$index = null;
 		$p = xml_parser_create();
 		xml_parse_into_struct($p, $content, $vals, $index);
-		xml_parser_free($p);
+		if (PHP_VERSION_ID < 80000) { xml_parser_free($p); } // PHP 8: the parser is an object, freed automatically (the function is deprecated in 8.5)
 		$votes = array();
 		$errorObject = array();
 		$voteData = null;

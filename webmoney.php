@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'zaksms';//фикс. места
@@ -17,11 +17,11 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 
 // --- --- удалить заказ --- --- //
-if (isset($_GET[del])){
+if (isset($_GET['del'])){
 $reqcolpovtor = mysql_num_rows(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `usr`='$log' and `id`='$_GET[del]' Limit 1"));
 if ($reqcolpovtor==1){
 mysql_query("DELETE FROM `zakaz_col_wm` WHERE `id`='$_GET[del]' and `usr`='$log' LIMIT 1");
@@ -30,7 +30,7 @@ echo "<p><font color=#339966>Удаленно</font></p><hr/>";
 }
 // -- CoL оставить (записать БД) заявка --//
 
-if (isset($_GET[go])){
+if (isset($_GET['go'])){
 
 		$data = date("d F Yг. в H:i", strtotime("+20 seconds"));
 
@@ -49,12 +49,12 @@ $data = str_replace("November","Ноября",$data);
 $data = str_replace("December","Декабря",$data);
 
 //защита//
-if ($_POST[col]<=0 or $_POST[col]>2000000000){echo "<p><font color=#f4d06e>Кол-во заказаных Coin Of Luck</font></p><hr/>";}else{
+if ((float)$_POST['col']<=0 or (float)$_POST['col']>2000000000){echo "<p><font color=#f4d06e>Кол-во заказаных Coin Of Luck</font></p><hr/>";}else{
 //-
 $reqcolpovtor = mysql_num_rows(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `usr`='$log' and `col`='$_POST[col]' Limit 1"));
 if ($reqcolpovtor==1){echo "<p><font color=#990000>Повтор запроса</font></p><hr/>";}else{
 //-
-if (empty($_POST[com]) or $_POST[com] == "Укажите WM перевода (R,U,B,Z). Код транзикции!"){echo "<p><font color=#990000>Не указан коментраий</font></p><hr/>";}else{
+if (empty($_POST['com']) or $_POST['com'] == "Укажите WM перевода (R,U,B,Z). Код транзикции!"){echo "<p><font color=#990000>Не указан коментраий</font></p><hr/>";}else{
 //-
 //-----//
 
@@ -93,8 +93,8 @@ echo "<hr/>";
 echo '<p><font color=#f4d06e>Оставить заявку на пополнения через Web Money</font></p><hr/>';
 
 
-if (empty($_POST[col])){$col_post = '';}else{$col_post = $_POST[col];}
-if (empty($_POST[com])){$com_post = '';}else{$com_post = $_POST[com];}
+if (empty($_POST['col'])){$col_post = '';}else{$col_post = $_POST['col'];}
+if (empty($_POST['com'])){$com_post = '';}else{$com_post = $_POST['com'];}
 
 echo "<form action=\"?go\" method=\"POST\">
 

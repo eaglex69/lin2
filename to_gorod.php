@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 include('inc/path.php');
@@ -13,7 +13,7 @@ include($path.'inc/core.php');
 $req = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$log' LIMIT 1");
 ////////////////////////////
 $mestouser = mysql_fetch_array($req);
-if($mestouser[city]==1){
+if($mestouser['city']==1){
 /////////место
 $req = mysql_query("SELECT incity FROM `world` WHERE `city` = '$udata[city]' and `x`='$mestouser[x]' and `y`='$mestouser[y]' LIMIT 1");
 ////////////////////////////

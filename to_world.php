@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 include('inc/path.php');
@@ -13,7 +13,7 @@ $req = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$log' LIMIT 1");
 ////////////////////////////
 $mestouser = mysql_fetch_array($req);
 
-if($mestouser[city]==0){
+if($mestouser['city']==0){
 mysql_query("UPDATE `mesto` SET `city` = '1' WHERE `usr` = '$log'");     
 header("Location: okrestnosti.php?");exit;
 }else{

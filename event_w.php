@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'event';//фикс. места
@@ -13,20 +13,20 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 
 
-if ($_GET[mod]=='r'){
+if ($_GET['mod']=='r'){
 echo "<font color=#527F3F>Первые по рыбалке:</font><br/><br/>";
 $req = mysql_query("SELECT * FROM `fish_log_w` WHERE `ids`>'0' ORDER BY `skoko` DESC LIMIT 5");
 $avto=mysql_num_rows($req);$i=1;
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-echo '<div class=inoy> <a href="search.php?nick='.$mag[usr].'&amp;go=go">.: '.$mag[usr].'  <font color=#ffffff> ` '.$mag[skoko].'</font></a> </div>';
+echo '<div class=inoy> <a href="search.php?nick='.$mag['usr'].'&amp;go=go">.: '.$mag['usr'].'  <font color=#ffffff> ` '.$mag['skoko'].'</font></a> </div>';
 $i++;}}else {echo "В даном эвенте нет участников!<br/>";}//написать что в эвенте никто не участвовал
 echo "<br/>";
 echo "<hr/>";
@@ -46,7 +46,7 @@ $avto=mysql_num_rows($req);$i=1;
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-echo '<div class=inoy> <a href="search.php?nick='.$mag[usr].'&amp;go=go">.: '.$mag[usr].'  <font color=#ffffff> ` '.$mag[skoko].'</font></a> </div>';
+echo '<div class=inoy> <a href="search.php?nick='.$mag['usr'].'&amp;go=go">.: '.$mag['usr'].'  <font color=#ffffff> ` '.$mag['skoko'].'</font></a> </div>';
 $i++;}}else {echo "В даном эвенте нет участников!<br/>";}//написать что в эвенте никто не участвовал
 echo "<br/>";
 echo "<hr/>";
@@ -58,7 +58,7 @@ $avto=mysql_num_rows($req); $i=1;
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-echo '<div class=inoy> <a href="search.php?nick='.$mag[usr].'&amp;go=go">.: '.$mag[usr].'  <font color=#ffffff> ` '.$mag[skoko].'</font></a> </div>';
+echo '<div class=inoy> <a href="search.php?nick='.$mag['usr'].'&amp;go=go">.: '.$mag['usr'].'  <font color=#ffffff> ` '.$mag['skoko'].'</font></a> </div>';
 $i++;}}else {echo "В даном эвенте нет участников!<br/>";}//написать что в эвенте никто не участвовал
 echo "<br/>";
 echo "<hr/>";

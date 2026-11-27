@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'main';//фикс. места
@@ -15,10 +15,10 @@ include($path.'inc/zag.php');
 
 $lim = htmlspecialchars(stripslashes($lim));
 
-$lim=$_GET[lim];
+$lim=$_GET['lim'];
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 

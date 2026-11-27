@@ -11,15 +11,15 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 $dir = opendir ("pic/smiles");
-while ($file = readdir ($dir)) 
-{ if (ereg (".gif$", "$file"))
+while ($file = lin2_readdir ($dir)) 
+{ if (preg_match('/\.gif$/', $file))
 {$a[]=$file;}}  
-closedir ($dir); 
-sort($a);
+lin2_closedir ($dir); 
+if (!isset($a)) $a = array(); sort($a);
 
 $total = count($a); 
 if (empty($_GET['start'])) $start = 0;
-else $start = $_GET['start'];
+else $start = (int) $_GET['start'];
 if ($total < $start + 20){ $end = $total; }
 else {$end = $start + 20; }
 for ($i = $start; $i < $end; $i++){ 

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'res';//фикс. места
@@ -27,7 +27,7 @@ exit;}
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -36,10 +36,10 @@ echo'<div class="menu">';
 echo" <center><img src='pic/roz/res.jpg'  width='300' height='130' alt='' style='margin-right:10px;border:1px solid #383838' class='dot'></div><hr/>";
 echo"<b> Выберите способ воскрешения.<br/></b>";
 
-$exp = $udata[exp]*0.005;
-$exp2 = $udata[exp]*0.002;
+$exp = $udata['exp']*0.005;
+$exp2 = $udata['exp']*0.002;
 
-if ($udata[lvl]<=9)	{echo"<br/><a href=\"res.php?mod=11\">Воскреснуть </a> <br/> До 9 уровня Вас воскрешают без потери опыта.";}else{
+if ($udata['lvl']<=9)	{echo"<br/><a href=\"res.php?mod=11\">Воскреснуть </a> <br/> До 9 уровня Вас воскрешают без потери опыта.";}else{
 	echo"<br/><a href=\"res.php?mod=1\">Воскреснуть самому. Утеря ".number_format($exp, 0, ',', ' ')." EXP </a>";
 	echo"<br/><a href=\"res.php?mod=2\">Заплатить целителю 200`000 Аден.  Утеря ".number_format($exp2, 0, ',', ' ')." EXP </a>";}
 
@@ -56,11 +56,11 @@ echo "</div>";
 break;
 ////////////////////////////////////////////////////////////
 ///////////			СПОсОбЫ ВоскРешеНия		///////////////
-case '11';
-if ($udata[lvl]>=10) {echo"Ошибка! <br/><a href=\"res.php?\">Назад.</a>";}
+case '11':
+if ($udata['lvl']>=10) {echo"Ошибка! <br/><a href=\"res.php?\">Назад.</a>";}
 
-$exp = $udata[exp];
-$hp = $udata[hpall]/2;
+$exp = $udata['exp'];
+$hp = $udata['hpall']/2;
 
 $res = mysql_query ("UPDATE users SET
         exp='$exp',
@@ -84,10 +84,10 @@ mysql_query("DELETE FROM `smert` WHERE `usr`='$log' and `life`='no'");
 break;
 
 
-case '1';
-$exp = $udata[exp]*0.005;
-$exp1 = $udata[exp]-$exp;
-$hp = $udata[hpall]/2;
+case '1':
+$exp = $udata['exp']*0.005;
+$exp1 = $udata['exp']-$exp;
+$hp = $udata['hpall']/2;
 
 $res = mysql_query ("UPDATE users SET
         exp='$exp1',
@@ -111,17 +111,17 @@ mysql_query("DELETE FROM `smert` WHERE `usr`='$log' and `life`='no'");
 break;
 
 
-case '2';
-if ($udata[money]<200000) 
+case '2':
+if ($udata['money']<200000) 
 	{
 	echo"Недостаточно денег!";
 	echo"<br/><br/><a href=\"res.php?\">Назад</a>";
 	include($path.'inc/down.php');exit;
 	}
-$exp = $udata[exp]*0.002;
-$exp1 = $udata[exp]-$exp;
-$hp = $udata[hpall]/2;
-$money = $udata[money]-200000;
+$exp = $udata['exp']*0.002;
+$exp1 = $udata['exp']-$exp;
+$hp = $udata['hpall']/2;
+$money = $udata['money']-200000;
 
 $res = mysql_query ("UPDATE users SET
         exp='$exp1',

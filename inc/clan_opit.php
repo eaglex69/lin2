@@ -1,4 +1,4 @@
-<?
+<?php
 
 if($clan['lvl']=="0"){ $expcl=round($clan['exp']*100/6700000);}
 if($clan['lvl']=="1"){ $expcl=round((($clan['exp']-6700000)/(297000000))*100,2);}

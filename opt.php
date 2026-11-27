@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'opt';//фикс. места
@@ -20,7 +20,7 @@ $timeout = $date - $taim;
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ if($avto==0) // создаем юзеру таблицу настроек есл
 		
 ////////////////////////////////////////////////////////////////////////////////
 					//  СОХРАНЯЕМ НАСТРОЙКИ //
-if ($_GET[mod]==save){
+if ($_GET['mod']=='save'){
 
 $ressave = mysql_query ("UPDATE options SET
         chat='$_POST[chat]',
@@ -94,7 +94,7 @@ echo '<hr/><form action="opt.php?mod=save" method="post">';
 
 echo " Выбор темы:<br/>";
 
-if (empty($user[theme]) or $user[theme]==style){
+if (empty($user['theme']) or $user['theme']=='style'){
 echo"<select name=\"theme\">
 <option value=\"style\">Измененная</option>
 <option value=\"osn\">Основная</option>
@@ -102,7 +102,7 @@ echo"<select name=\"theme\">
 </select>";
 }
 
-if ($user[theme]==osn){
+if ($user['theme']=='osn'){
 echo"<select name=\"theme\">
 <option value=\"osn\">Основная</option>
 <option value=\"style\">Измененная</option>
@@ -110,7 +110,7 @@ echo"<select name=\"theme\">
 </select>";
 }
 
-if ($user[theme]==wml){
+if ($user['theme']=='wml'){
 echo"<select name=\"theme\">
 <option value=\"wml\">WML</option>
 <option value=\"osn\">Основная</option>
@@ -128,7 +128,7 @@ echo"<select name=\"theme\">
 									
 	echo '<hr/>';								
 
-if ($user[chat]==yes){ // если чат включ то выводит первым да
+if ($user['chat']=='yes'){ // если чат включ то выводит первым да
 echo "Показывать чат?<br/>
 <select name=\"chat\">
 <option value=\"yes\">Да</option>
@@ -147,7 +147,7 @@ echo "Показывать чат?<br/>
 
 
 
-if ($user[privat]==yes){ // если приват включ то выводит первым да
+if ($user['privat']=='yes'){ // если приват включ то выводит первым да
 echo "Разр. писать в приват?<br/>
 <select name=\"privat\">
 <option value=\"yes\">Да</option>
@@ -159,7 +159,7 @@ echo "Разр. писать в приват?<br/>
 <option value=\"yes\">Да</option>
 </select><hr/>";}
 
-if ($user[paty]==yes){ // если пати включ то выводит первым да
+if ($user['paty']=='yes'){ // если пати включ то выводит первым да
 echo "Разр. кидать пати?<br/>
 <select name=\"paty\">
 <option value=\"yes\">Да</option>
@@ -171,7 +171,7 @@ echo "Разр. кидать пати?<br/>
 <option value=\"yes\">Да</option>
 </select><hr/>";}
 
-if ($user[foot]==pic or empty($user[foot])){ // если низ картинки или пусто то
+if ($user['foot']=='pic' or empty($user['foot'])){ // если низ картинки или пусто то
 echo "Нижнее меню:<br/>
 <select name=\"foot\">
 <option value=\"pic\">Картинки</option>

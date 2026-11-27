@@ -12,18 +12,18 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 function smiles($string){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string=str_replace(":$file2",'<img src="pic/smiles/'.$file.'" alt="">',$string);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string;  }
 /////////////
 $rand = rand(1000,9999);
@@ -41,16 +41,16 @@ echo "<a href=\"smile.php?\"><img src=\"pic/смайл.png\" ></a>
 echo "<form action=\"tchat.php?mod=writes\" method=\"POST\">";
 echo "<input type=\"text\" name=\"zin\" maxlength=\"5000\"/> <input type=\"submit\" value=\"\" class=\"button_medium3\"></div>";
 
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT komentaras FROM tchat"));
 $puslap = floor($viso/10);
 $times = date("H:i");
@@ -69,11 +69,11 @@ $ud = mysql_fetch_array($reqs);
 
 //картинка клана /////////////////////////////
 $pic = "";
-if(!empty($ud[clan])){
+if(!empty($ud['clan'])){
 $req6546566 = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ud[clan]' LIMIT 1");
 $wh = mysql_fetch_array($req6546566);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"cl\"/>";}}
 ////////////////////////////////////////////////
 $antiyou = "<img src=\"pic/smiles/align2.gif\" alt=\"antiyou\"/>";
@@ -86,7 +86,7 @@ $cl = "<font color=#$color[color]>";}else{
 $cl = "";}
 
 
-if($udata[dostup]>=2){
+if($udata['dostup']>=2){
 $silka = " <a href=\"tchat.php?mod=del_post&amp;p=$dsa[id]\"><font color=red>x</font></a>";
 }
 
@@ -98,14 +98,14 @@ echo "
 :<br/><font color=#ffffcc></b> $koment </font>";
 }else{
 
-if ($ud[dostup]>=4)
+if ($ud['dostup']>=4)
 {
 echo "
 <hr/><font color=#af9878>$time | $pic <b><a href=\"search.php?nick=$nickas&amp;go=go\"><font color=#f4d06e>$nickas</font></a>
 <a href=\"tchat.php?nick=$nickas&amp;mod=write\"><img src=\"pic/чат.png\" > $silka</a>
 <br/><font color=#ffffcc></b> $koment </font>";
 }else{
-if ($ud[dostup]==2 or $ud[dostup]==3)
+if ($ud['dostup']==2 or $ud['dostup']==3)
 {
 echo "
 <hr/><font color=#af9878>$time | $pic <b><a href=\"search.php?nick=$nickas&amp;go=go\"><font color=#f4d06e>$nickas</font></a>
@@ -120,22 +120,22 @@ echo "
 echo'<br/>';
 }
 echo "<hr/></div>";
-if($udata[dostup] >= 2)
+if($udata['dostup'] >= 2)
 {
 echo "<br/><div class=inoy><a href=\"tchat.php?mod=trinti\">Удалить все сообщения</a></div>";
 }
 
 
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"tchat.php?page=$back\">Назад</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "Назад";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"tchat.php?page=$next\">Далее</a>";}
 else
 {echo "Далее";}
@@ -143,9 +143,9 @@ echo "</div>";
 break;
 
 case 'del_post':
-if($udata[dostup] >= 2)
+if($udata['dostup'] >= 2)
 {
-if(empty($_GET[p])){
+if(empty($_GET['p'])){
 echo"Не выбран пост!<br/>";
 }else{
 $asd = mysql_query("SELECT * FROM tchat WHERE id='$_GET[p]' LIMIT 1");
@@ -167,9 +167,9 @@ case 'write':
 
 echo"<b>Объявление</b><br/>";
 echo "<form action=\"tchat.php?mod=writes\" method=\"POST\">";
-if (isset($_GET[nick]))
+if (isset($_GET['nick']))
 {
-$_GET[nick] = htmlspecialchars($_GET[nick]);
+$_GET['nick'] = htmlspecialchars($_GET['nick']);
 echo "<input type=\"text\" name=\"zin\" maxlength=\"250\" value=\"$_GET[nick], \" size=\"10\"/><br/>";
 }
 else
@@ -184,7 +184,7 @@ case 'writes':
 
 $msg=$_POST['zin'];
 
-if ($udata[lvl]<11){
+if ($udata['lvl']<11){
 echo "<b>В чате можно писать с 11 уровня! </b>";
 			echo"<br/><br/><a href=\"chat.php?\">Назад</a>";
 include($path.'inc/down.php');
@@ -211,11 +211,11 @@ exit;}}*/
 //////////////////////////////////////////////////////////////////////////////////
 
 
-$msg = eregi_replace("(l2servak|l 2 s e r v a k . r u|l2servak.ru|. mobi|. ua|. tk|. ru|. org|. net|. info|. com|game-l2.ru|l2wap.ru|l2full.ru|game-l2.ru|l2mobile.ru|l3pvp.ru|ln8.ru|l3pvp|ln8|l3new.ru|l3new|wapl2pvp.ru|wapl2pvp|l2mo.ru|miru.mobi|l2pirates.ru|waplin.ru|l2mobi.su|l2war.mobi|wapl2pvp.tk|war-lin.ru|l2mobi.h1r.biz|l2mir.h1r.biz|l2perchiki.tk|barbars.su|l3new.tk|l3waps.ru|l3mobile.ru|darklineage.ru|l2mobi.su|l2|l3|mobi|lineage|lin|line|war|la2|la3)", "Реклама запрещена", $msg);
-$msg = eregi_replace("(l2servak|l 2 s e r v a k . r u|l2servak.ru|. mobi|. ua|. tk|. ru|. org|. net|. info|. com|game-l2.ru|l2wap.ru|l2full.ru|game-l2.ru|l2mobile.ru|l3pvp.ru|ln8.ru|l3pvp|ln8|l3new.ru|l3new|wapl2pvp.ru|wapl2pvp|l2mo.ru|miru.mobi|l2pirates.ru|waplin.ru|l2mobi.su|l2war.mobi|wapl2pvp.tk|war-lin.ru|l2mobi.h1r.biz|l2mir.h1r.biz|l2perchiki.tk|barbars.su|l3new.tk|l3waps.ru|l3mobile.ru|darklineage.ru|l2mobi.su|l2|l3|mobi|lineage|lin|line|war|la2|la3)", "Реклама запрещена", $msg);
+$msg = preg_replace('~(l 2 s e r v a k . r u|l2mobi.h1r.biz|darklineage.ru|l2mir.h1r.biz|l2perchiki.tk|l2pirates.ru|l2servak.ru|l2mobile.ru|wapl2pvp.ru|wapl2pvp.tk|l3mobile.ru|game-l2.ru|game-l2.ru|l2war.mobi|war-lin.ru|barbars.su|l2full.ru|miru.mobi|waplin.ru|l2mobi.su|l3waps.ru|l2mobi.su|l2servak|l2wap.ru|l3pvp.ru|l3new.ru|wapl2pvp|l3new.tk|l2mo.ru|lineage|. mobi|. info|ln8.ru|. org|. net|. com|l3pvp|l3new|. ua|. tk|. ru|mobi|line|ln8|lin|war|la2|la3|l2|l3)~is', 'Реклама запрещена', $msg);
+$msg = preg_replace('~(l 2 s e r v a k . r u|l2mobi.h1r.biz|darklineage.ru|l2mir.h1r.biz|l2perchiki.tk|l2pirates.ru|l2servak.ru|l2mobile.ru|wapl2pvp.ru|wapl2pvp.tk|l3mobile.ru|game-l2.ru|game-l2.ru|l2war.mobi|war-lin.ru|barbars.su|l2full.ru|miru.mobi|waplin.ru|l2mobi.su|l3waps.ru|l2mobi.su|l2servak|l2wap.ru|l3pvp.ru|l3new.ru|wapl2pvp|l3new.tk|l2mo.ru|lineage|. mobi|. info|ln8.ru|. org|. net|. com|l3pvp|l3new|. ua|. tk|. ru|mobi|line|ln8|lin|war|la2|la3|l2|l3)~is', 'Реклама запрещена', $msg);
 
-$msg=eregi_replace("(СУКА|ХУЙ|ХУИ|ХУЁ|ХУЕ|ИБА|ИПАЛ|АХХУЕН|ПИТБ|ХУЯ|ХУУ|АХУЕ|ОХУЕ|ХУЕЛ|ОХУИ|ОХУУ|ОХИУ|ОХУЮ|АХУИ|АХИИ|АХИЕ|АХУУ|АХИУ|ПИЗД|ПИСД|ПЫЗД|ПЫСД|ПИЦД|ПЕЗД|ПЕСД|БЛЯД|БЛЯ|БЛАД|БЛЯТ|БЛАТЬ|БЛЙАД|БЛЙАТ|БЛИАД|БЛИАТ| ЁБ| ЁП| ЕБ|ЙОБ|ИОБ|ЪЕБ|АЁБ|АЁП|АЕБ|АЙОБ|АИОБ|ОЁБ|ОЕБ|УЁБ|УЁП|УЕБ|УЙОБ|УИОБ|ИЕБ|ЫЕБ|МУДИ|МУДА|ЧЛЕН|ЧЛЕП|ПИДОР|ПИДАР|НИДОР|НИДАР|ПЕДИ|ЧМО|ЖОП|ДРАЧИ|ДРАЦХИ|ТВАЮ|ПОЦ|ПОХ|САСИ| ЛОХ| ЛОШ|ЕДРИ|ХЕР|ПИДО|ГОНД|МАНД|ЗАЛУП|ОТХУ|СУЧЕ|СРАН|МУДО|ДАРАС|БАЛЬНИК|СЦУКА)", "***", $msg);
-$msg=eregi_replace("(сука|хуй|хуи|хеё|хуе|иба|ипал|аххуен|питв|хуя|ахуе|охуе|хуел|охуи|ахие|пизд|писд|пызд|пысд|пицд|пезд|песд|бляд|бля|блят|блять|блйад|блйат|блиад|блиат|уёбок|уебок|уйоб|член|члеп|пидор|пидар|нидор|нидар|педик|чмо|драчи|драчун|дроч|пох|саси|лох|хер|пидо|гонд|залуп|сучка|дарас|бальник|сцука)", "***", $msg);
+$msg=preg_replace('~(БАЛЬНИК|АХХУЕН|ДРАЦХИ|БЛАТЬ|БЛЙАД|БЛЙАТ|БЛИАД|БЛИАТ|ПИДОР|ПИДАР|НИДОР|НИДАР|ДРАЧИ|ЗАЛУП|ДАРАС|СЦУКА|СУКА|ИПАЛ|ПИТБ|АХУЕ|ОХУЕ|ХУЕЛ|ОХУИ|ОХУУ|ОХИУ|ОХУЮ|АХУИ|АХИИ|АХИЕ|АХУУ|АХИУ|ПИЗД|ПИСД|ПЫЗД|ПЫСД|ПИЦД|ПЕЗД|ПЕСД|БЛЯД|БЛАД|БЛЯТ|АЙОБ|АИОБ|УЙОБ|УИОБ|МУДИ|МУДА|ЧЛЕН|ЧЛЕП|ПЕДИ|ТВАЮ|САСИ|ЕДРИ|ПИДО|ГОНД|МАНД|ОТХУ|СУЧЕ|СРАН|МУДО| ЛОХ| ЛОШ|ХУЙ|ХУИ|ХУЁ|ХУЕ|ИБА|ХУЯ|ХУУ|БЛЯ|ЙОБ|ИОБ|ЪЕБ|АЁБ|АЁП|АЕБ|ОЁБ|ОЕБ|УЁБ|УЁП|УЕБ|ИЕБ|ЫЕБ|ЧМО|ЖОП|ПОЦ|ПОХ|ХЕР| ЁБ| ЁП| ЕБ)~is', '***', $msg);
+$msg=preg_replace('~(бальник|аххуен|драчун|блять|блйад|блйат|блиад|блиат|уёбок|уебок|пидор|пидар|нидор|нидар|педик|драчи|залуп|сучка|дарас|сцука|сука|ипал|питв|ахуе|охуе|хуел|охуи|ахие|пизд|писд|пызд|пысд|пицд|пезд|песд|бляд|блят|уйоб|член|члеп|дроч|саси|пидо|гонд|хуй|хуи|хеё|хуе|иба|хуя|бля|чмо|пох|лох|хер)~is', '***', $msg);
 
 
 
@@ -239,12 +239,12 @@ $rand = rand(1000,9999);
 //start
 function smiles($string){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string=str_replace(":$file2",'<img src="pic/smiles/'.$file.'" alt="">',$string);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string;  }
 /////////////
 $rand = rand(1000,9999);
@@ -255,16 +255,16 @@ echo "<a href=\"smile.php?\"><img src=\"pic/смайл.png\" ></a>
 echo "<form action=\"tchat.php?mod=writes\" method=\"POST\">";
 echo "<input type=\"text\" name=\"zin\" maxlength=\"5000\"/> <input type=\"submit\" value=\"\" class=\"button_medium3\"></div>";
 
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT komentaras FROM tchat"));
 $puslap = floor($viso/10);
 $times = date("H:i");
@@ -292,28 +292,28 @@ $ud = mysql_fetch_array($reqs);
 
 //картинка клана /////////////////////////////
 $pic = "";
-if(!empty($ud[clan])){
+if(!empty($ud['clan'])){
 $req6546566 = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ud[clan]' LIMIT 1");
 $wh = mysql_fetch_array($req6546566);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"cl\"/>";}}
 ////////////////////////////////////////////////
 
 
-if($udata[dostup]>=2){
+if($udata['dostup']>=2){
 $silka = " <a href=\"tchat.php?mod=del_post&amp;p=$dsa[id]\"><font color=red>x</font></a>";
 }
 
 
-if ($ud[dostup]>=4)
+if ($ud['dostup']>=4)
 {
 echo "
 <hr/><font color=#af9878>$time | $pic <b><a href=\"search.php?nick=$nickas&amp;go=go\"><font color=#f4d06e>$nickas</font></a>
 <a href=\"tchat.php?nick=$nickas&amp;mod=write\"><img src=\"pic/чат.png\" > $silka</a>
 <br/><font color=#ffffcc></b> $koment </font>";
 }else{
-if ($ud[dostup]==2 or $ud[dostup]==3)
+if ($ud['dostup']==2 or $ud['dostup']==3)
 {
 echo "
 <hr/><font color=#af9878>$time | $pic <b><a href=\"search.php?nick=$nickas&amp;go=go\"><font color=#f4d06e>$nickas</font></a>
@@ -328,22 +328,22 @@ echo "
 echo'<br/>';
 }
 echo "<hr/></div>";
-if($udata[dostup] >= 2)
+if($udata['dostup'] >= 2)
 {
 echo "<br/><div class=inoy><a href=\"tchat.php?mod=trinti\">Удалить все сообщения</a></div>";
 }
 
 
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"tchat.php?page=$back\">Назад</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "Назад";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"tchat.php?page=$next\">Далее</a>";}
 else
 {echo "Далее";}
@@ -373,7 +373,7 @@ break;
 
 case 'trinti':
 
-if($udata[dostup] >= 2)
+if($udata['dostup'] >= 2)
 {
 mysql_query("DELETE FROM tchat");
 echo "Все сообщения удалены!";

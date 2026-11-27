@@ -8,9 +8,9 @@ echo "</div></div></div></div><div class=gameBorder><div class=menu><div class=c
 //---------------------------------------------------------
 $in_chat = (mysql_query("SELECT chat FROM option_game WHERE id = '1' LIMIT 1"));
 $iiii =mysql_fetch_array ($in_chat);
-if ($iiii[chat]=='off'){
+if ($iiii['chat']=='off'){
 echo "<div class=msg><p>Чат на некоторое время закрыт Администрацией!</p></div>";
-if ($udata[prava]>=2){
+if ($udata['prava']>=2){
 echo " <a href=\"/chat.php?chat_on\"><font color=green>Открыть чат</font></a> </div>";}
 //include($path.'inc/down.php');exit;
 }else{
@@ -19,12 +19,12 @@ echo " <a href=\"/chat.php?chat_on\"><font color=green>Открыть чат</fo
 
 function smiles($string){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string=str_replace(":$file2",' <img src="/pic/smiles/'.$file.'" alt="" height="25" width="25"> ',$string);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string;  }
 /////////////
 $rand = rand(1000,9999);
@@ -42,7 +42,7 @@ echo "<a href=\"smile.php?\"><img src=\"pic/смайл.png\" ></a>
 <a href=\"chat.php?r=$rand\"><img src=\"pic/обн.png\" ></a>";
 echo "<form action=\"chat.php?mod=writes\" method=\"POST\" name=\"guestbook\">";
 
-if (isset($_GET[otv])){$nick = "$_GET[otv], ";}
+if (isset($_GET['otv'])){$nick = "$_GET[otv], ";}
 
 echo //"	<input type=\"text\" name=\"zin\" maxlength=\"5000\"/> 
 		"	<textarea name=\"zin\" rows=\"3\" maxlength=\"5000\">$nick</textarea><br/>";
@@ -70,21 +70,21 @@ $ud = mysql_fetch_array($reqs);
 
 //картинка клана /////////////////////////////
 $pic = "";
-if(!empty($ud[clan])){
+if(!empty($ud['clan'])){
 $req6546566 = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ud[clan]' LIMIT 1");
 $wh = mysql_fetch_array($req6546566);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"/pic/clan/$wh[emblema]\" alt=\"cl\"/>";}}
 ////////////////////////////////////////////////
 $antiyou = "<img src=\"pic/smiles/align2.gif\" alt=\"antiyou\"/>";
 
 
-if($udata[prava]>=2){
+if($udata['prava']>=2){
 $silka = " <a href=\"/chat.php?mod=del_post&amp;p=$dsa[id]\"><font color=red>x</font></a>";
 }
 
-if($ud[dostup]>4 and $dsa['nick']=='AntiYou')
+if($ud['dostup']>4 and $dsa['nick']=='AntiYou')
 {
 $nickas1=str2gradient("$nickas", "f11717", "ffff00");
 echo "
@@ -93,7 +93,7 @@ echo "
 <br/><font color=#ffffcc></b>$koment";
 }
 
-if($ud[dostup]>4 and $dsa['nick']!=='AntiYou')
+if($ud['dostup']>4 and $dsa['nick']!=='AntiYou')
 {
 $nickas1=str2gradient("$nickas", "f11717", "ffff00");
 echo "
@@ -101,7 +101,7 @@ echo "
 <a href=\"chat.php?otv=$nickas\"><img src=\"pic/чат.png\" > $silka</a>
 <br/><font color=#ffffcc></b>$koment";
 }else{
-if ($ud[dostup]==4)
+if ($ud['dostup']==4)
 {
 $nickas1=str2gradient("$nickas", "ffa500", "21f117");
 echo "
@@ -109,7 +109,7 @@ echo "
 <a href=\"chat.php?otv=$nickas\"><img src=\"pic/чат.png\" > $silka</a>
 <br/><font color=#ffffcc></b>$koment";
 }else{
-if ($ud[dostup]==2 or $ud[dostup]==3)
+if ($ud['dostup']==2 or $ud['dostup']==3)
 {
 $nickas1=str2gradient("$nickas", "547ef4", "547ef4");
 echo "
@@ -142,21 +142,21 @@ echo "
 echo'<br/>';
 }
 echo "<hr/></div>";
-if($udata[prava] >= 2)
+if($udata['prava'] >= 2)
 {
 echo "<br/><a href=\"/chat.php?mod=trinti\">Удалить все сообщения</a>";
 }
 
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"/chat.php?page=$back\">Назад</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "Назад";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"/chat.php?page=$next\">Далее</a>";}
 else
 {echo "Далее";}

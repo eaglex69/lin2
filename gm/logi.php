@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -18,9 +18,9 @@ $taim = 150;
 $date = time();
 $timeout = $date - $taim;
 ////////////////
-if ($udata[dostup]>1){
+if ($udata['dostup']>1){
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo "<p><b><font color=grey>Логи переводов!</font></b></p>";

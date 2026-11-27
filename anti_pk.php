@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Анти ПК';
@@ -15,13 +15,13 @@ include($path.'inc/zag.php');
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 
 
 
 
-if (isset($_GET[del]) && $_GET[del]!==yes){ // удаление после подтверждения
+if (isset($_GET['del']) && $_GET['del']!=='yes'){ // удаление после подтверждения
 echo "<p><font color=#ff4040>Вы уверены что хотите удалить Анти-ПК акаунт? CoL не вернуться.</font><br/>
 <a href=\"anti_pk.php?del=yes\"><font color=#ff4040>Да</font></a> |
 <a href=\"anti_pk.php?\"><font color=#f4d06e>Нет</font></a>
@@ -29,7 +29,7 @@ echo "<p><font color=#ff4040>Вы уверены что хотите удали�
 }
 
 
-if ($_GET[del]==yes){// удаление после подтверждения
+if ($_GET['del']=='yes'){// удаление после подтверждения
 $req222 = mysql_query("SELECT * FROM `anti_pk` WHERE `usr` = '$log' LIMIT 1"); // защита от нескольких акк
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -48,7 +48,7 @@ $resvip = mysql_query("DELETE FROM `anti_pk` WHERE `usr` = '$log' LIMIT 1");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //-------------	Оплата акаунта	--------------------//
-if (isset($_GET[go])){
+if (isset($_GET['go'])){
 
 
 $req222 = mysql_query("SELECT * FROM `anti_pk` WHERE `usr` = '$log' LIMIT 1"); // защита от нескольких акк
@@ -63,18 +63,18 @@ exit;
 
 // считаем цену
 
-$_POST[dney] = round($_POST[dney]);
+$_POST['dney'] = round((float)$_POST['dney']);
 
-if ($_POST[dney]<=0 or is_numeric($_POST[dney])==FALSE){
+if ((float)$_POST['dney']<=0 or is_numeric($_POST['dney'])==FALSE){
 echo "<p><font color=#ff4040><b>Ошибка! Вводите цифры больше ноля !!! </b></font></p>";
 echo "<div class=silka><a href=\"anti_pk.php\">Назад</a></div>";
 include($path.'inc/down.php');EXIT;
 }
 
-$cena = $_POST[dney] * 25; // цена за день 25 колов
-$ntm = 60*60*24*$_POST[dney]; // время плюс
+$cena = $_POST['dney'] * 25; // цена за день 25 колов
+$ntm = 60*60*24*$_POST['dney']; // время плюс
 		
-$nalmaz = $udata[almaz]-$cena;		
+$nalmaz = $udata['almaz']-$cena;		
 
 if($nalmaz<0){
 echo'<font color=#ff4040><p>Недостаточно Coin of Luck!</p></font>';
@@ -117,24 +117,24 @@ if($avto==1){
 $vip = mysql_fetch_array($req22);
 $del = "<a href=\"anti_pk.php?del\"><font color=#ff4040>[x]</font></a>";
 echo'<hr/><p> <font color=#f4d06e> Анти-ПК акаунт активирован!!</b> '.$del.'</p>';
-$vip[time]=$vip[time]-time();
+$vip['time']=$vip['time']-time();
 
 
-												$time_dd = floor($vip[time]/86400); // сколько дней										
-												$vip[time] = floor($vip[time]-($time_dd*86400)); // остача дня
+												$time_dd = floor($vip['time']/86400); // сколько дней										
+												$vip['time'] = floor($vip['time']-($time_dd*86400)); // остача дня
 
 												
 												
-												$time_ch = floor($vip[time]/3600); // сколько часов										
-												$vip[time] = floor($vip[time]-($time_ch*3600)); // остача часов
+												$time_ch = floor($vip['time']/3600); // сколько часов										
+												$vip['time'] = floor($vip['time']-($time_ch*3600)); // остача часов
 												
-												$time_min = floor($vip[time]/60);
+												$time_min = floor($vip['time']/60);
 												
-												$time_sek = floor($vip[time]-($time_min*60));
+												$time_sek = floor($vip['time']-($time_min*60));
 												
 													if ($time_sek<0) {
 																	$time_min=$time_min-1;
-																	$time_sek = floor($udata[time]-($time_min*60));
+																	$time_sek = floor($udata['time']-($time_min*60));
 																	}
 	
 											echo "<b>$time_dd</b> дн. <b>$time_ch</b> ч. <b>$time_min</b> мин. <b>$time_sek</b> сек.";

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'bank';//фикс. места
@@ -24,16 +24,16 @@ $avto=mysql_num_rows($req);
 if($avto>=1){
 $bank = mysql_fetch_array($req);
 }
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo" <center><img src='/pic/roz/bank.jpg'   alt=''  ></div><hr/>";
 
-if(empty($bank[usr])){
+if(empty($bank['usr'])){
 echo"<b><font color=#f4d06e>Вы неявляетесь клиентом банка!<br>
 Стартовый взнос 10 Аден!<br/></font></b><hr/>";
 }else{
-echo"<b><font color=#007F46>У Вас на счету в банке <b><u>".number_format($bank[money], 0, ',', "`")."</u></b> Аден!<br/></font></b><br>";
+echo"<b><font color=#007F46>У Вас на счету в банке <b><u>".number_format($bank['money'], 0, ',', "`")."</u></b> Аден!<br/></font></b><br>";
 }
 echo "<form action=\"bank.php?mod=go\" method=\"post\">";
 echo '<b>Операция:</b><br/>';
@@ -54,12 +54,12 @@ $all_bank=mysql_num_rows($req);
 $am=0;
 While($sum = mysql_fetch_array($req))
 {
-$am=$am+$sum[money];
+$am=$am+$sum['money'];
 }
 
 
 echo'<br/>Всего вкладчиков: '.number_format($all_bank, 0, ',', "`").'';
-if ($udata[dostup]>3) {echo '<br/>Капитал банка: '.number_format($am, 0, ',', "`").'<hr>';}
+if ($udata['dostup']>3) {echo '<br/>Капитал банка: '.number_format($am, 0, ',', "`").'<hr>';}
 break;
 
 
@@ -69,26 +69,26 @@ break;
 
 
 case 'go':
-if($_POST[oper]==1){
-if(empty($bank[usr])){
+if($_POST['oper']==1){
+if(empty($bank['usr'])){
 echo'Вы неявляетесь клиентом банка!<br/>';
 }else{
-if($_POST[gold]<=0 or ($bank[money]-$_POST[gold])<10){
+if((float)$_POST['gold']<=0 or ($bank['money']-$_POST['gold'])<10){
 echo'Ошибка, введена неверная сумма!В банке должно остаться не меньше 10 Аден!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
-$udata[money]=$udata[money]+$_POST[gold];
+$udata['money']=$udata['money']+$_POST['gold'];
 
-if($udata[money] > 999999999999999999999999999){
+if($udata['money'] > 999999999999999999999999999){
 echo'<p>Вы не можете взять с собой более 1 000 000 000 Аден !</p><br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
 
-$bank[money]=$bank[money]-$_POST[gold];
+$bank['money']=$bank['money']-$_POST['gold'];
 mysql_query("UPDATE `bank` SET `money` = '$bank[money]',`ltime`='$d' WHERE `usr` = '$log'");
 
 mysql_query("UPDATE `users` SET `money` = '$udata[money]' WHERE `usr` = '$log'");
@@ -97,29 +97,29 @@ echo"
 ";
 }
 }else
-if($_POST[oper]==2){
-if($_POST[gold]<=0 or ($udata[money]-$_POST[gold])<0 or is_numeric($_POST[gold])==FALSE){
+if($_POST['oper']==2){
+if((float)$_POST['gold']<=0 or ($udata['money']-$_POST['gold'])<0 or is_numeric($_POST['gold'])==FALSE){
 echo'Ошибка, введена неверная сумма! Возможно у вас таких денег нет!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
-if(empty($bank[usr])){
-if($_POST[gold]<10 or $_POST[gold] > 9999999999999999999999999){
+if(empty($bank['usr'])){
+if((float)$_POST['gold']<10 or (float)$_POST['gold'] > 9999999999999999999999999){
 echo'Первый взнос должен быть не меньше 10 и не более 9 000 000 000 Аден !<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
-$udata[money]=$udata[money]-$_POST[gold];
+$udata['money']=$udata['money']-$_POST['gold'];
 mysql_query("UPDATE `users` SET `money` = '$udata[money]' WHERE `usr` = '$log'");
 mysql_query("INSERT INTO bank SET usr='$log',money='$_POST[gold]',ltime='$d'");
 echo"
 Поздравляеем вы стали клиентом банка! Ваш первый взнос составил: <b>$_POST[gold]</b><br/>
 ";
 }else{
-$bank[money]=$bank[money]+$_POST[gold];
-$udata[money]=$udata[money]-$_POST[gold];
+$bank['money']=$bank['money']+$_POST['gold'];
+$udata['money']=$udata['money']-$_POST['gold'];
 
-if($bank[money] > 9999999999999999999999999999){
+if($bank['money'] > 9999999999999999999999999999){
 echo'Вы не можете положить более 9 000 000 000 Аден !<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
@@ -141,7 +141,7 @@ break;
 
 /////////////////////////////////////////////// перевод колов
 case 'sendcol':
-if(empty($_GET[act])){
+if(empty($_GET['act'])){
 
 echo "<font color=#007F46>Адена и Coin of Luck списуются с Вашего лицевого счёта и добовляются игроку на лецевой счёт! <hr/></font>";
 
@@ -156,27 +156,27 @@ echo '<input name="gold"/><br/>';
 echo '<input type="submit" value="Перевести"/></form>';
 echo"<font color=lime> Стоимость перевода 1 Coin of luck составляет 150`000  Аден.</font><br/><br/>";
 
-}elseif($_GET[act]==go){
-if($_POST[komu]==$log){
+}elseif($_GET['act']=='go'){
+if($_POST['komu']==$log){
 echo'Себе передавать Coin of Luck нельзя!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
-if($udata[lvl]<10){
+if($udata['lvl']<10){
 echo'Передавать Coin of Luck можно с 10 уровня!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
 
-if($_POST[gold]<=0 or ($udata[almaz]-$_POST[gold])<0  or is_numeric($_POST[gold])==FALSE){
+if((float)$_POST['gold']<=0 or ($udata['almaz']-$_POST['gold'])<0  or is_numeric($_POST['gold'])==FALSE){
 echo'Ошибка, введена неверная сумма! Возможно у вас на счету таких денег нет!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
-if($_POST[gold]*150000 > $udata[money]){
+if($_POST['gold']*150000 > $udata['money']){
 echo'Недостаточно Аден для перевода!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
@@ -189,11 +189,11 @@ if($avto==0){
 echo'Получатель не существует!<br/>';
 }else{
 $ubank = mysql_fetch_array($req);
-$ubank[almaz]=$ubank[almaz]+$_POST[gold];
-$udat[almaz]=$udata[almaz]-$_POST[gold];
-$udat[money]=$udata[money]-$_POST[gold]*150000;
+$ubank['almaz']=$ubank['almaz']+$_POST['gold'];
+$udat['almaz']=$udata['almaz']-$_POST['gold'];
+$udat['money']=$udata['money']-$_POST['gold']*150000;
 
-$_POST[gold] = number_format($_POST[gold], 0, ',', "`");
+$_POST['gold'] = number_format($_POST['gold'], 0, ',', "`");
 
 $time = date("H:i d.m.y");
 $text = " Игрок <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> перевёл вам  $_POST[gold] Coin of Luck.";
@@ -223,7 +223,7 @@ break;
 
 
 case 'send':
-if(empty($_GET[act])){
+if(empty($_GET['act'])){
 
 echo "<font color=#007F46>Адена списуется с Вашего счёта Банка и начисляется игроку на счёт Банка, при этом игрок должен являтся его клиентом. <hr/></font>";
 
@@ -235,18 +235,18 @@ echo '<b>Сколько:</b><br/>';
 echo '<input name="gold"/><br/>';
 
 echo '<input type="submit" value="Продолжить"/></form>';
-}elseif($_GET[act]==go){
-if($_POST[komu]==$log){
+}elseif($_GET['act']=='go'){
+if($_POST['komu']==$log){
 echo'Себе передавать Адену нельзя!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
-if($_POST[gold]<=0 or ($bank[money]-$_POST[gold])<=0  or is_numeric($_POST[gold])==FALSE){
+if((float)$_POST['gold']<=0 or ($bank['money']-$_POST['gold'])<=0  or is_numeric($_POST['gold'])==FALSE){
 echo'Ошибка, введена неверная сумма!Возможно у вас на счету таких денег нет!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
-if(empty($bank[usr])){
+if(empty($bank['usr'])){
 echo'Вы неявляетесь клиентом банка!<br/>';
 echo"<a href=\"bank.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
@@ -257,13 +257,13 @@ if($avto==0){
 echo'Получатель неявляется клиентом банка!<br/>';
 }else{
 $ubank = mysql_fetch_array($req);
-$ubank[money]=$ubank[money]+$_POST[gold];
-$bank[money]=$bank[money]-$_POST[gold];
+$ubank['money']=$ubank['money']+$_POST['gold'];
+$bank['money']=$bank['money']-$_POST['gold'];
 
 mysql_query("UPDATE `bank` SET `money` = '$ubank[money]' WHERE `usr` = '$_POST[komu]'");
 mysql_query("UPDATE `bank` SET `money` = '$bank[money]' WHERE `usr` = '$log'");
 
-$_POST[gold] = number_format($_POST[gold], 0, ',', "`");
+$_POST['gold'] = number_format($_POST['gold'], 0, ',', "`");
 
 $time = date("H:i d.m.y");
 $text = " Игрок <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> перевёл вам  $_POST[gold] Аден.";

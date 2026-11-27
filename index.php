@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 
@@ -24,16 +24,16 @@ $reg = mysql_num_rows(mysql_query("SELECT * FROM users"));
 $asd = mysql_query("SELECT time FROM news ORDER BY id DESC LIMIT 1");
 $news = mysql_fetch_array($asd);
 /////////////////////
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 
 
 
 echo'<div class="menu">';
 
-if (isset($error))
+if (isset($_GET['error']))
 { echo'Пароль или логин неверен.</center><br/><hr>'; }
-if (isset($exit))
+if (isset($_GET['exit']))
 { echo'<font color=red>Вы успешно покинули игру! Враги не дремлют, а друзья ждут вас в игре! Возвращайтесь поскорей</font></center><br/><hr>'; }
 
 echo'<center><img src="pic/глфон.png"  >&nbsp;<br/><br/></center>';
@@ -54,7 +54,7 @@ echo "<center>
 		
 
 
-$newstext  = nl2br($msg[text]);
+$newstext  = nl2br($msg['text']);
 
 
  if (strlen($newstext)>600)
@@ -74,12 +74,12 @@ echo '</div><br/></span>';
 
 
 
-if (isset($_GET[error]))
+if (isset($_GET['error']))
 { echo'<hr/></div><div class="head"><span style=color:red;>Пароль или логин введены не правильно.</span></div><div class="menu">'; }
 
 $in_chat = mysql_query("SELECT igra FROM option_game WHERE id = 1");
 $iiii =mysql_fetch_array ($in_chat);
-if ($iiii[igra]=='off'){
+if ($iiii['igra']=='off'){
 
 include($path.'inc/endmain.php');
 	exit;
@@ -140,8 +140,8 @@ $okra=mysql_num_rows($okra);
 
 $rekord = mysql_query("SELECT * FROM `rekord`");
 $rek = mysql_fetch_array($rekord);
-$rekonline=explode('|',$rek[online]);
-$reknewusr=explode('|',$rek[new_reg]);
+$rekonline=explode('|',$rek['online']);
+$reknewusr=explode('|',$rek['new_reg']);
 
 $lvlall = mysql_num_rows(mysql_query("SELECT * FROM lvl")); // сколько уровней
 
@@ -160,7 +160,7 @@ echo "<br>
 echo "<hr/>";
 
 echo'  Адрес игры:<br/><br/>
- <input value="http://'.$_SERVER[HTTP_HOST].'" name="ssilka"/></div><br/>';
+ <input value="http://'.$_SERVER['HTTP_HOST'].'" name="ssilka"/></div><br/>';
 
 echo "  Статус сервера: <font color=#6fcd72>On</b></span></div></div><hr/>";
 
@@ -192,10 +192,10 @@ echo'<p><font color=grey>У вас есть возможность устано�
 <font color=#007F46>
 На все страницах игры будет стоять ссылка "Главная" ведущая на ваш сайт!<hr/>
 Сделайте ссылку вида:<br/>
-<b>http://'.$_SERVER[HTTP_HOST].'?site=ВАШ_САЙТ&ref=ВАШ_НИК</b><br/>
+<b>http://'.$_SERVER['HTTP_HOST'].'?site=ВАШ_САЙТ&ref=ВАШ_НИК</b><br/>
 Где ВАШ_САЙТ адрес вашего сайта без http://<br/></font><br/>
 <b>Скопируйте ссылку:</b><br/>
-<input value="http://'.$_SERVER[HTTP_HOST].'?site=ВАШ_САЙТ&ref=ВАШ_НИК" name="ssilka"/><br/></div>
+<input value="http://'.$_SERVER['HTTP_HOST'].'?site=ВАШ_САЙТ&ref=ВАШ_НИК" name="ssilka"/><br/></div>
 <br/><div class=inoy><a href="index.php">Назад</a><br/></div></div>
 ';
 include($path.'inc/endmain.php'); 
@@ -294,7 +294,7 @@ $asd = mysql_query("SELECT laikas, usr FROM online WHERE laikas > '$timeou' ORDE
 $i=$from+1;
 While($visi = mysql_fetch_array($asd))
 {
-echo ' '.$i.')  ';echo idlog_2($idlog=$visi[usr]).'<hr/>';
+echo ' '.$i.')  ';echo idlog_2($idlog=$visi['usr']).'<hr/>';
 $i++;
 }
 
@@ -313,13 +313,13 @@ break;
 }
 include($path.'inc/end.php');
 }else{
-if($_GET[mod]=='exit'){
+if($_GET['mod']=='exit'){
 $header=TRUE;
 }
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -372,7 +372,7 @@ if (empty($arer)){$arer=0;}
 
 
 
-$newstext  = nl2br($msg[text]);
+$newstext  = nl2br($msg['text']);
 
 
  if (strlen($newstext)>700)
@@ -492,8 +492,8 @@ $okra=mysql_num_rows($okra);
 
 $rekord = mysql_query("SELECT * FROM `rekord`");
 $rek = mysql_fetch_array($rekord);
-$rekonline=explode('|',$rek[online]);
-$reknewusr=explode('|',$rek[new_reg]);
+$rekonline=explode('|',$rek['online']);
+$reknewusr=explode('|',$rek['new_reg']);
 
 $lvlall = mysql_num_rows(mysql_query("SELECT * FROM lvl")); // сколько уровней
 
@@ -513,7 +513,7 @@ echo "
 echo "<hr/>";
 
 echo'  Адрес игры:<br/><br/>
-&#160 <input value="http://'.$_SERVER[HTTP_HOST].'" name="ssilka"/></div><br/><br/>';
+&#160 <input value="http://'.$_SERVER['HTTP_HOST'].'" name="ssilka"/></div><br/><br/>';
 
 echo "  Статус сервера: <font color=#6fcd72>On</b></font></div><br/></div>";
 
@@ -524,7 +524,7 @@ break;
 ////////////////Реф. Програма
 
 case 'ref':
-$udata[wmr] = $udata[wmr]/100;
+$udata['wmr'] = $udata['wmr']/100;
 echo'<hr/><p><font color=grey><b> Приглашай игроков, помоги в развитии и получи вознаграждение!<br/></font></p><hr/>
 
 <font color=#007F46> У нас предусмотренно несколько способов поощирения.</font></b><br/>
@@ -667,7 +667,7 @@ case 'inv':
 $req = mysql_query("SELECT * FROM `invite` WHERE `usr` = '$log'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($inv = mysql_fetch_array($req))
 {
@@ -691,7 +691,7 @@ $inv = mysql_fetch_array($req);
 
 $req = mysql_query("SELECT `name` FROM `clan` WHERE `lider` = '$inv[clan]'");
 $clan = mysql_fetch_array($req);
-if(empty($_GET[go])){
+if(empty($_GET['go'])){
 echo"Отправитель: <b>$clan[name]</b><br/>";
 echo"Текст: $inv[text]<br/>";
 
@@ -699,19 +699,19 @@ echo"<a href=\"index.php?mod=inv&amp;id=$_GET[id]&amp;go=ok\">Принять</a>
 echo"<a href=\"index.php?mod=inv&amp;id=$_GET[id]&amp;go=no\">Отказаться</a><br/>";
 echo"<a href=\"index.php?mod=inv\">Назад</a>";
 }else{
-if($_GET[go]==ok){
-if(!empty($udata[clan])){
+if($_GET['go']=='ok'){
+if(!empty($udata['clan'])){
 echo'Вы уже находитесь в клане!';
 include"inc/down.php";exit;
 }
 
-if($udata[lvl]<72){mysql_query("INSERT INTO `miniage`.`academy` (`id`, `clan`, `student`) VALUES (NULL, '$inv[clan]', '$log')");}
+if($udata['lvl']<72){mysql_query("INSERT INTO `miniage`.`academy` (`id`, `clan`, `student`) VALUES (NULL, '$inv[clan]', '$log')");}
 mysql_query("DELETE FROM `invite` WHERE usr='$log' and `id`='$_GET[id]'");
 mysql_query("UPDATE `users` SET `clan`='$inv[clan]' WHERE `usr` = '$log'");
 
 echo"Приглашение принято.Вы вступили в клан $clan[name]!<br/>";
 
-}elseif($_GET[go]==no){
+}elseif($_GET['go']=='no'){
 
 mysql_query("DELETE FROM `invite` WHERE usr='$log' and `id`='$_GET[id]'");
 

@@ -1,4 +1,4 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 
 echo'</div><div class="foot">';

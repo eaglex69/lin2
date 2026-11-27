@@ -43,7 +43,7 @@ $asd = mysql_query("SELECT laikas, usr FROM online WHERE laikas > '$timeou' ORDE
 $i=1;
 While($visi = mysql_fetch_array($asd))
 {
-echo ' ';echo idlog_online($idlog=$visi[usr]).'';
+echo ' ';echo idlog_online($idlog=$visi['usr']).'';
 
 }
 

@@ -14,18 +14,18 @@ $req = mysql_query("SELECT * FROM `ban` WHERE `usr` = '$log' LIMIT 1");
 $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);    
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `ban` WHERE `usr` = '$log'");
     }else{
 echo'<div class="forum"><center>';
     echo"<b><font color=red>Ваш персонаж был забанен!</font></b><br/> <font color=lime><b>Причина:</font> <font color=green>$ban[text]!</font> <br/>Осталось: ";
-$ban[ban_time]=$ban[ban_time]-time();
-if($ban[ban_time]<60){
+$ban['ban_time']=$ban['ban_time']-time();
+if($ban['ban_time']<60){
 echo "$ban[ban_time] сек.";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo "$ban[ban_time] мин.";
-}else{$ban[ban_time]=round($ban[ban_time]/3600);
+}else{$ban['ban_time']=round($ban['ban_time']/3600);
 echo "$ban[ban_time] часов";}
 echo "</b>"; 
 

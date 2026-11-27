@@ -17,7 +17,7 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-$sort=$_GET[sort];
+$sort=$_GET['sort'];
 
 echo "</div><div class=fon>";
 
@@ -31,16 +31,16 @@ if ($sort=='lvl'){$ss="lvl"; $what="ур"; $so="DESC"; echo "LvL | ";}else{ echo
 if ($sort=='id') {$ss="lvl"; $what="ур"; $so="ASC"; echo "ID";}else{ echo"<a href=\"users.php?sort=id\">ID</a>";}
 
 //---выщитует страницы----------
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 
 $viso = mysql_num_rows(mysql_query("SELECT id FROM users"));
 $puslap = floor($viso/10);
@@ -55,11 +55,11 @@ While($usr = mysql_fetch_array($req))
 {
 
 
-if ($usr[dostup]==5) {$color='<font color=lime>';}
-if ($usr[dostup]==4) {$color='<font color=lime>';}
-if ($usr[dostup]==3 or $usr[dostup]==2) {$color='<font color=#547ef4>';}
-if ($usr[dostup]==1 or $usr[dostup]==0) {$color='';}
-if ($usr[dostup]<2){
+if ($usr['dostup']==5) {$color='<font color=lime>';}
+if ($usr['dostup']==4) {$color='<font color=lime>';}
+if ($usr['dostup']==3 or $usr['dostup']==2) {$color='<font color=#547ef4>';}
+if ($usr['dostup']==1 or $usr['dostup']==0) {$color='';}
+if ($usr['dostup']<2){
 $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$usr[usr]' LIMIT 1"); 
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -77,16 +77,16 @@ echo "</br>";
 //-*-----
 echo "<br/>";
 echo ' <div style="text-align			:center;">';
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"users.php?page=$back&sort=$sort\">Назад</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "Назад";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"users.php?page=$next&sort=$sort\">Далее</a>";}
 else
 {echo "Далее";}

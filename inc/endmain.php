@@ -24,12 +24,12 @@ echo '<a href="http://waplog.net/c.shtml?604414"><img src="http://c.waplog.net/6
 echo '</noscript>';
 
 ?>
-<?
+<?php
 
 
 echo "</p></small></span>";
 
-	info_compress();
+	if (function_exists('info_compress')) info_compress();
 
 
 exit;

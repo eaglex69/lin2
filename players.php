@@ -18,7 +18,7 @@ echo '<div class="error">Доступ не авторизованным ЗАПР
 include($path.'inc/end.php');
 exit;
 }
-if($udata[dostup]<1){
+if($udata['dostup']<1){
 echo'Доступ закрыт!';
 mysql_query("INSERT INTO `block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'DiNo', '4985139097', 'Попытка входав админпанель', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'DiNo', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в адм панель $udata[usr]' ");

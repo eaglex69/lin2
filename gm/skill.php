@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,9 +19,9 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup]==5 or $log == Ultimate){
+if ($udata['dostup']==5 or $log == 'Ultimate'){
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,10 +32,10 @@ echo' <a href="skill.php?mod=spisok">Все скилы </a>';
 echo "</div>";
 
 ///////////////////// сохраняем изменения ///////////////////////
-if ($_GET[mod]==save)
+if ($_GET['mod']=='save')
 	{
 	
-if(!empty($_GET[skill]))  {$_POST[skill]=$_GET[skill];}
+if(!empty($_GET['skill']))  {$_POST['skill']=$_GET['skill'];}
  
 		$req = mysql_query("SELECT * FROM `shop_mag` where `lat_name`='$_POST[skill]'");
 		$avto=mysql_num_rows($req);
@@ -78,9 +78,9 @@ if(!empty($_GET[skill]))  {$_POST[skill]=$_GET[skill];}
 
 	}						}
 ////////////////////////////////////////////////////////////////
-if(!empty($_GET[skill]))  {$_POST[skill]=$_GET[skill];}
+if(!empty($_GET['skill']))  {$_POST['skill']=$_GET['skill'];}
    
-if(empty($_POST[skill])){
+if(empty($_POST['skill'])){
 echo '<form action="?" method="post">';
 echo"Название умения: (lat_name) - полное (Название 2)<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$skill\" name=\"skill\"/><br/>";
@@ -170,7 +170,7 @@ echo"<br/><div class=silka>		<a href=\"/gm/\">Назад</a>			</div>";
 break;
 
 
-case 'spisok';
+case 'spisok':
 
 echo "<hr/>";
 $req = mysql_query("SELECT * FROM `shop_mag` WHERE `id`>='0' ORDER BY `id` ASC");

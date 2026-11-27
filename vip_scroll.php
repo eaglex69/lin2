@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'vip_vip_scroll';//фикс. места
@@ -14,7 +14,7 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-if(empty($_GET[tip])){
+if(empty($_GET['tip'])){
 
 echo"<font color=green><b>Заточка вещей!</b><br/>";
 echo"1 Coin of Luck заточки даёт +2 к Def (защите)!<br/>
@@ -34,7 +34,7 @@ echo"<a href=\"vip_scroll.php?tip=kolco&amp;id=$_GET[id]\">Левое кольц
 echo"<a href=\"vip_scroll.php?tip=rkolco&amp;id=$_GET[id]\">Правое кольцо</a> ";
 echo"<a href=\"vip_scroll.php?tip=poyas&amp;id=$_GET[id]\">Левая Серёжка</a> ";
 echo"<a href=\"vip_scroll.php?tip=rpoyas&amp;id=$_GET[id]\">Правая серёжка</a> </div>";
-}elseif(isset($_GET[tip]) and empty($_GET[what])){
+}elseif(isset($_GET['tip']) and empty($_GET['what'])){
 
 echo"<font color=grey><p>Колдуются вещи, которые одеты на Вас! <br/>Поехали далее:</p><hr/></font>";
 //-------ДА
@@ -48,28 +48,28 @@ echo "<input type='submit' name='ok' value=' Точить ' /></font></form> ";
 echo"<div class=inoy><a href=\"col_bonus.php?\"><font color=red>  Отказаться  </font></a></div>";
 }else{
 if(
-$_GET[tip]!=golova and 
-$_GET[tip]!=body and 
-$_GET[tip]!=nogi and 
-$_GET[tip]!=shit and 
-$_GET[tip]!=amulet and 
-$_GET[tip]!=ruki and 
-$_GET[tip]!=plash and
-$_GET[tip]!=poyas and 
-$_GET[tip]!=rpoyas and 
-$_GET[tip]!=kolco and 
-$_GET[tip]!=rkolco
+$_GET['tip']!='golova' and 
+$_GET['tip']!='body' and 
+$_GET['tip']!='nogi' and 
+$_GET['tip']!='shit' and 
+$_GET['tip']!='amulet' and 
+$_GET['tip']!='ruki' and 
+$_GET['tip']!='plash' and
+$_GET['tip']!='poyas' and 
+$_GET['tip']!='rpoyas' and 
+$_GET['tip']!='kolco' and 
+$_GET['tip']!='rkolco'
 ){
 echo'Ошибка, доступ закрыт!';
 include($path.'inc/down.php');
 exit;
 }
 // пишем если кольцо, амулет или серёжка то маг иначе физ защита
-if($_GET[tip]==amulet or $_GET[tip]==kolco or $_GET[tip]==rkolco or$_GET[tip]==poyas or $_GET[tip]==rpoyas) {$_GET[what] = mdef;}else{$_GET[what] = pdef;}
+if($_GET['tip']=='amulet' or $_GET['tip']=='kolco' or $_GET['tip']=='rkolco' or$_GET['tip']=='poyas' or $_GET['tip']=='rpoyas') {$_GET['what'] = 'mdef';}else{$_GET['what'] = 'pdef';}
 
 
 
-if($_GET[what]!=pdef and $_GET[what]!=mdef){
+if($_GET['what']!='pdef' and $_GET['what']!='mdef'){
 echo'Ошибка, доступ закрыт!';
 include($path.'inc/down.php');
 exit;
@@ -82,21 +82,21 @@ include($path.'inc/down.php');
 exit;
 }
 //////////////////////////
-if($_POST[alm] <= 0){echo'На 0 Coin of Luck точить нельзя!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
-if($udata[almaz] - $_POST[alm] < 0){echo'Недостаточно Coin of Luck!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
-$almaznew = $udata[almaz] - $_POST[alm];
+if((float)$_POST['alm'] <= 0){echo'На 0 Coin of Luck точить нельзя!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
+if($udata['almaz'] - $_POST['alm'] < 0){echo'Недостаточно Coin of Luck!';echo"<br/><a href=\"col_bonus.php?\">Назад</a>";include($path.'inc/down.php');exit;}
+$almaznew = $udata['almaz'] - $_POST['alm'];
 
 
 $it = mysql_fetch_array($req);
-$mag[give] = $_POST[alm] * 2;
+$mag['give'] = $_POST['alm'] * 2;
 
-$nprotect=$mag[give]+$udata[$_GET[what]];
+$nprotect=$mag['give']+$udata[$_GET['what']];
 
-$w=explode("*",$it[name]);
+$w=explode("*",$it['name']);
 if(empty($w[1])){
 $nam="$w[0]*$_POST[alm]";
 }else{
-$kol=$w[1]+$_POST[alm];
+$kol=$w[1]+$_POST['alm'];
 $nam="$w[0]*$kol";}
 
 //////////////забираем колы//////////////
@@ -104,7 +104,7 @@ $nam="$w[0]*$kol";}
 
 ////////////////////////////////////////
 
-$num=$mag[give]+$it[$_GET[what]];
+$num=$mag['give']+$it[$_GET['what']];
 
 mysql_query("UPDATE `users` SET `almaz` = '$almaznew',`$_GET[what]` = '$nprotect' WHERE usr = '$log'");
 mysql_query("UPDATE `item` SET

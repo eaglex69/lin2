@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 $headmod = 'zayavka';//фикс. места
 $textl='Предложения замуж';
@@ -9,7 +9,7 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[go]){
+switch($_GET['go']){
 
 default:
 $req = mysql_query("SELECT * FROM `zamuj` WHERE `usr` = '$log'");
@@ -22,7 +22,7 @@ echo"<a href=\"zayavka.php?go=no\">Отказаться</a><br/>";
 break;
 
 case 'ok':
-if(!empty($udata[zamujem])){
+if(!empty($udata['zamujem'])){
 echo'Вы уже состоите в браке!';
 include"inc/down.php";
 exit;

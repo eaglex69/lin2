@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'zaksms';//фикс. места
@@ -17,12 +17,12 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //--------монеты покупка---------------
 echo"<hr>";
 echo"<font color=#f4d06e> Купить <img src=\"pic/лааак.png\" height=15 width=15><font color=#ffffcc> Coin of Luck</font></font></p></b>";
-echo"<font color=#f4d06e> У вас <img src=\"pic/лааак.png\" height=15 width=15><font color=#ffffcc> ".number_format($udata[almaz], 0, ',', "`")."</font><font color=#f4d06e> Coin of Luck !</hr>";
+echo"<font color=#f4d06e> У вас <img src=\"pic/лааак.png\" height=15 width=15><font color=#ffffcc> ".number_format($udata['almaz'], 0, ',', "`")."</font><font color=#f4d06e> Coin of Luck !</hr>";
 echo "</div><br/></div>";
 echo"<font color=#f4d06e> Заказы принимаются только на: <font color=#ffffcc>Яндекс деньги, и Web Money кошельки !</font></font></p></b>";
 echo "</div><br/></div>";
@@ -126,7 +126,7 @@ break;
 
 
 //************************************************************************************************
-case 'webmoney';
+case 'webmoney':
 
 echo'<font color=orange><p><b>Как пользоватся WebMoney?</b></p></font><hr/>';
 

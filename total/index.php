@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'Тотализатор';
@@ -10,7 +10,7 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 case "stav": 
 
@@ -94,7 +94,7 @@ echo "<a href='my_stavki.php'>Мои ставки</a><br>";
 echo "<a href='search.php'>Поиск в прошедших матчах</a><br>";
 echo "<a href='top.php'>TOP 15 юзеров</a><br>";
 echo "<a href='statistika.php'>Статистика</a><br>";
-if($udata[dostup]>3){echo "<a href='admin.php'>Админ панель</a><br>";}
+if($udata['dostup']>3){echo "<a href='admin.php'>Админ панель</a><br>";}
 break;
 
 case 'stats':

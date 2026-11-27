@@ -11,7 +11,7 @@ include($path.'inc/head.php');
 
 $in_chat = mysql_query("SELECT reg FROM option_game WHERE id = 1");
 $iiii =mysql_fetch_array ($in_chat);
-if ($iiii[reg]=='off'){
+if ($iiii['reg']=='off'){
 echo "<div class=dot> Регистрация закрыта</div>";
 echo'<a href="/index.php">Назад</a>';
 include($path.'inc/endmain.php');
@@ -35,9 +35,9 @@ echo'<div style="color:#7F0000;text-align:center;"> <b>При регистрац
 function first()
 {
 $ref=rand(0,10000);
-$_SESSION[kod]=$ref;
+$_SESSION['kod']=$ref;
 
-if(!empty($_GET[site])){
+if(!empty($_GET['site'])){
 echo "<form action=\"reg.php?mod=goreg\" method=\"post\">";
 }else{
 echo '<form action="reg.php?mod=goreg" method="post">';
@@ -97,7 +97,7 @@ echo'<a href="index.php">Назад</a><hr/>';
 function goreg()
 {
 
-if(eregi("[^a-z0-9-]",$_POST[nick]))
+if(preg_match('/[^a-z0-9-]/i',$_POST['nick']))
 {
 echo"Логин содержит запрещенные символы.<br/>
 <a href=\"reg.php?\">Вернуться к регистрации</a><br/>"; 
@@ -106,46 +106,46 @@ include($path.'inc/end.php'); exit;
 
 
 if(
-$_POST[storona]!='human' and 
-$_POST[storona]!='gnom' and 
-$_POST[storona]!='elf' and 
-$_POST[storona]!='darkelf' and 
-$_POST[storona]!='ork'
+$_POST['storona']!='human' and 
+$_POST['storona']!='gnom' and 
+$_POST['storona']!='elf' and 
+$_POST['storona']!='darkelf' and 
+$_POST['storona']!='ork'
 ){
 echo "Невыбрана сторона персонажа!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
 
-if($_POST[klas]!='fighert' and $_POST[klas]!='wizard'){
+if($_POST['klas']!='fighert' and $_POST['klas']!='wizard'){
 echo "Невыбран класс персонажа!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
 
-if($_POST[storona]=='gnom' and $_POST[klas]=='wizard'){
+if($_POST['storona']=='gnom' and $_POST['klas']=='wizard'){
 echo "Гномы не могут быть магами!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }else{
 
 
-if($_POST[pol]!='m' and $_POST[pol]!='w'){
+if($_POST['pol']!='m' and $_POST['pol']!='w'){
 echo "Невыбран пол персонажа!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
 
 
 $ip=htmlspecialchars(stripslashes($_SERVER['REMOTE_ADDR']));
-$pass = $_POST[pass];
-$_POST[nick] = addslashes("$_POST[nick]");
-$_POST[nick] = htmlspecialchars($_POST[nick]);
+$pass = $_POST['pass'];
+$_POST['nick'] = addslashes("$_POST[nick]");
+$_POST['nick'] = htmlspecialchars($_POST['nick']);
     
-$_POST[pass] = addslashes("$_POST[pass]");       
-$_POST[pass] = htmlspecialchars($_POST[pass]);
+$_POST['pass'] = addslashes("$_POST[pass]");       
+$_POST['pass'] = htmlspecialchars($_POST['pass']);
 
-$_POST[repass] = addslashes("$_POST[repass]");
-$_POST[repass] = htmlspecialchars($_POST[repass]);
+$_POST['repass'] = addslashes("$_POST[repass]");
+$_POST['repass'] = htmlspecialchars($_POST['repass']);
     
-$_POST[email] = addslashes("$_POST[email]");       
-$_POST[email] = htmlspecialchars($_POST[email]);
+$_POST['email'] = addslashes("$_POST[email]");       
+$_POST['email'] = htmlspecialchars($_POST['email']);
 	
 $tkr = mysql_query("SELECT * FROM `users` WHERE `usr` = '$_POST[nick]'");
 $tkr=mysql_num_rows($tkr);
@@ -153,27 +153,27 @@ $tkr=mysql_num_rows($tkr);
 $bips = mysql_query("SELECT * FROM `users` WHERE `ip` = '$ip'");
 $bip=mysql_num_rows($bips);
 
-if($_SESSION[kod]!=$_POST[kod])
+if($_SESSION['kod']!=$_POST['kod'])
 {
-unset($_SESSION[kod]);
+unset($_SESSION['kod']);
 echo "Не правильно введён защитный код!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
-elseif (@preg_replace("[A-za-zА-яа-я0-9-_]+", "", $_POST[nick]) || @preg_replace("[A-za-z0-9]+", "", $_POST[pass]) || @preg_replace("[A-za-z0-9]+", "", $_POST[repass]))
+elseif (@preg_replace("[A-za-zА-яа-я0-9-_]+", "", $_POST['nick']) || @preg_replace("[A-za-z0-9]+", "", $_POST['pass']) || @preg_replace("[A-za-z0-9]+", "", $_POST['repass']))
 {
 echo "Используете запрещённые символы!<br/>";
 echo "<a href=\"reg.php?site=$_GET[site]\">Назад</a></div>";
 }
 
 
-elseif (ereg("/[0-9a-z_]+@[0-9a-z_^\.]", "", $_POST[email]))
+elseif (false /* PHP 8: legacy 3-arg ereg() with an empty subject never matched - e-mail is not validated (unchanged behaviour) */)
 {
 echo "Не правильно введён e-mail!</div>";
 echo "<a href=\"reg.php?site=$_GET[site]\">Назад</a></div>";
 }
 
 
-elseif (($tkr < 1) && ($bip < 7) && ($_POST[nick] != "") && ($_POST[pass] != "") && ($_POST[repass] != "") && ($_POST[pass] == $_POST[repass]))
+elseif (($tkr < 1) && ($bip < 7) && ($_POST['nick'] != "") && ($_POST['pass'] != "") && ($_POST['repass'] != "") && ($_POST['pass'] == $_POST['repass']))
 {
 
 $dater=date("d F, Y", time());
@@ -191,19 +191,19 @@ $dater = str_replace("October","октября",$dater);
 $dater = str_replace("November","ноября",$dater);
 $dater = str_replace("December","декабря",$dater);
 
-$_POST[pass] = md5($_POST[pass]);
+$_POST['pass'] = md5($_POST['pass']);
 
-$storona = $_POST[storona];
+$storona = $_POST['storona'];
 
-if($_POST[storona]=="human"){$city="Talking Island Village"; $all=50;}
-if($_POST[storona]=="gnom"){$city="Dwarven Village"; $all=100;}
-if($_POST[storona]=="elf"){$city="Elven Village";  $all=60;}
-if($_POST[storona]=="darkelf"){$city="Dark Elven Village"; $all=75;}
-if($_POST[storona]=="ork"){$city="Orc Village";  $all=100;}
-if($_POST[storona]=="kamael"){$city="Kamael Village";  $all=100;}
+if($_POST['storona']=="human"){$city="Talking Island Village"; $all=50;}
+if($_POST['storona']=="gnom"){$city="Dwarven Village"; $all=100;}
+if($_POST['storona']=="elf"){$city="Elven Village";  $all=60;}
+if($_POST['storona']=="darkelf"){$city="Dark Elven Village"; $all=75;}
+if($_POST['storona']=="ork"){$city="Orc Village";  $all=100;}
+if($_POST['storona']=="kamael"){$city="Kamael Village";  $all=100;}
 
 
-if($_POST[klas]=="wizard"){
+if($_POST['klas']=="wizard"){
 $mp = 100 + $all; $hp = 100 + $all;
 $patt = 23; 
 $matt = 56;
@@ -212,7 +212,7 @@ $mdef = 52;
 }
 
 
-if($_POST[klas]=="fighert"){
+if($_POST['klas']=="fighert"){
 $mp=80+$all; $hp=120+$all;
 $patt = 55;
 $matt = 21;
@@ -222,7 +222,7 @@ $mdef = 49;
 
 
 
-if(!empty($_GET[ref])){
+if(!empty($_GET['ref'])){
 $req = mysql_query("SELECT `ip` FROM `users` WHERE `id` = '$_GET[ref]' LIMIT 1");
 // //////////////////////////
 $avto = mysql_num_rows($req);
@@ -230,7 +230,7 @@ $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $refer = mysql_fetch_array($req);
     
-    if($ip!=$refer[ip]){
+    if($ip!=$refer['ip']){
     
     mysql_query("INSERT INTO
         `users` SET
@@ -461,7 +461,7 @@ mysql_query("INSERT INTO
         `image` = 'not'");
 
 		
-if($_POST[klas]=="wizard"){
+if($_POST['klas']=="wizard"){
 mysql_query("INSERT INTO
         `mag` SET
         `usr` = '$_POST[nick]',
@@ -478,7 +478,7 @@ mysql_query("INSERT INTO
         `cena` = '5|10|20|38|54|80|112|180|260',        
         `lvl` = '1'");
 }
-if($_POST[klas]=="fighert"){
+if($_POST['klas']=="fighert"){
 mysql_query("INSERT INTO
         `mag` SET
         `usr` = '$_POST[nick]',
@@ -542,9 +542,9 @@ $text = "Добро пожаловать в игру Lineage 3!
 
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Ultimate', `user_to` = '$_POST[nick]', `time` = '$time', `read` = 1, `mail_msg` = '$text'");
 
-$_SESSION['log'] = $_POST[nick];
-$_SESSION['pas'] = $_POST[pass];
-$_SESSION['klas'] = $_POST[klas];
+$_SESSION['log'] = $_POST['nick'];
+$_SESSION['pas'] = $_POST['pass'];
+$_SESSION['klas'] = $_POST['klas'];
 $_SESSION['storona'] = $storona;
 
 echo "Добро пожаловать в игру Lineage 3!<br/>";
@@ -552,22 +552,22 @@ echo "Логин: $_POST[nick]<br/>
 Пароль: $pass</div>";
 echo "<div class=\"inoy\"><a href=\"reg.php?mod=intro\">Далее</a></div>";
 }
-else if($_POST[nick] == "")
+else if($_POST['nick'] == "")
 {
 echo "Вы оставили пустое поле: Логин!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
-elseif($_POST[pass] == "")
+elseif($_POST['pass'] == "")
 {
 echo "Вы оставили пустое поле: Пароль!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
-elseif($_POST[repass] == "")
+elseif($_POST['repass'] == "")
 {
 echo "Вы оставили пустое поле: Пароль(повторно)!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
 }
-elseif($_POST[pass] != $_POST[repass])
+elseif($_POST['pass'] != $_POST['repass'])
 {
 echo "Пароли не совпадают!<br/>";
 echo "<a href=\"reg.php?\">Назад</a></div>";
@@ -604,11 +604,11 @@ echo'<br/>Не проходи мимо, Ты новичёк ещё, поэтом
 echo "<hr/><div class=\"inoy\"><a href=\"index.php?\">Войти в игру</a>";
 }
 }
-if($_GET[mod] == "")
+if($_GET['mod'] == "")
 {first();}
-elseif($_GET[mod] == "goreg")
+elseif($_GET['mod'] == "goreg")
 {goreg();}
-elseif($_GET[mod] == "intro")
+elseif($_GET['mod'] == "intro")
 {intro();}
 
 

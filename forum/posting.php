@@ -33,7 +33,7 @@ $page = intval($_GET['page']);
 
 	$topic = mysql_fetch_assoc(mysql_query("SELECT `id`, `id_cat`, `closed` FROM `forum_topics` WHERE `id` = '$id'"));
 
-if ($udata[lvl]<12){
+if ($udata['lvl']<12){
 echo "<b>В форуме можно писать с 12 уровня! </b>";
 	nav2('topic.php?id='.$topic['id'].'&amp;page='.$page.'', 'Назад');
 include($path.'inc/end.php');
@@ -72,7 +72,7 @@ $page = intval($_GET['page']);
 
 	$msg = mysql_fetch_assoc(mysql_query("SELECT `id`, `id_topic`, `login` FROM `forum_msg` WHERE `id` = '$id'"));
 
-if ($udata[lvl]<12){
+if ($udata['lvl']<12){
 echo "<b>В форуме можно писать с 12 уровня! </b>";
 	nav2('topic.php?id='.$msg['id_topic'].'&amp;page='.$page.'', 'Назад');
 include($path.'inc/end.php');
@@ -106,7 +106,7 @@ $page = intval($_GET['page']);
 
 	$msg = mysql_fetch_assoc(mysql_query("SELECT `id`, `id_cat`, `id_topic` FROM `forum_msg` WHERE `id` = '$id'"));
 
-if ($udata[lvl]<12){
+if ($udata['lvl']<12){
 echo "<b>В форуме можно писать с 12 уровня! </b>";
 nav2('topic.php?id='.$msg['id_topic'].'', 'Назад');
 include($path.'inc/end.php');
@@ -218,7 +218,7 @@ break;
 ###############################################################################
 case 'topic_add':
 
-if ($udata[lvl]<40){
+if ($udata['lvl']<40){
 echo "<b>Создавать темы можно с 40 уровня! </b>";
 	nav2('index.php?act=cat_view&amp;id='.$id.'', 'Назад');
 include($path.'inc/end.php');
@@ -240,7 +240,7 @@ break;
 ###############################################################################
 case 'topic_added':
 
-if ($udata[lvl]<40){
+if ($udata['lvl']<40){
 echo "<b>Создавать темы можно с 40 уровня! </b>";
  nav2('index.php?act=cat_view&amp;id='.$id.'', 'Назад');
 include($path.'inc/end.php');

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 define('PROTECTOR', 1);
 
@@ -110,7 +110,6 @@ echo " <a href=\"sab.php?\">[-]</a></div><br/>";
 <option value=\"Assassin\">Assassin</option>
 <option value=\"Dark Elf Wizard\">Dark Elf Wizard</option>
 <option value=\"Shillien Oracle\">Shillien Oracle</option>
-*/
 	
 	echo "<hr/><p><b><font color=#76ABC7>Професии от саб классов:</font></b></p>";
 
@@ -140,4 +139,5 @@ break;
 }
 
 include($path.'inc/down.php');
+*/
 ?>

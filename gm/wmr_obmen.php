@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='GM-Panel WebMoney';
@@ -14,14 +14,14 @@ include($path.'inc/zag.php');
 ///////////////
 
 
-if ($udata[dostup] < 4){
+if ($udata['dostup'] < 4){
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
 mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в гм панель $udata[usr]' ");
 include($path.'inc/down.php');
 exit;}
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -41,13 +41,13 @@ $data = str_replace("December","Декабря",$data);
 
 
 // --- --- Одобрить заказ --- --- //
-if (isset($_GET[pers])){
+if (isset($_GET['pers'])){
 
 $usr = mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `usr`='$_GET[pers]' Limit 1"));
 
-$almplus = round($usr[wmr]/400); // скоко начисляем
-$wmr = $usr[wmr]-$almplus*400; // выщитуем остачу
-$almaz = $usr[almaz]+($almplus*10); // плюсуем скоко получил к скоко есть
+$almplus = round($usr['wmr']/400); // скоко начисляем
+$wmr = $usr['wmr']-$almplus*400; // выщитуем остачу
+$almaz = $usr['almaz']+($almplus*10); // плюсуем скоко получил к скоко есть
 if ($wmr<0){$wmr=0;}
 
 mysql_query ("UPDATE users SET almaz='$almaz', wmr='$wmr'  WHERE usr='$_GET[pers]' LIMIT 1"); // пишем данные игрока с новой суммой

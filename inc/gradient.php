@@ -1,4 +1,4 @@
-<?
+<?php
 function str2gradient($text,$from='',$to='', $mode="hex") 
 { 
     if($mode=="hex") 

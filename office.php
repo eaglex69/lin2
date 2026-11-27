@@ -56,8 +56,8 @@ echo "<br><div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
 echo '<a href="office.php?a=my_pers">Войти в игру</a></div>';
 echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
 echo '<a href="office.php?a=password">Изм пароль</a> ';
-if(!$account[email])echo ' <a href="office.php?a=email">Уст e-mail</a>';
-if(!$account[sekret])echo ' <a href="office.php?a=sekret">Секретное слово</a>';
+if(!$account['email'])echo ' <a href="office.php?a=email">Уст e-mail</a>';
+if(!$account['sekret'])echo ' <a href="office.php?a=sekret">Секретное слово</a>';
 echo'</div>';
 echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
 echo '<a href="office.php?a=my_pers">Персонажи '.$my_pers.' - 7</b>';
@@ -110,7 +110,7 @@ echo'секретное слово '.$sekret.' успешно прикрепле
 echo'<a href="office.php">Назад</a>';
 break;
 
-case'savepass';
+case'savepass':
 $psstar = md5(htmlspecialchars(stripslashes(addslashes($_POST['psstar']))));
 $req = mysql_query("SELECT * FROM `account` WHERE `id` = '".$uid."' and `pass`='".$psstar."' LIMIT 1");
 $avto= mysql_num_rows($req);

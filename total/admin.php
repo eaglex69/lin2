@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'Тотализатор';
@@ -71,7 +71,7 @@ break;
 ################
 
 #### Удаление команды ####
-case "del_ok";
+case "del_ok":
 
 if(empty($_POST['submit'])){
 	echo "<big><font color='red'><b>Удаленно успешно!</b></font></big><br>";
@@ -84,7 +84,7 @@ break;
 
 
 #### Добавление новой команды ####
-case "add_ok";
+case "add_ok":
 
 if(empty($_POST['submit'])){
 	echo "<big><font color='red'><b>Добавленно успешно!</b></font></big><br>";
@@ -123,7 +123,7 @@ echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 #############
 
-case"base";
+case"base":
 echo"<a href='?mod=base_ist'>Очистить таблицу истории</a><br>";
 echo"<a href='?mod=base_match'>Очистить таблицу матчей</a><br>";
 echo"<a href='?mod=base_stav'>Очистить таблицу ставок</a><br>";
@@ -131,7 +131,7 @@ echo"<a href='?mod=base_all'>Очистить все таблицы тотали
 break;
 
 
-case"base_ist";
+case"base_ist":
 echo"<b><big>Таблица `tot_istor` успешно очишенна!</big></b><br><br>";
 mysql_query("TRUNCATE TABLE `tot_istor`");
 
@@ -139,7 +139,7 @@ echo '<br><br><a href=admin.php>В админку</a>';
 echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 
-case"base_match";
+case"base_match":
 echo"<b><big>Таблица `tot_match` успешно очишенна!</big></b><br><br>";
 mysql_query("TRUNCATE TABLE `tot_match`");
 
@@ -147,7 +147,7 @@ echo '<br><br><a href=admin.php>В админку</a>';
 echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 
-case"base_stav";
+case"base_stav":
 echo"<b><big>Таблица `tot_stavki` успешно очишенна!</big></b><br><br>";
 mysql_query("TRUNCATE TABLE `tot_stavki`");
 
@@ -155,7 +155,7 @@ echo '<br><br><a href=admin.php>В админку</a>';
 echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 
-case"base_all";
+case"base_all":
 echo"<b><big>Таблицы `tot_stavki`,`tot_istor`,`tot_match` успешно очишенны!</big></b><br><br>";
 mysql_query("TRUNCATE TABLE `tot_stavki`");
 mysql_query("TRUNCATE TABLE `tot_istor`");
@@ -194,7 +194,7 @@ echo '<br><br><a href=admin.php>В админку</a>';
 echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 
-case "opov_ok";
+case "opov_ok":
 
 
 $messa = $_POST['zag_mes'];
@@ -233,7 +233,7 @@ echo '<br><br><a href=admin.php>В админку</a>';
 echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 ##
-case "ochki_1";
+case "ochki_1":
 $nick=mysql_result(mysql_query("SELECT (usr) FROM `users` WHERE `usr`='".$_POST['user']."'"),0);
 $ochk=mysql_result(mysql_query("SELECT (tot_o) FROM `users` WHERE `usr`='".$_POST['user']."'"),0);
 
@@ -248,7 +248,7 @@ echo '<br><br><a href=admin.php>В админку</a>';
 echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 ##
-case "ochki_ok";
+case "ochki_ok":
 $och = trim ($_POST['ochk']);
 
 echo"<big><b><font color='red'>Успешно изминено!</font></big></b><br>";
@@ -260,7 +260,7 @@ echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 #############
 
-case"system";
+case"system":
 
 echo"<form action='?mod=setting_ok' method='post'>";
 echo"Приостановить временно роботу тотализатора :<br>";
@@ -275,7 +275,7 @@ echo "<br /><a href='index.php'>В тотализатор</a>";
 break;
 
 ####
-case "setting_ok";
+case "setting_ok":
 
 
 echo"<big><b><font color='red'>Успешно изминено!</font></big></b><br>";

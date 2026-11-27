@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Магазин';
@@ -14,7 +14,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[act]){
+switch($_GET['act']){
 
 default:
 $req = mysql_query("SELECT * FROM `shop_vip` WHERE `id`='$_GET[id]'");
@@ -28,7 +28,7 @@ exit;
 $mag = mysql_fetch_array($req);
 ///////////////
 
-$nmoney=$udata[almaz]-$mag[cena];
+$nmoney=$udata['almaz']-$mag['cena'];
 
 if($nmoney<0){
 echo'Нехватает Coin of Luck!';
@@ -36,7 +36,7 @@ include($path.'inc/down.php');
 exit;
 }
 
-$ncena2222 = $mag[cena]*100000; // продажа в ломбард
+$ncena2222 = $mag['cena']*100000; // продажа в ломбард
 
 mysql_query("INSERT INTO
         `item` SET

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'sklad';//фикс. места
@@ -18,7 +18,7 @@ include($path.'inc/zag.php');
 
 echo "<font color=#f4d06e><b> Склад: </b></p></font>";
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"<center><img src=\"pic/roz/sklad2.jpg\" alt=\"\"></center>";
@@ -33,10 +33,10 @@ case 'send':
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
-{$u = explode("*",$mag[name]);
+{$u = explode("*",$mag['name']);
 echo "<div class=inoy>";
 echo"<a href=\"sklad.php?mod=send&amp;id=$mag[id]\"><img src=\"shmot/$u[0].png\" alt=\"pic\"/> $mag[name]</a>";
 echo "</div>";
@@ -86,10 +86,10 @@ case 'back':
 $req = mysql_query("SELECT * FROM `sklad` WHERE `usr` = '$log'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
-{$u = explode("*",$mag[name]);
+{$u = explode("*",$mag['name']);
 
 echo"<div class=inoy><a href=\"sklad.php?mod=back&amp;id=$mag[id]\"><img src=\"shmot/$u[0].png\" alt=\"pic\"/>  $mag[name]</a></div>";
 }
@@ -134,26 +134,26 @@ echo"<br/><div class=silka><a href=\"sklad.php?\">Назад</a></div>";
 
 break;
 case 'give':
-if($udata[lvl]<9){
+if($udata['lvl']<9){
 echo'Доступно с 9 уровня!<br/>';
 echo"<a href=\"sklad.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
-if(empty($_GET[act])){
+if(empty($_GET['act'])){
 echo "<div class=inoy>";
 echo"<a href=\"sklad.php?mod=give&amp;act=1\">Передать вещи <br/><font color=grey><small> &nbsp;* комисия 1% от цены </small></font></a>";
 echo"<a href=\"sklad.php?mod=give&amp;act=2\">Передать ресурсы</a>";
 echo"<a href=\"sklad.php?mod=give&amp;act=5\">Передать вещи для питомцев</a>";
 echo "</div><br/>";
 echo"<div class=silka><a href=\"sklad.php?\">Назад</a></div>";
-}elseif($_GET[act]==1){
+}elseif($_GET['act']==1){
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
-{$u = explode("*",$mag[name]);
+{$u = explode("*",$mag['name']);
 echo"<div class=inoy><a href=\"sklad.php?mod=give&amp;act=3&amp;id=$mag[id]\"><img src=\"shmot/$u[0].png\" alt=\"pic\"/> $mag[name]</a></div>";
 }
 }else{
@@ -181,16 +181,16 @@ include($path.'inc/down.php');exit;
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not' and `id` = $_GET[id] LIMIT 1");
 $mag = mysql_fetch_array($req);
 ////////////////////////////
-$u = explode("*",$mag[name]);
+$u = explode("*",$mag['name']);
 echo"<hr/><p><u>Передать:</u></p><img src=\"/shmot/$u[0].png\" alt=\"pic\"/> $mag[name]<br/><br/>";
 //---------------комисия товара-------------------------------------
 // люкс
 $cena = mysql_fetch_array(mysql_query("SELECT cena FROM `shop_lux` WHERE `name` = '$u[0]' and `tip`='$mag[tip]' LIMIT 1"));
-if (!empty($cena[cena])){$kom = floor(($cena[cena] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
+if (!empty($cena['cena'])){$kom = floor(($cena['cena'] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
 
 // вип
 $cena = mysql_fetch_array(mysql_query("SELECT cena FROM `shop_vip` WHERE `name` = '$u[0]' and `tip`='$mag[tip]' LIMIT 1"));
-if (!empty($cena[cena])){$kom = floor(($cena[cena] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
+if (!empty($cena['cena'])){$kom = floor(($cena['cena'] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
 
 //удочки
 if ($u[0]=='Baby Duck Rod'){$kom=floor((5+$u[1]/4)*0.01); echo " * Комисия: $kom CoL <br/><br/>";}
@@ -199,13 +199,13 @@ if ($u[0]=='Pelican Rod'){$kom=floor((15+$u[1]/4)*0.01); echo " * Комисия
 if ($u[0]=='KingFisher Rod'){$kom=floor((21+$u[1]/4)*0.01); echo " * Комисия: $kom CoL <br/><br/>";}
 //------------------------------------------------------------------
 
-if($udata[almaz] < $kom){
+if($udata['almaz'] < $kom){
 echo "Не хватает <b><u>CoL</u></b> для оплаты комисии. Нужно <b>$kom</b>, а у Вас  <u>$udata[almaz]</u>!<br/>";
 echo"<a href=\"sklad.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
-$colnew = $udata[almaz] - $kom;
+$colnew = $udata['almaz'] - $kom;
 mysql_query("UPDATE `users` SET `almaz` = '$colnew' WHERE `usr` = '$log' LIMIT 1");
 
 
@@ -248,11 +248,11 @@ echo"<b>Нет такой вещи</b><br/>";
 }
 }
 echo"<br/><div class=silka><a href=\"sklad.php?\">Назад</a></div>";
-}elseif($_GET[act]==5){
+}elseif($_GET['act']==5){
 $req = mysql_query("SELECT * FROM `pit_item` WHERE `usr` = '$log' and `image`='not'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
@@ -306,19 +306,19 @@ echo"<b>Нет такой вещи</b><br/>";
 }
 }
 echo"<br/><div class=silka><a href=\"sklad.php?\">Назад</a></div>";
-}elseif($_GET[act]==2){
+}elseif($_GET['act']==2){
 
 
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT * FROM `res` WHERE `usr` = '$log'"));
 $puslap = floor($viso/10);
 
@@ -327,7 +327,7 @@ $puslap = floor($viso/10);
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' LIMIT $num,10");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 
 echo "<div class=dot><p> 	Передать ресурсы (выбрать):	</p></div><hr/>";
@@ -335,23 +335,23 @@ echo "<div class=dot><p> 	Передать ресурсы (выбрать):	</p>
 While($mag = mysql_fetch_array($req))
 {
 
-$u=explode(': ',$mag[name]);
+$u=explode(': ',$mag['name']);
 echo "<div class=inoy>";
 echo"<a href=\"sklad.php?mod=give&amp;act=4&amp;id=$mag[id]\"> <img src=\"pic/skr/$u[0].gif\" alt=\"pic\"/> $mag[name] <font color=#ffffff>($mag[kol] штук)</font></a>";
 echo "</div>";
 }
 
 echo "<p><center>";
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"?page=$back&mod=give&act=2\"> <-=-=- </a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "<-=-=-";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"?page=$next&mod=give&act=2\"> -=-=-> </a>";}
 else
 {echo "-=-=->";}
@@ -365,7 +365,7 @@ echo"<b>Нет ресурсов!</b><br/>";
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$_POST[komu]'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if($avto=="0" or $_POST[num]<=0){
+if($avto=="0" or (float)$_POST['num']<=0){
 echo'Ошибка!<br/>';
 echo"<a href=\"sklad.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
@@ -385,13 +385,13 @@ $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$_POST[komu]' and `lat_na
 ////////////////////////////
 $avto=mysql_num_rows($req);
 /////////////////////
-if($res[kol]-$_POST[num]<=0){
+if($res['kol']-$_POST['num']<=0){
 mysql_query("DELETE FROM `res` WHERE usr='$log' and `id`='$_GET[id]'");
-$nkol=$res[kol];
+$nkol=$res['kol'];
 }else{
-$res[kol]=$res[kol]-$_POST[num];
+$res['kol']=$res['kol']-$_POST['num'];
 mysql_query("UPDATE `res` SET `kol` = '$res[kol]' WHERE `usr` = '$log' and `id`='$_GET[id]'");
-$nkol=$_POST[num];
+$nkol=$_POST['num'];
 }
 ////////////////////////
 if($avto==0){
@@ -407,7 +407,7 @@ mysql_query("INSERT INTO
         `cena` = '$res[cena]'");
 }else{
 $item = mysql_fetch_array($req);
-$item[kol]=$item[kol]+$nkol;
+$item['kol']=$item['kol']+$nkol;
 mysql_query("UPDATE `res` SET `kol` = '$item[kol]' WHERE `usr` = '$_POST[komu]' and `lat_name`='$res[lat_name]'");
 }
 $time = date("H:i d.m.y");
@@ -422,7 +422,7 @@ echo"<b>Нет такой вещи</b><br/>";
 }
 }
 echo"<br/><div class=silka><a href=\"sklad.php?\">Назад</a></div>";
-}elseif($_GET[act]==3){
+}elseif($_GET['act']==3){
 
 
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not' and `id` = $_GET[id] LIMIT 1");
@@ -432,18 +432,18 @@ $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not' 
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not' and `id` = $_GET[id] LIMIT 1");
 $mag = mysql_fetch_array($req);
 ////////////////////////////
-$u = explode("*",$mag[name]);
+$u = explode("*",$mag['name']);
 echo"<hr/><p><u>Передать:</u></p><img src=\"/shmot/$u[0].png\" alt=\"pic\"/> $mag[name]<br/><br/>";
 
 
 //---------------комисия товара-------------------------------------
 // люкс
 $cena = mysql_fetch_array(mysql_query("SELECT cena FROM `shop_lux` WHERE `name` = '$u[0]' and `tip`='$mag[tip]' LIMIT 1"));
-if (!empty($cena[cena])){$kom = floor(($cena[cena] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
+if (!empty($cena['cena'])){$kom = floor(($cena['cena'] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
 
 // вип
 $cena = mysql_fetch_array(mysql_query("SELECT cena FROM `shop_vip` WHERE `name` = '$u[0]' and `tip`='$mag[tip]' LIMIT 1"));
-if (!empty($cena[cena])){$kom = floor(($cena[cena] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
+if (!empty($cena['cena'])){$kom = floor(($cena['cena'] + $u[1]/4) * 0.01);echo " * Комисия: $kom CoL <br/><br/>";}
 
 //удочки
 if ($u[0]=='Baby Duck Rod'){$kom=floor((5+$u[1]/4)*0.01); echo " * Комисия: $kom CoL <br/><br/>";}
@@ -458,14 +458,14 @@ echo '<input name="komu"/><br/>';
 echo '<input type="submit" value="Продолжить"/></form>';
 
 echo"<a href=\"sklad.php?\">Назад</a>";
-}elseif($_GET[act]==6){
+}elseif($_GET['act']==6){
 echo "<form action=\"sklad.php?mod=give&amp;act=5&amp;id=$_GET[id]\" method=\"post\">";
 echo '<b>Кому:</b><br/>';
 echo '<input name="komu"/><br/>';
 echo '<input type="submit" value="Продолжить"/></form>';
 
 echo"<a href=\"sklad.php?\">Назад</a>";
-}elseif($_GET[act]==4){
+}elseif($_GET['act']==4){
 
 echo "<form action=\"sklad.php?mod=give&amp;act=2&amp;id=$_GET[id]\" method=\"post\">";
 echo '<b>Кому:</b><br/>';

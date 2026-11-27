@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='GM-Panel WebMoney';
@@ -14,14 +14,14 @@ include($path.'inc/zag.php');
 ///////////////
 
 
-if ($udata[dostup] < 4){
+if ($udata['dostup'] < 4){
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
 mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в гм панель $udata[usr]' ");
 include($path.'inc/down.php');
 exit;}
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -41,14 +41,14 @@ $data = str_replace("December","Декабря",$data);
 
 
 // --- --- Одобрить заказ --- --- //
-if (isset($_GET[y])){
+if (isset($_GET['y'])){
 $reqcolpovto = mysql_num_rows(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `id`='$_GET[y]' Limit 1"));
 if ($reqcolpovto==1){
 
 $zak = mysql_fetch_array(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `id`='$_GET[y]' Limit 1"));
 $usr = mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `usr`='$zak[usr]' Limit 1"));
 
-$col=$usr[almaz]+$_POST[col]*1;
+$col=$usr['almaz']+$_POST['col']*1;
 
 mysql_query ("UPDATE users SET almaz='$col' WHERE usr='$zak[usr]' LIMIT 1"); // пишем данные игрока с новой суммой
 mysql_query("DELETE FROM `zakaz_col_wm` WHERE `id`='$zak[id]' and `usr`='$zak[usr]' LIMIT 1"); // удаляем со списка заказов
@@ -65,13 +65,13 @@ mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` =
 
 		//----------даём рефералу процент----------------
 		
-		if (!empty($usr[ref])){
+		if (!empty($usr['ref'])){
 		$ref = mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `usr`='$usr[ref]' Limit 1"));
 		
-		$cenasms = $_POST[col]*100; // считаем цену потраченого
+		$cenasms = $_POST['col']*100; // считаем цену потраченого
 		$refprocent = 0.15; // процент 15 стоит
 		$wmrprocent = round($cenasms * $refprocent);
-		$wmr = $ref[almaz]+$wmrprocent;
+		$wmr = $ref['almaz']+$wmrprocent;
 		mysql_query ("UPDATE users SET almaz='$wmr' WHERE usr='$ref[usr]' LIMIT 1");
 		
 		}
@@ -79,14 +79,14 @@ mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` =
 
 
 
-echo '<p><font color=#99CC66><b>'.$_POST[col].' CoL персонажу '.$zak[usr].' зачислено:</b></font></p><hr/> ';
+echo '<p><font color=#99CC66><b>'.$_POST['col'].' CoL персонажу '.$zak['usr'].' зачислено:</b></font></p><hr/> ';
 //echo "Цена СМС - $cenasms / Процент - $refprocent / Проц.ден. - $wmrprocent / К начислению - $wmr / Кому - $ref[usr] / Реф - $usr[ref]";
 }
 }
 
 
 // --- --- Проверка заказ --- --- //
-if (isset($_GET[yes])){
+if (isset($_GET['yes'])){
 $reqcolpovtor2 = mysql_num_rows(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `id`='$_GET[yes]' Limit 1"));
 if ($reqcolpovtor2==1){
 
@@ -112,7 +112,7 @@ echo "<form action=\"?y=$_GET[yes]\" method=\"POST\">
 }
 
 // --- --- удалить заказ --- --- //
-if (isset($_GET[del])){
+if (isset($_GET['del'])){
 $reqcolpovtor = mysql_num_rows(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `id`='$_GET[del]' Limit 1"));
 $zak = mysql_fetch_array(mysql_query("SELECT * FROM `zakaz_col_wm` WHERE `id`='$_GET[del]' Limit 1"));
 if ($reqcolpovtor==1){

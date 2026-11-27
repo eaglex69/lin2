@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 $headmod = 'zayavka';//фикс. места
 $textl='Предложения замуж';
@@ -18,9 +18,9 @@ $drevaden=rand(50,300);
 $time=date("H:i");
 
 
-if($udata[lvl]<"20"){echo"Чтобы зайти в игорный дом  нужно иметь 20 или выше уровень.<br/>"; include_once("inc/down.php"); exit;}
+if($udata['lvl']<"20"){echo"Чтобы зайти в игорный дом  нужно иметь 20 или выше уровень.<br/>"; include_once("inc/down.php"); exit;}
 
-switch($_GET[go]){
+switch($_GET['go']){
 
 default:
 echo"<center><img src=\"pic/roz/casino.png\" alt=\"\"></center>";
@@ -46,8 +46,8 @@ break;
 
 case 'krutit':
 if($loto==1){
-if($udata[almaz]<"1"){echo"Чтоб крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
-$udata[almaz]=$udata[almaz]-1;
+if($udata['almaz']<"1"){echo"Чтоб крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+$udata['almaz']=$udata['almaz']-1;
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 1 ! </font></font></p></i></b>";
 echo"<i><font color=#f4d06e>- Вы ничего не выиграли, этот сектор пустой ! </font></font></p></i>";
@@ -59,9 +59,9 @@ echo"<a href=\"lotomy.php?go=koleso\">К Колесу</a><br/>";
 }
 
 if($loto==2){
-if($udata[almaz]<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+if($udata['almaz']<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
 
-$udata[almaz]=$udata[almaz]-1;
+$udata['almaz']=$udata['almaz']-1;
 mysql_query("UPDATE `users` SET `udata[almaz]`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 2 ! </font></font></p><i></b>";
 echo"<i><font color=#f4d06e>- Вы выиграли, этот сектор с выигрышными монетами удачи <font color=#ffffcc><img src=\"pic/лааак.png\" height=15 width=15> Coin Of Luck ! </font></font></p></i>";
@@ -71,13 +71,13 @@ echo"<i><font color=#f4d06e>- Вы выиграли <font color=#ffffcc> $coin <
 echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
 echo"<a href=\"lotomy.php?go=koleso\">Забрать</a><br/>";
 echo"<a href=\"lotomy.php?go=krutit\">Прокрутить </a><br/>"; 
-$udata[almaz]=round($udata[almaz]+$coin);
+$udata['almaz']=round($udata['almaz']+$coin);
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 }
 
 if($loto==3){
-if($udata[almaz]<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
-$udata[almaz]=$udata[almaz]-1;
+if($udata['almaz']<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+$udata['almaz']=$udata['almaz']-1;
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 1 ! </font></font></p></i></b>";
 echo"<i><font color=#f4d06e>- Вы ничего не выиграли, этот сектор пустой ! </font></font></p></i>";
@@ -89,8 +89,8 @@ echo"<a href=\"lotomy.php?go=koleso\">К Колесу</a><br/>";
 }
 
 if($loto==4){
-if($udata[almaz]<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
-$udata[almaz]=$udata[almaz]-1;
+if($udata['almaz']<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+$udata['almaz']=$udata['almaz']-1;
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 1 ! </font></font></p></i></b>";
 echo"<i><font color=#f4d06e>- Вы ничего не выиграли, этот сектор пустой ! </font></font></p></i>";
@@ -102,8 +102,8 @@ echo"<a href=\"lotomy.php?go=koleso\">К Колесу</a><br/>";
 }
 
 if($loto==5){
-if($udata[almaz]<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
-$udata[almaz]=$udata[almaz]-1;
+if($udata['almaz']<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+$udata['almaz']=$udata['almaz']-1;
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 1 ! </font></font></p></i></b>";
 echo"<i><font color=#f4d06e>- Вы ничего не выиграли, этот сектор пустой ! </font></font></p></i>";
@@ -115,9 +115,9 @@ echo"<a href=\"lotomy.php?go=koleso\">К Колесу</a><br/>";
 }
 
 if($loto==6){
-if($udata[almaz]<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+if($udata['almaz']<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
 
-$udata[almaz]=round($udata[almaz]-1);
+$udata['almaz']=round($udata['almaz']-1);
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 6 ! </font></font></p></b>";
 echo"<i><font color=#f4d06e>- Вы выиграли, этот сектор имеет <font color=#ffffcc><img src=\"pic/adena.png\" height=15 width=15> Адены ! </font></font></p></i>";
@@ -127,13 +127,13 @@ echo"<i><font color=#f4d06e>- Вы выиграли <font color=#ffffcc> $aden <
 echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
 echo"<a href=\"lotomy.php?go=koleso\">Забрать</a><br/>";
 echo"<a href=\"lotomy.php?go=krutit\">Прокрутить </a><br/>"; 
-$udata[money]=round($udata[money]+$aden);
+$udata['money']=round($udata['money']+$aden);
 mysql_query("UPDATE `users` SET `money`='$udata[money]' WHERE `usr`='$log'");
 }
 if($loto==7){
-if($udata[almaz]<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
+if($udata['almaz']<"1"){echo"Чтобы крутить колесо нужно иметь минимум 1 монету удачи или выше.<br/>"; include_once("inc/down.php"); exit;}
 
-$udata[almaz]=round($udata[almaz]-1);
+$udata['almaz']=round($udata['almaz']-1);
 mysql_query("UPDATE `users` SET `almaz`='$udata[almaz]' WHERE `usr`='$log'");
 echo"<b><i><img src=\"pic/roz/casino2.png\" alt=\"\"><font color=#f4d06e> Выпал сектор номер <font color=#ff4040> 7 ! </font></font></p></b>";
 echo"<i><font color=#f4d06e>- Вы ничего не выиграли, этот сектор пустой ! </font></font></p></i>";

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'akademwar';//фикс. места
@@ -16,28 +16,28 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-if($udata[klas]!='fighert'){echo"Вход только для воинов!";include($path.'inc/down.php');exit;}
+if($udata['klas']!='fighert'){echo"Вход только для воинов!";include($path.'inc/down.php');exit;}
 
 // делаем светлым и тёмным эльфам одинаковые скилы  //
-if ($udata[storona]=='darkelf'){$udata[storona]='elf';}
+if ($udata['storona']=='darkelf'){$udata['storona']='elf';}
 //-------------        ------------            ----//
 
 // Приравниваем професии магу //----------------------------
-if ($udata[prof] == 'Dark Elf Fighter'){$udata[prof] = 'Elf Fighter';}// 1профа
-if ($udata[prof] == 'Palus Knight'){$udata[prof] = 'Elf Knight';} // 2,1
-if ($udata[prof] == 'Assassin'){$udata[prof] = 'Scout';} // 2,2
-if ($udata[prof] == 'Shillien Knight'){$udata[prof] = 'Swordsinger';} // 
-if ($udata[prof] == 'Bladedancer'){$udata[prof] = 'Temple Knight';} // 
-if ($udata[prof] == 'Abyss Walker'){$udata[prof] = 'Plains Walker';} // 
-if ($udata[prof] == 'Phantom Ranger'){$udata[prof] = 'Silver Ranger';} // 
-if ($udata[prof] == 'Shillien Templar'){$udata[prof] = 'Sword Muse';} // 
-if ($udata[prof] == 'Spectral Dancer'){$udata[prof] = 'Eva Templar';} // 
-if ($udata[prof] == 'Ghost Hunter'){$udata[prof] = 'Wind Rider';} // 
-if ($udata[prof] == 'Ghost Sentinel'){$udata[prof] = 'Moonlight Sentinel';} // 
+if ($udata['prof'] == 'Dark Elf Fighter'){$udata['prof'] = 'Elf Fighter';}// 1профа
+if ($udata['prof'] == 'Palus Knight'){$udata['prof'] = 'Elf Knight';} // 2,1
+if ($udata['prof'] == 'Assassin'){$udata['prof'] = 'Scout';} // 2,2
+if ($udata['prof'] == 'Shillien Knight'){$udata['prof'] = 'Swordsinger';} // 
+if ($udata['prof'] == 'Bladedancer'){$udata['prof'] = 'Temple Knight';} // 
+if ($udata['prof'] == 'Abyss Walker'){$udata['prof'] = 'Plains Walker';} // 
+if ($udata['prof'] == 'Phantom Ranger'){$udata['prof'] = 'Silver Ranger';} // 
+if ($udata['prof'] == 'Shillien Templar'){$udata['prof'] = 'Sword Muse';} // 
+if ($udata['prof'] == 'Spectral Dancer'){$udata['prof'] = 'Eva Templar';} // 
+if ($udata['prof'] == 'Ghost Hunter'){$udata['prof'] = 'Wind Rider';} // 
+if ($udata['prof'] == 'Ghost Sentinel'){$udata['prof'] = 'Moonlight Sentinel';} // 
 /////////////////////////////////////////////////////////////////
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo" <center><img src='/pic/roz/академвар.png'    alt=''  ></div><hr/>";
@@ -104,48 +104,48 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-$mag_mp=$mag[mp];
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[0];//мп
+$mag_mp=$mag['mp'];
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[0];//мп
 
-$mag_hp=$mag[hp];
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[0];//хп
+$mag_hp=$mag['hp'];
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[0];//хп
 
-$mag_plushp=$mag[plushp];
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[0];//+хп
+$mag_plushp=$mag['plushp'];
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[0];//+хп
 
-$mag_uron=$mag[uron];
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[0];//+урон
+$mag_uron=$mag['uron'];
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[0];//+урон
 
-$mag_cena=$mag[cena];
-$magcena=explode("|",$mag[cena]);
-$mag[cena]=$magcena[0];//+цена
+$mag_cena=$mag['cena'];
+$magcena=explode("|",$mag['cena']);
+$mag['cena']=$magcena[0];//+цена
 
 
-if($_GET[act]!='by'){
+if($_GET['act']!='by'){
 
-if ($mag[ruka]=='me4'){$tp="Меч";}
-if ($mag[ruka]=='kas'){$tp="Кастет";}
-if ($mag[ruka]=='rap'){$tp="Рапиру";}
-if ($mag[ruka]=='luk'){$tp="Лук";}
-if ($mag[ruka]=='kin'){$tp="Кинжал";}
+if ($mag['ruka']=='me4'){$tp="Меч";}
+if ($mag['ruka']=='kas'){$tp="Кастет";}
+if ($mag['ruka']=='rap'){$tp="Рапиру";}
+if ($mag['ruka']=='luk'){$tp="Лук";}
+if ($mag['ruka']=='kin'){$tp="Кинжал";}
 
-if ($mag[tip]=='atack'){$tip="Атака";}
-if ($mag[tip]=='bafkrit'){$tip="Баф Критов";}
-if ($mag[tip]=='bafat'){$tip="Баф Атаки";}
-if ($mag[tip]=='bafzash'){$tip="Баф Защиты";}
-if ($mag[tip]=='bafzat'){$tip="Баф Защиты и Атаки";}
-if ($mag[tip]=='hpot'){$tip="Отжор";}
-if ($mag[tip]=='hp'){$tip="Реген. HP";}
-if ($mag[tip]=='mp'){$tip="Реген. MP";}
-if ($mag[tip]=='bafmp'){$tip="Баф на ману";}
-if ($mag[tip]=='bafhp'){$tip="Баф на жизни";}
-if ($mag[tip]=='resp'){$tip="Респ. игрока";}
-if ($mag[tip]=='spoil'){$tip="Спойлинг";}
-if ($mag[tip]=='spoilall'){$tip="Спойлинг всех вещей";}
+if ($mag['tip']=='atack'){$tip="Атака";}
+if ($mag['tip']=='bafkrit'){$tip="Баф Критов";}
+if ($mag['tip']=='bafat'){$tip="Баф Атаки";}
+if ($mag['tip']=='bafzash'){$tip="Баф Защиты";}
+if ($mag['tip']=='bafzat'){$tip="Баф Защиты и Атаки";}
+if ($mag['tip']=='hpot'){$tip="Отжор";}
+if ($mag['tip']=='hp'){$tip="Реген. HP";}
+if ($mag['tip']=='mp'){$tip="Реген. MP";}
+if ($mag['tip']=='bafmp'){$tip="Баф на ману";}
+if ($mag['tip']=='bafhp'){$tip="Баф на жизни";}
+if ($mag['tip']=='resp'){$tip="Респ. игрока";}
+if ($mag['tip']=='spoil'){$tip="Спойлинг";}
+if ($mag['tip']=='spoilall'){$tip="Спойлинг всех вещей";}
 
 echo'<div class="event">';
 echo"<img src=\"pic/skils/$mag[name].jpg\" alt=\"pic\"/> <b>$mag[name]:</b><br/>";
@@ -156,15 +156,15 @@ echo"Забирает маны: $mag[mp]<br/>";
 echo"Забирает здоровья: $mag[hp]<br/>";
 echo"Даёт здоровья: $mag[plushp]<br/>";
 echo"Тип умения: $tip<br/>";
-if ($mag[ruka] =="not" or $mag[ruka]==""){}else
+if ($mag['ruka'] =="not" or $mag['ruka']==""){}else
 {
 echo "<font color=grey>Для использования нужно держать в руках <b>$tp</b></font><br/>";
 }
-if ($mag[nead_res]=="net" or $mag[nead_res]=="") {}else{
+if ($mag['nead_res']=="net" or $mag['nead_res']=="") {}else{
 
 echo"Что бы получить умение нужны ресурсы: <br/>";
 
-$res=explode("|",$mag[nead_res]);
+$res=explode("|",$mag['nead_res']);
 $kres=count($res);
 $i=0;
 $b=1;
@@ -183,13 +183,13 @@ echo"</div>";
 echo"<a href=\"akademwar.php?mod=info&amp;act=by&amp;id=$mag[id]\"><b>Изучить</b></a><br/>";
 }else{
 
-if($udata[lvl]<$mag[lvl]){
+if($udata['lvl']<$mag['lvl']){
 echo'Низкий уровень!';
 include($path.'inc/down.php');
 exit;
 }
 
-if($udata[sp]<$mag[cena]){
+if($udata['sp']<$mag['cena']){
 echo'Недостаточно SP! Иди в окресности и бей мобов.';
 include($path.'inc/down.php');
 exit;
@@ -220,7 +220,7 @@ exit;
 
 
 
-if($udata[storona]!=$mag[storona])
+if($udata['storona']!=$mag['storona'])
 {
 echo'Ошибка! Умение не подходит!';
 include($path.'inc/down.php');
@@ -236,8 +236,8 @@ include($path.'inc/down.php');
 exit;
 }
 
-if ($mag[nead_res]=="net") {echo "";}else{
-$res=explode("|",$mag[nead_res]);
+if ($mag['nead_res']=="net") {echo "";}else{
+$res=explode("|",$mag['nead_res']);
 $kres=count($res);
 $i=0;
 $b=1;
@@ -257,7 +257,7 @@ $i++;
 $b++;
 }
 
-if ($mag[nead_res]=="net"){$not=false;}
+if ($mag['nead_res']=="net"){$not=false;}
 
 if($not==TRUE){
 echo'Недостаточно ресурсов!';
@@ -274,10 +274,10 @@ $kol=$rb[$b];
 
 $req = mysql_query("SELECT * FROM `res` WHERE `usr`='$log' and `lat_name`='$lat_name' LIMIT 1");
 $re = mysql_fetch_array($req);
-if(($re[kol]-$kol)<=0){
+if(($re['kol']-$kol)<=0){
 mysql_query("DELETE FROM `res` WHERE `usr`='$log' and `lat_name`='$lat_name' LIMIT 1");//чистим логи
 }else{
-$ros=$re[kol]-$kol;
+$ros=$re['kol']-$kol;
 mysql_query("UPDATE `res` SET `kol` = '$ros' WHERE `usr`='$log' and `lat_name`='$lat_name' LIMIT 1");
 }
 $b++;
@@ -285,7 +285,7 @@ $b++;
 }
 }
 
-$udata[sp]=$udata[sp]-$mag[cena];// sp
+$udata['sp']=$udata['sp']-$mag['cena'];// sp
 
 mysql_query("UPDATE `users` SET `sp` = '$udata[sp]' WHERE `usr` = '$log'");
 
@@ -322,8 +322,8 @@ if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
 
-$maglv=explode("|",$mag[lv]);
-$mag[lv]=$maglv[$mag[lvl]];//след уровень
+$maglv=explode("|",$mag['lv']);
+$mag['lv']=$maglv[$mag['lvl']];//след уровень
 //-----------
 
 
@@ -340,12 +340,12 @@ echo "<hr/>";
 
 While($mag = mysql_fetch_array($req))
 {
-$maglv=explode("|",$mag[lv]);
-$mag[lv]=$maglv[$mag[lvl]];//след уровень
+$maglv=explode("|",$mag['lv']);
+$mag['lv']=$maglv[$mag['lvl']];//след уровень
 
-if ($mag[lvl]>=$mag[lvlmax]){}else{
+if ($mag['lvl']>=$mag['lvlmax']){}else{
 echo "<img src=\"pic/skils/$mag[name].jpg\" alt=\"pic\"/> ";
-if ($mag[lv]>=$udata[lvl]){
+if ($mag['lv']>=$udata['lvl']){
 echo"<b>$mag[name]</b><br/>Доступен с $mag[lv] уровня<hr/>";
 }else{
 echo"<a href=\"akademwar.php?mod=upgo&amp;id=$mag[id]\">$mag[name]</a> <hr/>";
@@ -368,37 +368,37 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-if($mag[lvl]>=$mag[lvlmax]){
+if($mag['lvl']>=$mag['lvlmax']){
 echo'У умения макс. уровень!';
 include($path.'inc/down.php');
 exit;
 }
 
 
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[$mag[lvl]];//мп
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[$mag['lvl']];//мп
 
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[$mag[lvl]];//хп
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[$mag['lvl']];//хп
 
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[$mag[lvl]];//+хп
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[$mag['lvl']];//+хп
 
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[$mag[lvl]];//+урон
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[$mag['lvl']];//+урон
 
-$magcena=explode("|",$mag[cena]);
-$mag[cena]=$magcena[$mag[lvl]];//+cena
+$magcena=explode("|",$mag['cena']);
+$mag['cena']=$magcena[$mag['lvl']];//+cena
 
-$maglv=explode("|",$mag[lv]);
-$mag[lv]=$maglv[$mag[lvl]];//след уровень
+$maglv=explode("|",$mag['lv']);
+$mag['lv']=$maglv[$mag['lvl']];//след уровень
 
 
-$mag[lvl]++;
+$mag['lvl']++;
 //--------------------------------
-if($_GET[act]=='by'){
+if($_GET['act']=='by'){
 
-if ($udata[lvl]<$mag[lv]){
+if ($udata['lvl']<$mag['lv']){
 echo "У Вас мал уровень!";
 include($path.'inc/down.php');
 exit;
@@ -411,13 +411,13 @@ exit;
 }
 */
 
-if($udata[sp]<$mag[cena]){
+if($udata['sp']<$mag['cena']){
 echo'Мало SP!';
 include($path.'inc/down.php');
 exit;
 }
 
-$udata[sp]=$udata[sp]-$mag[cena];//sp очки 
+$udata['sp']=$udata['sp']-$mag['cena'];//sp очки 
 
 //$mag[lvl]++;
 

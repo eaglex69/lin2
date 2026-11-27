@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'clan_shop';//фикс. места
@@ -16,8 +16,9 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-$tip2=$_GET[tip2];
-$lvlus=$_GET[lvlus];
+$tip2=$_GET['tip2'];
+$lvlus=$_GET['lvlus'];
+$o=isset($_GET['o'])?$_GET['o']:'';
 
 $lider = mysql_num_rows(mysql_query("SELECT * FROM `clan` WHERE `lider` = '$log' LIMIT 1"));
 $req = mysql_query("SELECT * FROM `clan` where `lider`='$udata[clan]'");
@@ -27,13 +28,13 @@ echo'Вы не лидер клана<br/>';
 echo"<a href=\"home.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
-if($clan[lvl]<10){
+if($clan['lvl']<10){
 echo'Требования не выполнены! У клана уровень ниже 10.<br/>';
 echo"<a href=\"home.php?\">Назад</a>";
 include($path.'inc/down.php');exit;
 }
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"</div></div> <div class=menu> <font color=grey>Решили переодеть соклановце? <br/>Выбирай что нужно: </font><br/><br/></div>";
@@ -53,7 +54,7 @@ echo"<a href=\"clan_shop.php?\">Назад</a>";
 break;
 
 case 'b':
-if(empty($_GET[o])){
+if(empty($_GET['o'])){
 echo"<font color=grey> Хах...Защита важная часть!!! </font><br/><br/>";
 
 echo "<div class=inoy>";
@@ -76,7 +77,7 @@ echo"<br/><a href=\"clan_shop.php?\">Назад</a>";
 echo "</div>";
 
 }else{
-if($_GET[o]!=shit && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=rpoyas && $_GET[o]!=poyas && $_GET[o]!=plash && $_GET[o]!=pants && $_GET[o]!=ruki && $_GET[o]!=nogi){
+if($_GET['o']!='shit' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='rpoyas' && $_GET['o']!='poyas' && $_GET['o']!='plash' && $_GET['o']!='pants' && $_GET['o']!='ruki' && $_GET['o']!='nogi'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -119,10 +120,10 @@ $avto=mysql_num_rows($req);
 
 While($mag = mysql_fetch_array($req))
 {
-$mag[name] = htmlspecialchars(stripslashes(addslashes($mag[name])));
+$mag['name'] = htmlspecialchars(stripslashes(addslashes($mag['name'])));
 
 echo" <img src=\"shmot/$mag[name].png\" alt=\"pic\"/>
- <a href=\"clan_shop.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag[cena])." <hr/>";
+ <a href=\"clan_shop.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag['cena'])." <hr/>";
 }
 
 echo"<br/><a href=\"clan_shop.php?mod=b\">Назад</a>";
@@ -191,7 +192,7 @@ While($mag = mysql_fetch_array($req))
 
 echo"	<img src=\"shmot/$mag[name].png\" alt=\"pic\"/>
 		<a href=\"clan_shop.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/>
-		Цена: ".number_format($mag[cena])." Аден "; 
+		Цена: ".number_format($mag['cena'])." Аден "; 
 		//[<a href=\"sell.php?act=ask&amp;id=$mag[id]\">купить</a>]<br/>";
 echo "<hr/>";
 }
@@ -207,7 +208,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -239,7 +240,7 @@ case 'ruki':
 $tip='Рукавицы';
 break;
 }
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -252,18 +253,18 @@ break;
 }
 
 
-if($mag[nlvl]<20){$st="NG";}
-elseif($mag[nlvl]>=20 and $mag[nlvl]<40){$st="D";}
-elseif($mag[nlvl]>=40 and $mag[nlvl]<52){$st="C";}
-elseif($mag[nlvl]>=52 and $mag[nlvl]<62){$st="B";}
-elseif($mag[nlvl]>=62 and $mag[nlvl]<76){$st="A";}
-elseif($mag[nlvl]>=76 and $mag[nlvl]<91){$st="S";}
-elseif($mag[nlvl]>=91){$st="R";}
+if($mag['nlvl']<20){$st="NG";}
+elseif($mag['nlvl']>=20 and $mag['nlvl']<40){$st="D";}
+elseif($mag['nlvl']>=40 and $mag['nlvl']<52){$st="C";}
+elseif($mag['nlvl']>=52 and $mag['nlvl']<62){$st="B";}
+elseif($mag['nlvl']>=62 and $mag['nlvl']<76){$st="A";}
+elseif($mag['nlvl']>=76 and $mag['nlvl']<91){$st="S";}
+elseif($mag['nlvl']>=91){$st="R";}
 
 
 echo"<b></div></div></div><div class=menu><img src=\"shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b><br/>
 Тип: $tip<br/>
-Цена: ".number_format($mag[cena], 0, ',', "'")." Аден <br/><br/>";
+Цена: ".number_format($mag['cena'], 0, ',', "'")." Аден <br/><br/>";
 
 if ($tip=="Оружие"){
 echo "
@@ -289,8 +290,8 @@ break;
 
 case 'soulshots':
 
-if (isset($_GET[t])){
-$colnew=$udata[almaz]-1;
+if (isset($_GET['t'])){
+$colnew=$udata['almaz']-1;
 $co = 100; // количество наживки
 if ($colnew>=0){
 
@@ -300,10 +301,10 @@ $rs = mysql_fetch_array($req);
 if($res==0){
 mysql_query("INSERT INTO `l2warmobi`.`soulshots` (`id` ,`usr` ,`kol` )
 VALUES (NULL , '$log', '100');");
-$nk=$rs[kol]+$co;
+$nk=$rs['kol']+$co;
 echo "<p><font color=blue>Вы купили $co Shots. У Вас теперь $nk Shots.</font></p>";
 }else{
-$nk=$rs[kol]+$co;
+$nk=$rs['kol']+$co;
 mysql_query("UPDATE `soulshots` SET `kol` = '$nk' WHERE `usr` = '$log'");
 echo "<p><font color=blue>Вы купили $co Shots. У Вас теперь $nk Shots.</font></p>";
 

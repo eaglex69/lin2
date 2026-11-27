@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'st';//фикс. места
@@ -11,28 +11,28 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 // получаем Вассал
-if (isset($_GET[v])){
-if ($udata[wins]>=2500 && $udata[almaz]>=100 && $udata[st]<1){
-$new_alm = $udata[almaz]-100; 
+if (isset($_GET['v'])){
+if ($udata['wins']>=2500 && $udata['almaz']>=100 && $udata['st']<1){
+$new_alm = $udata['almaz']-100; 
 mysql_query ("UPDATE users SET almaz='$new_alm', st='1' WHERE usr='$log' LIMIT 1"); // пишем данные игрока с новой суммой
 }}
 
 // получаем Рыцарь
-if (isset($_GET[s])){
-if ($udata[wins]>=10000 && $udata[almaz]>=500 && $udata[st]<2){
-$new_alm = $udata[almaz]-500; 
+if (isset($_GET['s'])){
+if ($udata['wins']>=10000 && $udata['almaz']>=500 && $udata['st']<2){
+$new_alm = $udata['almaz']-500; 
 mysql_query ("UPDATE users SET almaz='$new_alm', st='2' WHERE usr='$log' LIMIT 1"); // пишем данные игрока с новой суммой
 }}
 
 // получаем Маркиз
-if (isset($_GET[m])){
-if ($udata[wins]>=22500 && $udata[almaz]>=1155 && $udata[st]<3){
-$new_alm = $udata[almaz]-1155; 
+if (isset($_GET['m'])){
+if ($udata['wins']>=22500 && $udata['almaz']>=1155 && $udata['st']<3){
+$new_alm = $udata['almaz']-1155; 
 mysql_query ("UPDATE users SET almaz='$new_alm', st='3' WHERE usr='$log' LIMIT 1"); // пишем данные игрока с новой суммой
 }}
 
@@ -46,13 +46,13 @@ mysql_query ("UPDATE users SET almaz='$new_alm', st='3' WHERE usr='$log' LIMIT 1
 
 //------------------------------------------------------------------------------
 // звания
-if ($udata[st]==0) {$st='Бродяга';}
-if ($udata[st]==1) {$st='Вассал';}
-if ($udata[st]==2) {$st='Рыцарь';}
-if ($udata[st]==3) {$st='Маркиз';}
+if ($udata['st']==0) {$st='Бродяга';}
+if ($udata['st']==1) {$st='Вассал';}
+if ($udata['st']==2) {$st='Рыцарь';}
+if ($udata['st']==3) {$st='Маркиз';}
 
 echo "<font color=grey><p>";
-if ($udata[st]==3){
+if ($udata['st']==3){
 echo "Рад видеть тебя снова здесь $st ! Ты получил уже максимальный уровень звания ! Извени, мне предложить тебе нечего... Прощай!";}
 else{
 echo 'Ооо... '.$st.'! Добро пожаловать, '.$log.'! 
@@ -63,9 +63,9 @@ echo "</font></p><hr/>";
 
 
 echo "<div class=inoy>";
-if ($udata[st]<1) {echo "<a href=\"?v\"> Вассал / 2`500 побед / 100 CoL </a>";}
-if ($udata[st]<2) {echo "<a href=\"?s\"> Рыцарь / 10`000 побед / 500 CoL </a>";}
-if ($udata[st]<3) {echo "<a href=\"?m\"> Маркиз / 22`500 побед / 1155 CoL </a>";}
+if ($udata['st']<1) {echo "<a href=\"?v\"> Вассал / 2`500 побед / 100 CoL </a>";}
+if ($udata['st']<2) {echo "<a href=\"?s\"> Рыцарь / 10`000 побед / 500 CoL </a>";}
+if ($udata['st']<3) {echo "<a href=\"?m\"> Маркиз / 22`500 побед / 1155 CoL </a>";}
 echo "</div>";
 }
 

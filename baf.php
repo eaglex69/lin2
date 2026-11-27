@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'baf';//фикс. места
@@ -19,8 +19,8 @@ $timeout = $date - $taim;
 ////////////////
 
 //---------------------
-$nick=$_GET[nick];
-$id=$_GET[id];
+$nick=$_GET['nick'];
+$id=$_GET['id'];
 //---------------------
 /*
 if ($udata[prava]<4){
@@ -33,13 +33,13 @@ exit;
 
 echo "</div> <div class = fon>";
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
-if (!empty($nick)) {$_POST[nick] = $nick;}  // если значение ник не пустое то пост ник равен нику
+if (!empty($nick)) {$_POST['nick'] = $nick;}  // если значение ник не пустое то пост ник равен нику
 
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="baf.php?" method="post">';
 echo"Ник:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$nick\" name=\"nick\"/><br/>";
@@ -53,7 +53,7 @@ echo"<div class=silka>		<a href=\"baf.php?&nick=$log\">Бафнуть себя</
 
 }else{
 
-if (!empty($_POST[nick])) {$nick = $_POST[nick];} // если значение пост ник не пустое то знаение ник равно ему
+if (!empty($_POST['nick'])) {$nick = $_POST['nick'];} // если значение пост ник не пустое то знаение ник равно ему
 
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$nick'");
 
@@ -81,35 +81,35 @@ echo"<b></div><div class=inoy>Скилы (+Сила/-MP):</b><br/><br/>";
 
 While($mag = mysql_fetch_array($req))
 {
-$mag[lvl]=$mag[lvl]-1;
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[$mag[lvl]];//мп
+$mag['lvl']=$mag['lvl']-1;
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[$mag['lvl']];//мп
 
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[$mag[lvl]];//хп
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[$mag['lvl']];//хп
 
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[$mag[lvl]];//+хп
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[$mag['lvl']];//+хп
 
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[$mag[lvl]];//+урон
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[$mag['lvl']];//+урон
 
 
 
-if ($mag[tip]=="bafat"){$sms="Атака  +$mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
-if ($mag[tip]=="pmdef"){$sms="P.Def и M.Def +$mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
-if ($mag[tip]=="bafzat"){$sms="Def и Att +$mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
-if ($mag[tip]=="bafhp"){$sms="+HP $mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
-if ($mag[tip]=="bafmp"){$sms="+MP $mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
+if ($mag['tip']=="bafat"){$sms="Атака  +$mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
+if ($mag['tip']=="pmdef"){$sms="P.Def и M.Def +$mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
+if ($mag['tip']=="bafzat"){$sms="Def и Att +$mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
+if ($mag['tip']=="bafhp"){$sms="+HP $mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
+if ($mag['tip']=="bafmp"){$sms="+MP $mag[uron]/-$mag[mp]"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";}
 
-if ($mag[tip]=="resp"){
+if ($mag['tip']=="resp"){
 $reqi = mysql_query("SELECT * FROM `users` WHERE `usr`='$nick'");
 $usr = mysql_fetch_array($reqi);
 
-$respaun=(100-$mag[uron])*0.00001;
-$exp = $usr[exp]*$respaun;
-$exp1 = $usr[exp]-$exp;
-$hp = $usr[hpall]/2;
+$respaun=(100-$mag['uron'])*0.00001;
+$exp = $usr['exp']*$respaun;
+$exp1 = $usr['exp']-$exp;
+$hp = $usr['hpall']/2;
 
 $sms="-".number_format($exp, 0, ',', ' ')." EXP/-$mag[mp] MP/$mag[uron]%"; $adres="<a href=\"baf.php?mod=add&nick=$nick&id=$mag[id]\">";
 }
@@ -135,14 +135,14 @@ exit;
 
 $magiya=mysql_fetch_array($reqi2);
 
-$magiya[lvl]=$magiya[lvl]-1;
+$magiya['lvl']=$magiya['lvl']-1;
 
-$magur=explode("|",$magiya[uron]);
-$magiya[uron]=$magur[$magiya[lvl]];//+урон
+$magur=explode("|",$magiya['uron']);
+$magiya['uron']=$magur[$magiya['lvl']];//+урон
 
-$magmp=explode("|",$magiya[mp]);
-$magiya[mp]=$magmp[$magiya[lvl]];//+мана
-$mpbaf=$udata[mp]-$magiya[mp];
+$magmp=explode("|",$magiya['mp']);
+$magiya['mp']=$magmp[$magiya['lvl']];//+мана
+$mpbaf=$udata['mp']-$magiya['mp'];
 
 if ($mpbaf<0){
 echo "Недостаточно маны<br/>";
@@ -155,12 +155,12 @@ $reqi = mysql_query("SELECT * FROM `users` WHERE `usr`='$nick'");
 $usr = mysql_fetch_array($reqi);
 
 /// воскрешение игрока /////////////////
-if ($magiya[tip]=="resp"){
+if ($magiya['tip']=="resp"){
 
-$respaun=(100-$magiya[uron])*0.00001;
-$exp = $usr[exp]*$respaun;
-$exp1 = $usr[exp]-$exp;
-$hp = $usr[hpall]*($magiya[uron]/100);
+$respaun=(100-$magiya['uron'])*0.00001;
+$exp = $usr['exp']*$respaun;
+$exp1 = $usr['exp']-$exp;
+$hp = $usr['hpall']*($magiya['uron']/100);
 
 
 $req = mysql_query("SELECT * FROM `smert` WHERE `usr`='$nick' and `life`='no'");
@@ -189,7 +189,7 @@ mysql_query("DELETE FROM `smert` WHERE `usr`='$nick' and `life`='no'");
 }else{
 /////////////////////////////////
 
-if ($magiya[tip]!=="bafat" && $magiya[tip]!=="pmdef" && $magiya[tip]!=="bafmp" && $magiya[tip]!=="bafzat" && $magiya[tip]!=="bafhp" && $magiya[tip]!=="bafmp")
+if ($magiya['tip']!=="bafat" && $magiya['tip']!=="pmdef" && $magiya['tip']!=="bafmp" && $magiya['tip']!=="bafzat" && $magiya['tip']!=="bafhp" && $magiya['tip']!=="bafmp")
 {
 echo" Ошибка, скил не подходит!<br/>";
  echo"<br/><div class=silka><a href=\"baf.php?&nick=$nick\">Назад</a>";
@@ -202,18 +202,18 @@ if ($mpbaf<0){echo "Недостаточно маны<br/>";
 }else{
 
 // баф на атаку
-if ($magiya[tip]=="bafat"){$tt=1800; $bafmatt=$magiya[uron]*$usr[patt]/100; $bafpatt=$magiya[uron]*$usr[matt]/100; $bafat=($bafmatt+$bafpatt)/2; $sms="баф на атаку. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
+if ($magiya['tip']=="bafat"){$tt=1800; $bafmatt=$magiya['uron']*$usr['patt']/100; $bafpatt=$magiya['uron']*$usr['matt']/100; $bafat=($bafmatt+$bafpatt)/2; $sms="баф на атаку. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
 // баф на защиту
-if ($magiya[tip]=="pmdef"){$tt=1800; $pdef=$magiya[uron]*$usr[pdef]/100; $mdef=$magiya[uron]*$usr[mdef]/100; $pmdef=($pdef+$mdef)/2; $sms="баф на защиту. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
+if ($magiya['tip']=="pmdef"){$tt=1800; $pdef=$magiya['uron']*$usr['pdef']/100; $mdef=$magiya['uron']*$usr['mdef']/100; $pmdef=($pdef+$mdef)/2; $sms="баф на защиту. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
 //баф на защ и атаку
-if ($magiya[tip]=="bafzat"){$tt=1800; 
-$bafmatt=$magiya[uron]*$usr[patt]/100; $bafpatt=$magiya[uron]*$usr[matt]/100; $bafat=($bafmatt+$bafpatt)/2; 
-$pdef=$magiya[uron]*$usr[pdef]/100; $mdef=$magiya[uron]*$usr[mdef]/100; $pmdef=($pdef+$mdef)/2; 
+if ($magiya['tip']=="bafzat"){$tt=1800; 
+$bafmatt=$magiya['uron']*$usr['patt']/100; $bafpatt=$magiya['uron']*$usr['matt']/100; $bafat=($bafmatt+$bafpatt)/2; 
+$pdef=$magiya['uron']*$usr['pdef']/100; $mdef=$magiya['uron']*$usr['mdef']/100; $pmdef=($pdef+$mdef)/2; 
 $sms="баф на атаку и защиту. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
 // баф на пополнение ХП
-if ($magiya[tip]=="bafhp"){$bafhp=$magiya[uron]; $tt=0; $sms="баф на жизни. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
+if ($magiya['tip']=="bafhp"){$bafhp=$magiya['uron']; $tt=0; $sms="баф на жизни. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
 // баф на пополнение MП
-if ($magiya[tip]=="bafmp"){$bafmp=$magiya[uron]; $tt=0; $sms="баф на ману. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
+if ($magiya['tip']=="bafmp"){$bafmp=$magiya['uron']; $tt=0; $sms="баф на ману. Сила +$magiya[uron]. Каст отнял $magiya[mp] MP";}
 
 
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$nick'");
@@ -226,7 +226,7 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-if ($magiya[tip]=="bafhp" && $mag[hp]>=$mag[hpall]){echo "У игрока полно жизней!<br/>";}else{
+if ($magiya['tip']=="bafhp" && $mag['hp']>=$mag['hpall']){echo "У игрока полно жизней!<br/>";}else{
 
 
 $req1 = mysql_query("SELECT * FROM `baf` WHERE `usr` = '$nick' LIMIT 1");
@@ -251,12 +251,12 @@ mysql_query("INSERT INTO
         `pmdef` = '$pmdef',
         `time` = '$time'");}
 
-$patt=$bafat+$usr[patt];
-$matt=$bafat+$usr[matt];
-$pdef=$pmdef+$usr[pdef];
-$mdef=$pmdef+$usr[mdef];
-$nhp=$bafhp+$usr[hp];
-$nmp=$bafmp+$usr[mp];
+$patt=$bafat+$usr['patt'];
+$matt=$bafat+$usr['matt'];
+$pdef=$pmdef+$usr['pdef'];
+$mdef=$pmdef+$usr['mdef'];
+$nhp=$bafhp+$usr['hp'];
+$nmp=$bafmp+$usr['mp'];
 
 
 

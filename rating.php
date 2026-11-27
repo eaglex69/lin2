@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'rating';//фикс. места
@@ -11,12 +11,12 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 echo "<font color=#f4d06e> Рейтинги игроков: </font><br/><br/>";
-if ($udata[dostup]>=0){
+if ($udata['dostup']>=0){
 }
 
 
@@ -32,7 +32,7 @@ echo"<br/><div class=silka><a href=\"index.php?\">Назад</a></div>";
 break;
 
 case 'adena':
-if ($udata[dostup]>=4){
+if ($udata['dostup']>=4){
 $b = mysql_query("SELECT usr,money FROM users WHERE money >'0' and dostup < '4' ORDER BY money DESC LIMIT 0, 10");
 ////////////////////////////
 $avto=mysql_num_rows($b);
@@ -41,7 +41,7 @@ $i=1;
 While($best = mysql_fetch_array($b))
 {
 echo"$i. <a href=\"search.php?nick=$best[usr]&amp;go=go\">$best[usr]</a>
- [Адена <b>".number_format($best[money], 0, ',', "`")."</b>]<br/>";
+ [Адена <b>".number_format($best['money'], 0, ',', "`")."</b>]<br/>";
 $i++;
 }
 }else{
@@ -52,7 +52,7 @@ echo"<a href=\"rating.php?\">Назад</a>";
 break;
 ///////////
 case 'col':
-if ($udata[dostup]>=4){
+if ($udata['dostup']>=4){
 $b = mysql_query("SELECT usr,almaz FROM users WHERE almaz >'0' and dostup < '4' ORDER BY almaz DESC LIMIT 0, 10");
 ////////////////////////////
 $avto=mysql_num_rows($b);
@@ -61,7 +61,7 @@ $i=1;
 While($best = mysql_fetch_array($b))
 {
 echo"$i. <a href=\"search.php?nick=$best[usr]&amp;go=go\">$best[usr]</a>
- - <font color=grey>CoL <b>".number_format($best[almaz], 0, ',', "`")."</b></font><br/>";
+ - <font color=grey>CoL <b>".number_format($best['almaz'], 0, ',', "`")."</b></font><br/>";
 $i++;
 }
 }else{

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shopaura';//фикс. места
@@ -17,7 +17,7 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -50,7 +50,7 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -107,10 +107,10 @@ $liders='black';
 $liders='not';
 }
 if($udata['storona']==$liders){
-$mag[cena]=round($mag[cena]-(($mag[cena]/100)*15));
+$mag['cena']=round($mag['cena']-(($mag['cena']/100)*15));
 }
 
-$nmoney=$udata[money]-$mag[cena];
+$nmoney=$udata['money']-$mag['cena'];
 
 if($nmoney<0){
 echo'Нехватает монет!';
@@ -146,17 +146,17 @@ mysql_query("INSERT INTO
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $city = mysql_fetch_array($req);
-if($city[clan]!='not' and $udata[clan]!=$city[clan]){
+if($city['clan']!='not' and $udata['clan']!=$city['clan']){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider`='$city[clan]'");
 ////////////////////////////
 $clan = mysql_fetch_array($req);
-$clan[money]=$clan[money]+round(($mag[cena]/100)*2);
+$clan['money']=$clan['money']+round(($mag['cena']/100)*2);
 
 mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$city[clan]'");
 }
 
 }else{
-$nk=$res[kol]+1;
+$nk=$res['kol']+1;
 mysql_query("UPDATE `item_aura` SET `kol` = '$nk' WHERE `usr` = '$log' and `lat_name` = '$mag[lat_name]'");
 }
 mysql_query("UPDATE users SET money = '$nmoney' WHERE usr = '$log'");

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shopsoul';//фикс. места
@@ -31,7 +31,7 @@ $mag = mysql_fetch_array($req);
 if($udata9<=20){
 $mag['cena']=0;
 }
-$nmoney=$udata8-$mag[cena];
+$nmoney=$udata8-$mag['cena'];
 
 if($nmoney<0){ header ("Location: gk.php?&error=adencastle");
 
@@ -57,7 +57,7 @@ if($ggg1>"5"){header ("Location: gk.php?clan");exit;}
 
 }}
 
-if ($mag[name]=="$udata20 Castle" and $udata9<="51"){
+if ($mag['name']=="$udata20 Castle" and $udata9<="51"){
 
         header ("Location: gorod.php?&errorr=lvl");
 
@@ -71,14 +71,14 @@ mysql_query("UPDATE `users` SET `udata8`='$nmoney' WHERE `udata0`='$log'");
 
 $udata8=number_format($udata8);
 
-if($mag[gk]=="gorod"){
+if($mag['gk']=="gorod"){
 echo"Вы телепортировались <b>$mag[town]</b><br>
 У вас осталось $udata8 аден.<br>";
 echo"<a href=\"gorod.php?\">Продолжить</a>";
 mysql_query("UPDATE `users` SET `udata37`='' WHERE `udata0`='$log'");
 }
 
-if($mag[gk]=="combat" ){
+if($mag['gk']=="combat" ){
 
 
 $req = mysql_query("SELECT * FROM `who_usr` WHERE `nick` = '$log'");

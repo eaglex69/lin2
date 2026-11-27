@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'obm_fs_ad';
@@ -14,7 +14,7 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 
 default:
@@ -22,12 +22,12 @@ default:
 $res = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' && `name` = 'Сундук удачи'");
 $av = mysql_num_rows($res);
 $fa = mysql_fetch_array($res);
-$av = $fa[kol];
+$av = $fa['kol'];
 if (empty($av)){$av = 0;}
 $resk = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' && `name` = 'Ключ'");
 $avk = mysql_num_rows($resk);
 $fak = mysql_fetch_array($resk);
-$avk = $fak[kol];
+$avk = $fak['kol'];
 if (empty($avk)){$avk = 0;}
 if ($av==0){
 
@@ -39,7 +39,7 @@ echo "<div class=silka><a href=\"gorod.php\">В город</a></div>";
 }else{
 
 
-if (isset($_GET[yes])){ 
+if (isset($_GET['yes'])){ 
 
 
 if($avk>0){
@@ -50,7 +50,7 @@ if($res==0){
 echo "<p><font color=red>У Вас нет сундуков удачи...</font></p>";
 }else{
 $avk=$avk-1;
-$nk=$rs[kol]-1;
+$nk=$rs['kol']-1;
 mysql_query("UPDATE `res` SET `kol` = '$avk' WHERE `usr` = '$log' and `name` = 'Ключ'");
 mysql_query("UPDATE `res` SET `kol` = '$nk' WHERE `usr` = '$log' and `name` = 'Сундук удачи'");
 if($nk <= 0){ //удаляем
@@ -72,7 +72,7 @@ mysql_query("DELETE FROM `res` WHERE `id` = '$rs[id]' LIMIT 1");
 $r_col=rand(1,100);
 $kol=rand(1,15);
 if ($r_col<=30){ 
-$colnew=$udata[almaz]+$kol;
+$colnew=$udata['almaz']+$kol;
 mysql_query("UPDATE `users` SET `almaz` = '$colnew' WHERE `usr` = '$log' LIMIT 1");
 $rez_col = " Выпало: <b>$kol Coin of Luck </b><br/>";
 }else{$rez_col = 0;}
@@ -80,7 +80,7 @@ $rez_col = " Выпало: <b>$kol Coin of Luck </b><br/>";
 $r_aden=rand(1,100);
 $aden=rand(5000000,95000000);
 if ($r_aden<=50){ 
-$moneynew=$udata[money]+$aden;
+$moneynew=$udata['money']+$aden;
 mysql_query("UPDATE `users` SET `money` = '$moneynew' WHERE `usr` = '$log' LIMIT 1");
 $rez_aden = " Выпало: <b>$aden Аден </b><br/>";
 }else{$rez_aden = 0;}
@@ -88,7 +88,7 @@ $rez_aden = " Выпало: <b>$aden Аден </b><br/>";
 $r_exp=rand(1,100);
 $exp=rand(50000,9500000);
 if ($r_exp<=50){ 
-$expnew=$udata[exp]+$exp;
+$expnew=$udata['exp']+$exp;
 mysql_query("UPDATE `users` SET `exp` = '$expnew' WHERE `usr` = '$log' LIMIT 1");
 $rez_aden = " Выпало: <b>$exp Опыта </b><br/>";
 }else{$rez_exp = 0;}

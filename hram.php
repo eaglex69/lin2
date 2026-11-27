@@ -11,7 +11,7 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -29,7 +29,7 @@ echo "
 
 
 echo'<div class="m_bg"></div>';
-if($udata[zamujem] == NULL){
+if($udata['zamujem'] == NULL){
 echo "<a href=\"hram.php?mod=yes\">Подать заявку</a><br/>";}
 else{
 echo "<a href=\"hram.php?mod=delbrak\">Разорвать брак с  $udata[zamujem]</a>";
@@ -52,13 +52,13 @@ echo "Брак успешно разорван<br>";
 break;
 
 case 'yes':
-if($udata[pol]=="w"){echo"Заявку может подавать только парень<br/>";
+if($udata['pol']=="w"){echo"Заявку может подавать только парень<br/>";
 include($path.'inc/down.php');
 exit;
 }
 
 
-if(empty($_POST[name]) or empty($_POST[text])){
+if(empty($_POST['name']) or empty($_POST['text'])){
 echo "<form action=\"hram.php?mod=yes\" method=\"post\">";
 echo"Напишите ник жены:<br/>";
 echo"<input class='input' type=\"text\" size=\"20\" name=\"name\" maxlength=\"10\"/><br/>";
@@ -66,8 +66,8 @@ echo"Текст к заявке:<br/>";
 echo"<input class='input' type=\"text\" size=\"20\" name=\"text\" maxlength=\"100\"/><br/>";
 echo '<input class="button" type="submit" value="Продолжить" /></form>';
 }else{
-$name=htmlspecialchars($_POST[name]);
-$text=htmlspecialchars($_POST[text]);
+$name=htmlspecialchars($_POST['name']);
+$text=htmlspecialchars($_POST['text']);
 
 $req = mysql_query("SELECT * FROM `ya_zamujem` WHERE `usr` = '$log' LIMIT 1");
 ////////////////////////////
@@ -105,7 +105,7 @@ exit;
 }
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$name'");
 $pk = mysql_fetch_assoc($req);
-if($pk[pol] == "m"){
+if($pk['pol'] == "m"){
 echo'Геям вход запрещен!';
 echo'<br />';
 echo "<a href=\"hram.php?\"> Вернуться</a><br>";
@@ -142,7 +142,7 @@ exit;
 
 
 
-$almaz=$udata[almaz]-100;//almaz
+$almaz=$udata['almaz']-100;//almaz
 
 mysql_query("UPDATE `users` SET `almaz` = '$almaz' WHERE `usr` = '$log'");
 

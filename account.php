@@ -64,7 +64,7 @@ echo'<a href="index.php">Назад</a><hr/>';
 function goreg()
 {
 
-if(eregi("[^a-z0-9-]",$_POST['nick']))
+if(preg_match('/[^a-z0-9-]/i',$_POST['nick']))
 {
 echo"Логин содержит запрещенные символы.<br/>
 <a href=\"account.php?\">Вернуться к регистрации</a><br/>"; 
@@ -130,7 +130,7 @@ $dater = str_replace("December","декабря",$dater);
 
 $reg_pass = md5($reg_pass);
 
-if(!empty($_GET[ref])){
+if(!empty($_GET['ref'])){
 $req = $mysql->query("SELECT `ip` FROM `users` WHERE `id` = '$_GET[ref]' LIMIT 1");
 // //////////////////////////
 $avto = $mysql->num_rows($req);
@@ -138,7 +138,7 @@ $avto = $mysql->num_rows($req);
 if ($avto == 1) {
     $refer = $mysql->fetch_assoc($req);
     
-    if($ip!=$refer[ip]){
+    if($ip!=$refer['ip']){
     
     mysql_query("INSERT INTO
         `account` SET

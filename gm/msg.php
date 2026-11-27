@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,20 +19,20 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup]>1){
+if ($udata['dostup']>1){
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-if(empty($_POST[nick])){ $nick = $_GET[nick];}else{$nick = $_POST[nick];}
+if(empty($_POST['nick'])){ $nick = $_GET['nick'];}else{$nick = $_POST['nick'];}
 
-if(!empty($_GET[nick]))  {$_POST[nick]=$_GET[nick];}
+if(!empty($_GET['nick']))  {$_POST['nick']=$_GET['nick'];}
    
    
    
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="msg.php?" method="post">';
 echo"Ник:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$nick\" name=\"nick\"/><br/>";
@@ -56,28 +56,28 @@ include($path.'inc/down.php');exit;
 
 $usdata = mysql_fetch_array($req);
 
-if($udata[dostup]<$usdata[dostup]){
+if($udata['dostup']<$usdata['dostup']){
 echo'Нельзя читать почту! Вы меньше по званию.';
 include($path.'inc/down.php');exit;
 }
-if($usdata[usr]=='Ultimate' and $udata[usr]!='Ultimate'){
+if($usdata['usr']=='Ultimate' and $udata['usr']!='Ultimate'){
 echo'Нельзя читать почту Ultimate!Это наказуемо =D.';
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Вашу почту попытался прочитать $udata[usr]' ");
 include($path.'inc/down.php');exit;
 }
-if($usdata[usr]=='Ultimate' and $udata[usr]!='Ultimate'){
+if($usdata['usr']=='Ultimate' and $udata['usr']!='Ultimate'){
 echo'Ох чую щас ты люлей отхапаешь :D.';
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Вашу почту попытался прочитать $udata[usr]' ");
 include($path.'inc/down.php');exit;
 }
 
-if($usdata[usr]=='Ultimate' and $udata[usr]!='Ultimate'){
+if($usdata['usr']=='Ultimate' and $udata['usr']!='Ultimate'){
 echo'Ох чую щас ты люлей отхапаешь :D.';
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Вашу почту попытался прочитать $udata[usr]' ");
 include($path.'inc/down.php');exit;
 }
 
-if($usdata[usr]=='Ultimate' and $udata[usr]!='Ultimate'){
+if($usdata['usr']=='Ultimate' and $udata['usr']!='Ultimate'){
 echo'Нельзя читать почту Ultimate!Это наказуемо =D.';
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Вашу почту попытался прочитать $udata[usr]' ");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Почту Ultimate попытался прочитать $udata[usr]' ");
@@ -94,33 +94,33 @@ echo "<b>Почта пуста!</b><br/>";
 else {
 
 echo "<hr/>";
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 5;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 5;
+if($_GET['page'] == "0")
 {$i = 0;}
-else{$i = ($_GET[page]*5)+1;}
+else{$i = ($_GET['page']*5)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT komentaras FROM komentarai"));
 $puslap = floor($viso/5);
 $message = mysql_query("SELECT * FROM msg_r WHERE user_to = '$nick'  ORDER BY id DESC LIMIT $num,5");
 while($msg = mysql_fetch_array($message))
 {
-if ($msg[read] == 1)
+if ($msg['read'] == 1)
 {
 //mysql_query("UPDATE `msg_r` SET `read` = 0 WHERE `user_to` = '$nick'"); // не прочитаное что бы не пропало
 }
-if ($msg[read] == 1)
+if ($msg['read'] == 1)
 {
 $read = "<font color=red>Не прочитано<br/></font>";
 } else
 {
 $read = "";
 }
-$text = $msg[mail_msg];
+$text = $msg['mail_msg'];
 //$text = strip_tags($text);
 $from = strip_tags($msg['user_from']);
 echo "<br/><b><font color=grey>От:</font> </b><b><a href='/search.php?nick=".$from."&amp;go=go'>$from</a><font color=#686868></b> <small>$msg[time]</small></font>
@@ -130,16 +130,16 @@ echo "<br/><b><font color=grey>От:</font> </b><b><a href='/search.php?nick=".$
 <br/><br/>";
 echo "<hr/>";
 } 
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"msg.php?nick=$nick&amp;page=$back\">back</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "back";
 }
 echo"|";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"msg.php?nick=$nick&amp;page=$next\">next</a><br/>";}
 else
 {echo "next<br/>";}

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'Подарки';//фикс. места
@@ -27,7 +27,7 @@ if (!isset($users) && !isset($_GET['id'])){header("Location: /index.php?".SID);e
 
 $ank=mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `id` = '$_GET[id]' LIMIT 1"));
 
-if(empty($ank[usr])){
+if(empty($ank['usr'])){
 echo'<font color=red>Нет такого игрока!</font>';
 echo"<br/><div class=silka><a href=\"/?\">Главная</a>";
 include($path.'inc/down.php');exit;
@@ -37,8 +37,8 @@ include($path.'inc/down.php');exit;
 
 if ((!isset($_SESSION['refer']) || $_SESSION['refer']==NULL)
 && isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']!=NULL &&
-!ereg('gifts\.php',$_SERVER['HTTP_REFERER']))
-$_SESSION['refer']=str_replace('&','&amp;',ereg_replace('^http://[^/]*/','/', $_SERVER['HTTP_REFERER']));
+strpos($_SERVER['HTTP_REFERER'],'gifts.php')===false)
+$_SESSION['refer']=str_replace('&','&amp;',preg_replace('~^http://[^/]*/~','/', $_SERVER['HTTP_REFERER']));
 
 
 $p = (isset($_GET['p'])) ? htmlspecialchars($_GET['p']) : null;
@@ -55,7 +55,7 @@ $pid = intval($_GET['pid']);
 
 if (isset($_GET['go'])){
 
-if ($users[id]==$ank[id]){echo "<font color=red><p>Себе дарить нельзя</p></font>";
+if ($users['id']==$ank['id']){echo "<font color=red><p>Себе дарить нельзя</p></font>";
 include($path.'inc/down.php');exit;
 }
 

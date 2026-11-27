@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'index';//фикс. места
@@ -12,7 +12,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[id]) {
+switch($_GET['id']) {
 
 default:
 
@@ -431,12 +431,12 @@ echo '<center>
 
 While($lvl = mysql_fetch_array($reqvh))
 {
-$lvl[lvl]++; // уровень будет при таком опыте
+$lvl['lvl']++; // уровень будет при таком опыте
 echo '<center>
 <table style="width:100%" cellspacing="0" cellpadding="0"><tr>
                    <td style="vertical-align:top;width:10%;border: 2px double;border-width:1px;color:#3366FF;padding:2px">
-  '.number_format($lvl[lvl], 0, ',', "`").' </td><td style="vertical-align:top;width:19%;border: 2px double;border-width:1px;color:#3366FF;padding:2px">
-  '.number_format($lvl[exp], 0, ',', "`").' </td></tr></table></center>
+  '.number_format($lvl['lvl'], 0, ',', "`").' </td><td style="vertical-align:top;width:19%;border: 2px double;border-width:1px;color:#3366FF;padding:2px">
+  '.number_format($lvl['exp'], 0, ',', "`").' </td></tr></table></center>
 ';
 }
 echo '</div>';}

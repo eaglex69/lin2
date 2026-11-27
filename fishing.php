@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Рыбалка';
@@ -15,7 +15,7 @@ include($path.'inc/zag.php');
 ///////////////
 
 
-switch($_GET[f]){
+switch($_GET['f']){
 default:
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -75,14 +75,14 @@ break;
 
 case 'ud':
 
-if (isset($_GET[t])){
+if (isset($_GET['t'])){
 
-if ($_GET[t]==1){$name='Baby Duck Rod';$patt=10; $matt=10; $nlvl=0;$cena=50;}
-if ($_GET[t]==2){$name='Albatross Rod';$patt=100; $matt=100; $nlvl=40;$cena=100;}
-if ($_GET[t]==3){$name='Pelican Rod';$patt=300; $matt=300; $nlvl=62;$cena=150;}
-if ($_GET[t]==4){$name='KingFisher Rod';$patt=650; $matt=610; $nlvl=96;$cena=210;}
+if ($_GET['t']==1){$name='Baby Duck Rod';$patt=10; $matt=10; $nlvl=0;$cena=50;}
+if ($_GET['t']==2){$name='Albatross Rod';$patt=100; $matt=100; $nlvl=40;$cena=100;}
+if ($_GET['t']==3){$name='Pelican Rod';$patt=300; $matt=300; $nlvl=62;$cena=150;}
+if ($_GET['t']==4){$name='KingFisher Rod';$patt=650; $matt=610; $nlvl=96;$cena=210;}
 
-$colnew=$udata[almaz]-$cena;
+$colnew=$udata['almaz']-$cena;
 if ($colnew>=0){
 // --записуем удочку
 mysql_query("INSERT INTO
@@ -132,8 +132,8 @@ break;
 
 case 'lur':
 
-if (isset($_GET[t])){
-$colnew=$udata[almaz]-1;
+if (isset($_GET['t'])){
+$colnew=$udata['almaz']-1;
 $co = 100; // количество наживки
 if ($colnew>=0){
 //----------------------------------- пишем в инвентарь ----------------------
@@ -151,10 +151,10 @@ mysql_query("INSERT INTO
         `give` = '0',
         `kol` = '$co',
         `cena` = '250000'");
-$nk=$rs[kol]+$co;
+$nk=$rs['kol']+$co;
 echo "<p><font color=#f4d06e>Вы купили $co Lure. У Вас теперь $nk Lure.</font></p>";
 }else{
-$nk=$rs[kol]+$co;
+$nk=$rs['kol']+$co;
 mysql_query("UPDATE `res` SET `kol` = '$nk' WHERE `usr` = '$log' and `lat_name` = 'lure'");
 echo "<p><font color=blue>Вы купили $co Lure. У Вас теперь $nk Lure.</font></p>";
 
@@ -210,7 +210,7 @@ $asd = mysql_query("SELECT * FROM fish_log WHERE ids >= '0' ORDER BY `skoko` DES
 $i=1;
 While($visi = mysql_fetch_array($asd))
 {
-echo ' ';echo idlog_online($idlog=$visi[usr]).' <font color=#f4d06e> - '.$visi[skoko].' рыбок</font></div>';
+echo ' ';echo idlog_online($idlog=$visi['usr']).' <font color=#f4d06e> - '.$visi['skoko'].' рыбок</font></div>';
 
 }
 

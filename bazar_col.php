@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'bazar_col';//фикс. места
@@ -25,12 +25,12 @@ $avto=mysql_num_rows($req);
 if ($avto>=1){
 $col = mysql_fetch_array($req);
 
-if ($_GET[mod]==del){
+if ($_GET['mod']=='del'){
 
 
 //--------------------------------------------------------------------
 //	// 		КАЛЬКУЛЯТОР 		//	//
-$nalmaz = $udata[almaz] + $col[col]; // плюсуем колы
+$nalmaz = $udata['almaz'] + $col['col']; // плюсуем колы
 //			////////			//	//
 //--------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ exit;
 
 }else{
 echo "<b>Рынок Coin of Luck</b><br/>";
-echo "Ты продаешь ".number_format($col[col], 0, ',', "`")." Coins of Luck по цене ".number_format($col[cena], 0, ',', "`")." Aден за штуку.";
+echo "Ты продаешь ".number_format($col['col'], 0, ',', "`")." Coins of Luck по цене ".number_format($col['cena'], 0, ',', "`")." Aден за штуку.";
 echo "<hr/><div class=menu><font color=#007F46>Старик:</font><br/>
  <font color=grey>- Ты можешь идти, я послежу за твоими Coin of Luck</font></div><hr/>";	
 
@@ -65,7 +65,7 @@ exit;
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"<p><b>Рынок Coin of Luck</p></b> <hr/>";
@@ -78,7 +78,7 @@ $avto=mysql_num_rows($req);
 if ($avto>=1){
 While($col = mysql_fetch_array($req))
 {
-echo "<a href=\"bazar_col.php?&mod=by&id=$col[id]\">Купить</a>  ".number_format($col[col], 0, ',', "`")." Coin of Luck у <a href=\"search.php?&nick=$col[usr]&go=go\">$col[usr]</a> по ".number_format($col[cena], 0, ',', "`")." Аден <hr/>";
+echo "<a href=\"bazar_col.php?&mod=by&id=$col[id]\">Купить</a>  ".number_format($col['col'], 0, ',', "`")." Coin of Luck у <a href=\"search.php?&nick=$col[usr]&go=go\">$col[usr]</a> по ".number_format($col['cena'], 0, ',', "`")." Аден <hr/>";
 }
 }else{echo "<p>Список продаж не обнаружен!</p><hr/>";}
 
@@ -88,11 +88,11 @@ echo"<a href=\"zaksms.php?\">Заказать Coin of Luck</a></div>";
 break;
 
 /////////////////////Продажа колов//////////////////////////////////////////////////////////
-case 'pr';
+case 'pr':
 
 
-if(empty($_POST[col]) or $_POST[col]<=0 or $_POST[cena]<=0 or is_numeric($_POST[cena])==FALSE or is_numeric($_POST[col])==FALSE){
-echo "<p>Вы хотите продать Coin of Luck. У Вас их <b>".number_format($udata[almaz], 0, ',', "`")."</b> шт.</p><hr/>";
+if(empty($_POST['col']) or (float)$_POST['col']<=0 or (float)$_POST['cena']<=0 or is_numeric($_POST['cena'])==FALSE or is_numeric($_POST['col'])==FALSE){
+echo "<p>Вы хотите продать Coin of Luck. У Вас их <b>".number_format($udata['almaz'], 0, ',', "`")."</b> шт.</p><hr/>";
 echo '<form action="bazar_col.php?mod=pr" method="post">';
 echo"Количество CoL:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$udata[almaz]\" name=\"col\"/><br/>";
@@ -113,14 +113,14 @@ include($path.'inc/down.php');
 exit;
 }
 
-if($udata[almaz]<$_POST[col]){
+if($udata['almaz']<$_POST['col']){
 echo'У вас недостаточно Coin of Luck!<br/>';
 					echo"<br/><div class=inoy><a href=\"bazar_col.php?\">Рынок Coin of Luck</a></div>";
 include($path.'inc/down.php');
 exit;
 }
 
-if($_POST[cena] * $_POST[col] >999999999999999999){
+if($_POST['cena'] * $_POST['col'] >999999999999999999){
 echo'Максимальная цена за всё 500`000`000 Аден<br/>';
 					echo"<br/><div class=inoy><a href=\"bazar_col.php?\">Рынок Coin of Luck</a></div>";
 include($path.'inc/down.php');
@@ -130,10 +130,10 @@ exit;
 
 
 
-if (empty($_POST[cena])){$_POST[cena] = 0;} 
+if (empty($_POST['cena'])){$_POST['cena'] = 0;} 
 
 
-$nalmaz = $udata[almaz] - $_POST[col];
+$nalmaz = $udata['almaz'] - $_POST['col'];
 
 mysql_query ("UPDATE users SET  almaz='$nalmaz' WHERE usr='$log' LIMIT 1"); // забираем у юзера колы выставленные на продажу
 
@@ -143,11 +143,11 @@ $res = mysql_query("INSERT INTO
         `col` = '$_POST[col]', 
 		`cena` = '$_POST[cena]'");
 
-$cena555 = $_POST[col]*$_POST[cena];
+$cena555 = $_POST['col']*$_POST['cena'];
 
 						if ($res == 'true')
 					{
-					echo 'Вы выставили <b>'.number_format($_POST[col], 0, ',', "`").'</b> Coin of Luck на продажу по <b>'.number_format($_POST[cena], 0, ',', "`").'</b> Аден.<br/>
+					echo 'Вы выставили <b>'.number_format($_POST['col'], 0, ',', "`").'</b> Coin of Luck на продажу по <b>'.number_format($_POST['cena'], 0, ',', "`").'</b> Аден.<br/>
 					Общая цена составила <b><u>'.number_format($cena555, 0, ',', "`").'</u></b> Аден'; // удачно
 					}
 					else
@@ -164,10 +164,10 @@ break;
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////// купить колы ///////
-case 'by';
+case 'by':
 
 
-if (!empty($_POST[col]) && $_POST[col]>0){
+if (!empty($_POST['col']) && (float)$_POST['col']>0){
 $req = mysql_query("SELECT * FROM `bazar_col` WHERE `id` = '$_GET[id]' LIMIT 1");
 $avto=mysql_num_rows($req);
 if ($avto>=1){
@@ -178,11 +178,11 @@ $users = mysql_fetch_array($req2);
 
 //--------------------------------------------------------------------
 //	// 		КАЛЬКУЛЯТОР 		//	//
-$cena = $_POST[col] * $col[cena]; // цена ввёденого количества
-$nmoney = $udata[money] - $cena; // остача аден при покупке
-$nmoney2 = $users[money] + $cena; // даём аден при покупке
-$nalmaz = $udata[almaz] + $_POST[col]; // плюсуем колы
-$ncol = $col[col] - $_POST[col]; // сколько осталось на базаре
+$cena = $_POST['col'] * $col['cena']; // цена ввёденого количества
+$nmoney = $udata['money'] - $cena; // остача аден при покупке
+$nmoney2 = $users['money'] + $cena; // даём аден при покупке
+$nalmaz = $udata['almaz'] + $_POST['col']; // плюсуем колы
+$ncol = $col['col'] - $_POST['col']; // сколько осталось на базаре
 //			////////			//	//
 //--------------------------------------------------------------------
 
@@ -193,7 +193,7 @@ include($path.'inc/down.php');
 exit;
 }
 
-if($log == $col[usr]){
+if($log == $col['usr']){
 echo'Вы не можете купить у себя Coin of Luck<br/>';
 					echo"<br/><div class=inoy><a href=\"bazar_col.php?\">Рынок Coin of Luck</a></div>";
 include($path.'inc/down.php');
@@ -253,10 +253,10 @@ $avto=mysql_num_rows($req);
 if ($avto>=1){
 $col = mysql_fetch_array($req);
 
-$cena555 = $col[col]*$col[cena];
+$cena555 = $col['col']*$col['cena'];
 
-echo "<p>Игрок <b>$col[usr]</b> продает <b>".number_format($col[col], 0, ',', "`")."</b> шт. Coin of Luck. <br/>
-Цена продавца: <b>".number_format($col[cena], 0, ',', "`")."</b> Aден за штуку <br/>
+echo "<p>Игрок <b>$col[usr]</b> продает <b>".number_format($col['col'], 0, ',', "`")."</b> шт. Coin of Luck. <br/>
+Цена продавца: <b>".number_format($col['cena'], 0, ',', "`")."</b> Aден за штуку <br/>
 Общая цена: <b><u>".number_format($cena555, 0, ',', "`")."</b></u> Aден.</p>";
 
 echo '<form action="" method="post">';

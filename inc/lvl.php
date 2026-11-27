@@ -1,4 +1,4 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 
 $isfffgfgthfg = 0;
@@ -84,7 +84,7 @@ matt = '".$matt."',
 pdef = '".$pdef."',
 money = '".$money."',
 mdef = '".$mdef."',
-skill='".$udata[skill]."' WHERE usr = '".$log."' LIMIT 1");
+skill='".$udata['skill']."' WHERE usr = '".$log."' LIMIT 1");
 //mysql_query("UPDATE users SET money = '$money' WHERE usr = '$log'");
 }else{$isfffgfgthfg = 10;}
 
@@ -243,7 +243,7 @@ if($pit['exp']>=1109337 && $pit['lvl']=="34"){
 $new_lvl_pit='yes';
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-if($pit[exp]>=1215996 && $pit['lvl']=="35"){ 
+if($pit['exp']>=1215996 && $pit['lvl']=="35"){ 
 $new_lvl_pit='yes';
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ if($pit['exp']>=2000000 && $pit['lvl']=="39"){
 $new_lvl_pit='yes';
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-if($new_lvl_pit==yes){
+if($new_lvl_pit=='yes'){
 $pit['lvl']=$pit['lvl']+1;
 $pit['skill']=$pit['skill']+2;
 

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'lambard';//фикс. места
@@ -16,20 +16,20 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 
-if(!empty($_GET[id])){
+if(!empty($_GET['id'])){
 
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not' and `id`='$_GET[id]'");
 $avto=mysql_num_rows($req);
 if($avto==1){
 $item = mysql_fetch_array($req);
 
-$cena=round($item[cena]/4);
-$udata[money]=$udata[money]+$cena;
+$cena=round($item['cena']/4);
+$udata['money']=$udata['money']+$cena;
 
 mysql_query("UPDATE `users` SET `money` = '$udata[money]' WHERE `usr` = '$log'");
 
@@ -65,8 +65,8 @@ echo "<p><span style=color:#1B7551;><b>Вещи, которые можно пр�
 
 While($mag = mysql_fetch_array($req))
 {
-$cena=round($mag[cena]/4);
-$u=explode('*',$mag[name]);
+$cena=round($mag['cena']/4);
+$u=explode('*',$mag['name']);
 echo "<div class=inoy><a href=\"/lambard.php?id=$mag[id]&amp;page=$page\"><img src=\"shmot/$u[0].png\"  align='left' width='32' height='32' alt='' style='margin-right:10px;border:1px solid #383838'/>
  $mag[name] <br/><span style=color:#C2B6B2;>&nbsp;&nbsp;Продать за: ".number_format($cena, 0, ',', "`")." Аден</span></a></div>";
 

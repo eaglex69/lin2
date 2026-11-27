@@ -1,7 +1,9 @@
-<?
+<?php
 define('PROTECTOR', 1);
+// PHP 8: error level / timezone / mysql_*() before the code below (this entry runs code before inc/db.php)
+include_once dirname(__FILE__).'/inc/php8.php';
 
-if($_GET[mod]=='ataka'){
+if($_GET['mod']=='ataka'){
 $header=TRUE;
 }else{
 $textl='Битва';
@@ -39,12 +41,12 @@ function lose(){
 global $log,$pas,$m,$pit,$mob,$udata;
 
 $time=time();
-$losetime=$m[ltime]+120;
+$losetime=$m['ltime']+120;
 
-if($udata[hp]<=0 or $time>$losetime){
+if($udata['hp']<=0 or $time>$losetime){
 
-$nloses=$udata[loses]+1;
-if($mob[hp]<=0){
+$nloses=$udata['loses']+1;
+if($mob['hp']<=0){
 mysql_query("UPDATE `guards` SET `hp` = '0',`status`='off',`oponent`='$time' WHERE `id` = '$m[mob]'");
 }else{
 mysql_query("UPDATE `guards` SET `hp` = '$mob[hp]',`status`='on',`oponent`='not' WHERE `id` = '$m[mob]'");
@@ -63,8 +65,8 @@ mysql_query("INSERT INTO
         `timeout` = '$time'");
 
 //питы
-if($pit[status]==on){
-if($pit[hp]<=0){
+if($pit['status']=='on'){
+if($pit['hp']<=0){
 mysql_query("UPDATE pit SET status = 'die' WHERE `usr` = '$log'");
 }
 }
@@ -79,24 +81,24 @@ global $log,$pas,$m,$mob,$pit,$udata;
 
 $time=time();
 
-if($mob[hp]<=0){
+if($mob['hp']<=0){
 
-$nwins=$udata[wins]+1;
-$nexp=$udata[exp]+$mob[exp]+$mob[lvl];
+$nwins=$udata['wins']+1;
+$nexp=$udata['exp']+$mob['exp']+$mob['lvl'];
 //питы
-if($pit[status]==on){
-if($pit[hp]<=0){
+if($pit['status']=='on'){
+if($pit['hp']<=0){
 mysql_query("UPDATE pit SET status = 'die' WHERE `usr` = '$log'");
 }else{
-$pexp=round($mob[exp]/2);
-$pexp=$pit[exp]+$pexp;
+$pexp=round($mob['exp']/2);
+$pexp=$pit['exp']+$pexp;
 mysql_query("UPDATE pit SET exp='$pexp' WHERE `usr` = '$log'");
 }
 }
 
-$sm=rand(1,$mob[sm]);
+$sm=rand(1,$mob['sm']);
 if($sm==1){
-$nmoney=$udata[money]+$mob[money];
+$nmoney=$udata['money']+$mob['money'];
 }
 
 mysql_query("UPDATE `guards` SET `hp` = '0',`status`='off',`oponent`='$time' WHERE `id` = '$m[mob]'");
@@ -110,7 +112,7 @@ mysql_query("DELETE FROM `tmp_zamok` WHERE usr='$log'");//чистим логи
 mysql_query("UPDATE regenerator SET last = '$time' WHERE usr = '$log'");//сбиваем регенерацию
 
 echo"Вы победили в бою с $mob[name]!<br/>";
-if(!empty($drop[name])){
+if(!empty($drop['name'])){
 echo"Выпало: $drop[name]<br/>";
 }
 echo"+$mob[exp] опыта<br/>";
@@ -127,8 +129,8 @@ exit;
 }
 function pit(){
 global $log,$pas,$pit,$udata;
-if($pit[status]==on){
-if($pit[hp]<=0){
+if($pit['status']=='on'){
+if($pit['hp']<=0){
 mysql_query("UPDATE pit SET status = 'die' WHERE `usr` = '$log'");
 }
 }
@@ -139,8 +141,8 @@ timer();
 lose();
 win();
 pit();
-if(!empty($pit[id])){
-if($pit[status]==on){
+if(!empty($pit['id'])){
+if($pit['status']=='on'){
 echo"<b>$pit[name]:</b> ($pit[hp]/$pit[hpall])<br/>";
 }}
 echo"<b>$mob[name]:</b> ($mob[hp]/$mob[hpall])<br/>";
@@ -155,18 +157,18 @@ if(mysql_num_rows($req)>=1)
 {
 While($mag = mysql_fetch_array($req))
 {
-$mag[lvl]=$mag[lvl]-1;
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[$mag[lvl]];//мп
+$mag['lvl']=$mag['lvl']-1;
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[$mag['lvl']];//мп
 
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[$mag[lvl]];//хп
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[$mag['lvl']];//хп
 
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[$mag[lvl]];//+хп
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[$mag['lvl']];//+хп
 
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[$mag[lvl]];//+урон
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[$mag['lvl']];//+урон
 
 echo"<option value=\"mag,$mag[id]\">$mag[name]($mag[uron],$mag[mp],$mag[hp],$mag[plushp])</option>";
 }
@@ -186,7 +188,7 @@ function ataka(){
 global $log,$pas,$m,$pit,$timer,$mob,$udata;
 
 //защита юзера рандом
-$_POST[block]=rand(1,3);
+$_POST['block']=rand(1,3);
 
 //атака юзера рандом
  if ($udar=='at') {$udar=rand(1,5);}
@@ -194,15 +196,15 @@ $_POST[block]=rand(1,3);
 
 
 // если в клане то увеличуем параметры игрока
-	if(!empty($udata[clan]))
+	if(!empty($udata['clan']))
 {
 $reqcla = mysql_query("SELECT * FROM `clan` where `lider`='$udata[clan]'");
 $clan = mysql_fetch_array($reqcla);
 
-$udata[patt]=$udata[patt]+($udata[patt]*($clan[patt]/100));
-$udata[matt]=$udata[matt]+($udata[matt]*($clan[matt]/100));
-$udata[pdef]=$udata[pdef]+($udata[pdef]*($clan[pdef]/100));
-$udata[mdef]=$udata[mdef]+($udata[mdef]*($clan[mdef]/100));
+$udata['patt']=$udata['patt']+($udata['patt']*($clan['patt']/100));
+$udata['matt']=$udata['matt']+($udata['matt']*($clan['matt']/100));
+$udata['pdef']=$udata['pdef']+($udata['pdef']*($clan['pdef']/100));
+$udata['mdef']=$udata['mdef']+($udata['mdef']*($clan['mdef']/100));
 }
 
 
@@ -216,7 +218,7 @@ $mblock=rand(1,3);
 $pudar=rand(1,3);
 $pblock=rand(1,3);
 /////////////
-$ud = explode(",",$_POST[udar]);
+$ud = explode(",",$_POST['udar']);
 if($ud[0]=='mag'){
 $req = mysql_query("SELECT * FROM `mag` WHERE `id` = '$ud[1]' and `usr` = '$log' LIMIT 1");
 if (mysql_num_rows($req)==0){
@@ -225,25 +227,25 @@ header ("Location: fight.php?");exit;
 }
 $mag = mysql_fetch_array($req);
 
-$mag[lvl]=$mag[lvl]-1;
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[$mag[lvl]];//мп
+$mag['lvl']=$mag['lvl']-1;
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[$mag['lvl']];//мп
 
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[$mag[lvl]];//хп
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[$mag['lvl']];//хп
 
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[$mag[lvl]];//+хп
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[$mag['lvl']];//+хп
 
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[$mag[lvl]];//+урон
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[$mag['lvl']];//+урон
 
-if ($mag[hp]>=$udata[hp]){
+if ($mag['hp']>=$udata['hp']){
 mysql_query("INSERT INTO log SET usr='$log',text='Нехватает здоровья',kto='system',place='battle',timer='$timer'");
 header ("Location: fight.php?");exit; 
 }
 
-if ($mag[mp]>$udata[mp]){
+if ($mag['mp']>$udata['mp']){
 mysql_query("INSERT INTO log SET usr='$log',text='Нехватает маны',kto='system',place='battle',timer='$timer'");
 header ("Location: fight.php?");exit; 
 }
@@ -251,8 +253,8 @@ header ("Location: fight.php?");exit;
 $bonus=rand(1,25);
 
 
-if ($udata[klas]=="wizard") {$uron = $udata[matt];} // если маг, то маг атака работает
-if ($udata[klas]=="fighert") {$uron = $udata[patt];} // если воин, то физ атака работает
+if ($udata['klas']=="wizard") {$uron = $udata['matt'];} // если маг, то маг атака работает
+if ($udata['klas']=="fighert") {$uron = $udata['patt'];} // если воин, то физ атака работает
 
 
 
@@ -261,34 +263,34 @@ if ($udata[klas]=="fighert") {$uron = $udata[patt];} // если воин, то 
 //$uron=$uron*$bonus;
 //----------
 
-if($udata[klas]=='wizard')	{ // если маг скил умножает атаку на 0,001 и плюсует её
+if($udata['klas']=='wizard')	{ // если маг скил умножает атаку на 0,001 и плюсует её
 
-	$uron2 = $mag[uron] * 0.00467 * $uron; // выщитуем маг урон
+	$uron2 = $mag['uron'] * 0.00467 * $uron; // выщитуем маг урон
 	$uron = $uron2 + $uron + $bonus;
 								}else	{ // иначе когда воин просто скил плюс к урону
 			
-			$uron = $mag[uron] + $uron + $bonus;
+			$uron = $mag['uron'] + $uron + $bonus;
 										}
 
 $uron="".number_format($uron, 0, ',', "")."";
 
 
-if ($udata[klas]=="wizard") {$mobdef = $mob[mdef];} // защита маг
-if ($udata[klas]=="fighert") {$mobdef = $mob[pdef];} // защита физ
+if ($udata['klas']=="wizard") {$mobdef = $mob['mdef'];} // защита маг
+if ($udata['klas']=="fighert") {$mobdef = $mob['pdef'];} // защита физ
 
 $uron=$uron-$mobdef;
 
 if($uron<=0){$uron=round(0,1);}
-$newmob=$mob[hp]-$uron;
+$newmob=$mob['hp']-$uron;
 
-if ($udata[hp]>=$udata[hpall]){}else{
-if ($mag[tip]=="hpot"){$mag[plushp] = $uron*($mag[uron]/300);}
+if ($udata['hp']>=$udata['hpall']){}else{
+if ($mag['tip']=="hpot"){$mag['plushp'] = $uron*($mag['uron']/300);}
 }
-$newmp=$udata[mp]-$mag[mp];
-$newhp=$udata[hp]-$mag[hp]+$mag[plushp];
+$newmp=$udata['mp']-$mag['mp'];
+$newhp=$udata['hp']-$mag['hp']+$mag['plushp'];
 mysql_query("UPDATE `users` SET `mp` = '$newmp',`hp` = '$newhp' WHERE `usr` = '$log'");
 
-if ($mag[plushp]>0){$hp111="/ +$mag[plushp] HP ";}
+if ($mag['plushp']>0){$hp111="/ +$mag[plushp] HP ";}
 
 mysql_query("INSERT INTO log SET usr='$log',text='$smskrit $mag[name] $kuda -$uron $hp111',kto='user',place='battle',timer='$timer'");
 
@@ -301,11 +303,11 @@ if($udar==4){$bonus=1.01;$kuda='по рукам';}
 if($udar==5){$bonus=1.02;$kuda='в плечо';}
 
 
-if ($udata[klas]=="wizard") {$uron = $udata[matt];} // если маг, то маг атака работает
-if ($udata[klas]=="fighert") {$uron = $udata[patt];} // если воин, то физ атака работает
+if ($udata['klas']=="wizard") {$uron = $udata['matt'];} // если маг, то маг атака работает
+if ($udata['klas']=="fighert") {$uron = $udata['patt'];} // если воин, то физ атака работает
 
-if ($udata[klas]=="wizard") {$mobdef = $mob[mdef];} // защита маг
-if ($udata[klas]=="fighert") {$mobdef = $mob[pdef];} // защита физ
+if ($udata['klas']=="wizard") {$mobdef = $mob['mdef'];} // защита маг
+if ($udata['klas']=="fighert") {$mobdef = $mob['pdef'];} // защита физ
 
 if($uron >= $mobdef) {
 
@@ -313,7 +315,7 @@ $uron=round($uron*$bonus);
 $uron=$uron-$mobdef;
 
 if($uron<=0){$uron=round(0,1);}
-$newmob=$mob[hp]-$uron;
+$newmob=$mob['hp']-$uron;
 
 $msg=rand(0,2);
 if($msg=="0"){$sms="Ты бьёшь $mob[name] $kuda! -$uron";}
@@ -323,7 +325,7 @@ if($msg=="2"){$sms="Ты бьёшь $mob[name] $kuda! -$uron";}
 mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='user',place='battle',timer='$timer'");
 
 }else{
-$newmob=$mob[hp];
+$newmob=$mob['hp'];
 
 $msg=rand(0,2);
 if($msg=="0"){$sms="$mob[name] пригнулся от твоего удара!";}
@@ -341,36 +343,36 @@ if($mudar==3){$bonus=0.70;$kuda='по ногам';}
 
 
 #********************************#
-if($mob[lovk]<$udata[lovk]){
+if($mob['lovk']<$udata['lovk']){
 $ms_l=rand(1,100);
-$mshans_lovk=round(($udata[lovk]-$mob[lovk])*5);
+$mshans_lovk=round(($udata['lovk']-$mob['lovk'])*5);
 }
 #********************************#
 
-if($_POST[block]!=$mudar and ($mob[lovk]>=$udata[lovk] or $ms_l>$mshans_lovk)){
+if($_POST['block']!=$mudar and ($mob['lovk']>=$udata['lovk'] or $ms_l>$mshans_lovk)){
 /////protect//////////////////////////////
 //////////////////////////////////////////////////////
 switch($mudar){
 case '1':
-$protect=round(($udata[prot]+$udata[pgolova])/3);
+$protect=round(($udata['prot']+$udata['pgolova'])/3);
 break;
 case '2':
-$protect=round(($udata[prot]+$udata[pbody])/3);
+$protect=round(($udata['prot']+$udata['pbody'])/3);
 break;
 case '3':
-$protect=round(($udata[prot]+$udata[pnogi])/3);
+$protect=round(($udata['prot']+$udata['pnogi'])/3);
 break;
 }
 //////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
-$uron=rand($mob[umin],$mob[umax]);
+$uron=rand($mob['umin'],$mob['umax']);
 
 $krit=rand(1,100);
-if($krit<=$mob[krit]){
+if($krit<=$mob['krit']){
 
 $makrit=rand(1,100);
-if($makrit<=$udata[antikrit]){
+if($makrit<=$udata['antikrit']){
 
 $msg=rand(0,2);
 if($msg=="0"){$sms="$mob[name] наносит крит-удар $kuda, но ты блокируешь!";}
@@ -380,12 +382,12 @@ if($msg=="2"){$sms="$mob[name] наносит крит-удар $kuda, но ты
 mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='enemy',place='battle',timer='$timer'");
 
 }else{
-$mno=round(($uron/100)*$mob[ukrit]);
+$mno=round(($uron/100)*$mob['ukrit']);
 $uron=$uron+$mno;
 $uron=$uron-$protect;
 $uron=round($uron*$bonus);
 if($uron<=0){$uron=round(0,1);}
-$newhp=$udata[hp]-$uron;
+$newhp=$udata['hp']-$uron;
 
 mysql_query("UPDATE `users` SET `hp` = '$newhp' WHERE `usr` = '$log'");
 
@@ -400,7 +402,7 @@ mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='enemy',place='battl
 $uron=$uron-$protect;
 $uron=round($uron*$bonus);
 if($uron<=0){$uron=round(0,1);}
-$newhp=$udata[hp]-$uron;
+$newhp=$udata['hp']-$uron;
 
 mysql_query("UPDATE `users` SET `hp` = '$newhp' WHERE `usr` = '$log'");
 
@@ -421,14 +423,14 @@ mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='enemy',place='battl
 }
 ///////////////////////
 //////////////////////////
-if($pit[status]==on){
+if($pit['status']=='on'){
 ///////////////////////////
 ////////////////////////////
 
 #********************************#
-if($pit[lovk]<$mob[lovk]){
+if($pit['lovk']<$mob['lovk']){
 $ps_l=rand(1,100);
-$pshans_lovk=round(($mob[lovk]-$pit[lovk])*5);
+$pshans_lovk=round(($mob['lovk']-$pit['lovk'])*5);
 }
 #********************************#
 
@@ -436,19 +438,19 @@ if($pudar==1){$bonus=1.25;$kuda='в голову';}
 if($pudar==2){$bonus=1;$kuda='по туловищу';}
 if($pudar==3){$bonus=0.70;$kuda='по ногам';}
 /////////////
-if($pudar!=$mblock and ($pit[lovk]>=$pit[lovk] or $ps_l>$pshans_lovk)){
+if($pudar!=$mblock and ($pit['lovk']>=$pit['lovk'] or $ps_l>$pshans_lovk)){
 
 if($pudar==1){$mprotect='pgolova';}
 if($pudar==2){$mprotect='pbody';}
 if($pudar==3){$mprotect='pnogi';}
 
-$uron=rand($pit[umin],$pit[umax])+$pit[sila];
+$uron=rand($pit['umin'],$pit['umax'])+$pit['sila'];
 
 $krit=rand(1,100);
-if($krit<=$pit[krit]){
+if($krit<=$pit['krit']){
 
 $makrit=rand(1,100);
-if($makrit<=$mob[antikrit]){
+if($makrit<=$mob['antikrit']){
 
 $msg=rand(0,2);
 if($msg=="0"){$sms="$pit[name] наносит крит-удар $kuda, но $mob[name] блокирует!";}
@@ -457,7 +459,7 @@ if($msg=="2"){$sms="$pit[name] наносит крит-удар $kuda, но $mob
 
 mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='user',place='battle',timer='$timer'");
 }else{
-$mno=round(($uron/100)*$pit[ukrit]);
+$mno=round(($uron/100)*$pit['ukrit']);
 $uron=$uron+$mno;
 $uron=$uron-$mob[$mprotect];
 $uron=round($uron*$bonus);
@@ -508,25 +510,25 @@ if($pblock!=$mudar){
 //////////////////////////////////////////////////////
 switch($mudar){
 case '1':
-$protect=round(($pit[prot]+$pro[golova]+$pro[weapon])/3);
+$protect=round(($pit['prot']+$pro['golova']+$pro['weapon'])/3);
 break;
 case '2':
-$protect=round(($pit[prot]+$pro[body]+$pro[weapon])/3);
+$protect=round(($pit['prot']+$pro['body']+$pro['weapon'])/3);
 break;
 case '3':
-$protect=round(($pit[prot]+$pro[nogi]+$pro[weapon])/3);
+$protect=round(($pit['prot']+$pro['nogi']+$pro['weapon'])/3);
 break;
 }
 //////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
-$uron=rand($mob[umin],$mob[umax]);
+$uron=rand($mob['umin'],$mob['umax']);
 
 $krit=rand(1,100);
-if($krit<=$mob[krit]){
+if($krit<=$mob['krit']){
 
 $makrit=rand(1,100);
-if($makrit<=$pit[antikrit]){
+if($makrit<=$pit['antikrit']){
 
 $msg=rand(0,2);
 if($msg=="0"){$sms="$mob[name] наносит крит-удар $kuda, но $pit[name] блокирует!";}
@@ -536,12 +538,12 @@ if($msg=="2"){$sms="$mob[name] наносит крит-удар $kuda, но $pit
 mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='enemy',place='battle',timer='$timer'");
 
 }else{
-$mno=round(($uron/100)*$mob[ukrit]);
+$mno=round(($uron/100)*$mob['ukrit']);
 $uron=$uron+$mno;
 $uron=$uron-$protect;
 $uron=round($uron*$bonus);
 if($uron<=0){$uron=round(0,1);}
-$newhp=$pit[hp]-$uron;
+$newhp=$pit['hp']-$uron;
 
 mysql_query("UPDATE `pit` SET `hp` = '$newhp' WHERE `usr` = '$log'");
 
@@ -556,7 +558,7 @@ mysql_query("INSERT INTO log SET usr='$log',text='$sms',kto='enemy',place='battl
 $uron=$uron-$protect;
 $uron=round($uron*$bonus);
 if($uron<=0){$uron=round(0,1);}
-$newhp=$pit[hp]-$uron;
+$newhp=$pit['hp']-$uron;
 
 mysql_query("UPDATE `pit` SET `hp` = '$newhp' WHERE `usr` = '$log'");
 
@@ -581,7 +583,7 @@ mysql_query("UPDATE `guards` SET `hp` = '$newmob' WHERE `id` = '$m[mob]'");
 header ("Location: fight.php?");exit; //в бой
 }
 /////страница!!начало
-if($_GET[mod]=='ataka'){
+if($_GET['mod']=='ataka'){
 ataka();
 }else{
 mein();

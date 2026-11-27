@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Магазин';
@@ -14,7 +14,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[act]){
+switch($_GET['act']){
 
 default:
 $req = mysql_query("SELECT * FROM `shop_gold` WHERE `city` != '' and `id`='$_GET[id]'");
@@ -28,7 +28,7 @@ exit;
 $mag = mysql_fetch_array($req);
 ///////////////
 /////////////
-$nmoney=$udata[gold]-$mag[cena];
+$nmoney=$udata['gold']-$mag['cena'];
 
 if($nmoney<0){
 echo'Нехватает Gold Bar! Иди в окрестности и бей монстров.';

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'bazar';//фикс. места
@@ -25,7 +25,7 @@ exit;
 }*/
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 ////////////////////
@@ -61,17 +61,17 @@ break;
 case 'sell':
 echo "<b><font color=grey> <p>Базар: </p></font></b><hr/>";
 
-if(empty($_GET[tip])){
+if(empty($_GET['tip'])){
 echo "<div class=inoy>";
 echo"<a href=\"bazar.php?mod=sell&amp;tip=item\">Продать вещи</a>";
 echo"<a href=\"bazar.php?mod=sell&amp;tip=res\">Продать ресурсы</a>";
 echo"<a href=\"bazar.php?mod=sell&amp;tip=pit\">Продать вещи питомцев</a>";
 echo "</div>";
-}elseif($_GET[tip]==item){
+}elseif($_GET['tip']=='item'){
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `image`='not'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
@@ -81,13 +81,13 @@ echo"<div class=dot><a href=\"bazar.php?mod=sell&amp;tip=item&amp;id=$mag[id]\">
 echo"Нет вещей<br/>";
 }
 }else{
-if(empty($_POST[mycena])){
+if(empty($_POST['mycena'])){
 echo "<form action=\"bazar.php?mod=sell&amp;tip=item&amp;id=$_GET[id]\" method=\"post\">";
 echo '<b>Цена:</b><br/>';
 echo '<input name="mycena"/><br/>';
 echo '<input type="submit" value="Продолжить"/></form>';
 }else{
-if($_POST[mycena]<=0){
+if((float)$_POST['mycena']<=0){
 echo"Минимальная цена одна монета!";
 include($path.'inc/down.php');exit;
 }
@@ -124,11 +124,11 @@ echo"Вещь $item[name] выставлена на продажу за $_POST[m
 echo"Нет такой вещи<br/>";
 }
 }}
-}elseif($_GET[tip]==res){
+}elseif($_GET['tip']=='res'){
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
@@ -138,7 +138,7 @@ echo"<div class=dot><a href=\"bazar.php?mod=sell&amp;tip=res&amp;id=$mag[id]\">$
 echo"Нет ресурсов!<br/>";
 }
 }else{
-if(empty($_POST[mycena]) or empty($_POST[num])){
+if(empty($_POST['mycena']) or empty($_POST['num'])){
 echo "<form action=\"bazar.php?mod=sell&amp;tip=res&amp;id=$_GET[id]\" method=\"post\">";
 echo '<b>Цена за штуку:</b><br/>';
 echo '<input name="mycena"/><br/>';
@@ -146,7 +146,7 @@ echo '<b>Сколько:</b><br/>';
 echo '<input name="num"/><br/>';
 echo '<input type="submit" value="Продолжить"/></form>';
 }else{
-if($_POST[mycena]<=0 or $_POST[num]<=0){
+if((float)$_POST['mycena']<=0 or (float)$_POST['num']<=0){
 echo"Ошибка! Неправильно введённая цена или количество!";
 include($path.'inc/down.php');exit;
 }
@@ -159,16 +159,16 @@ $req = mysql_query("SELECT * FROM `bazar` WHERE `usr` = '$log' and `lat_name`='$
 ////////////////////////////
 $avto=mysql_num_rows($req);
 /////////////////////
-if($res[kol]-$_POST[num]<=0){
+if($res['kol']-$_POST['num']<=0){
 mysql_query("DELETE FROM `res` WHERE usr='$log' and `id`='$_GET[id]'");
-$nkol=$res[kol];
+$nkol=$res['kol'];
 }else{
-$res[kol]=$res[kol]-$_POST[num];
+$res['kol']=$res['kol']-$_POST['num'];
 mysql_query("UPDATE `res` SET `kol` = '$res[kol]' WHERE `usr` = '$log' and `id`='$_GET[id]'");
-$nkol=$_POST[num];
+$nkol=$_POST['num'];
 }
 ////////////////////////
-$_POST[mycena]=round($_POST[mycena]*$nkol);
+$_POST['mycena']=round($_POST['mycena']*$nkol);
 /////////////////////
 if($avto==0){
 mysql_query("INSERT INTO
@@ -186,7 +186,7 @@ mysql_query("INSERT INTO
         `cena` = '$res[cena]'");
 }else{
 $item = mysql_fetch_array($req);
-$item[kol]=$item[kol]+$nkol;
+$item['kol']=$item['kol']+$nkol;
 mysql_query("UPDATE `bazar` SET `kol` = '$item[kol]' WHERE `usr` = '$log' and `lat_name`='$res[lat_name]' and `city` = '$udata[city]'");
 }     
 echo"$res[name]($nkol штук) выставлен на продажу за $_POST[mycena] монет!<br/>";
@@ -195,11 +195,11 @@ echo"Нет ресурсов!<br/>";
 }
 }
 }
-}elseif($_GET[tip]==pit){
+}elseif($_GET['tip']=='pit'){
 $req = mysql_query("SELECT * FROM `pit_item` WHERE `usr` = '$log' and `image`='not'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
@@ -209,13 +209,13 @@ echo"<div class=dot><a href=\"bazar.php?mod=sell&amp;tip=pit&amp;id=$mag[id]\">$
 echo"Нет вещей<br/>";
 }
 }else{
-if(empty($_POST[mycena])){
+if(empty($_POST['mycena'])){
 echo "<form action=\"bazar.php?mod=sell&amp;tip=pit&amp;id=$_GET[id]\" method=\"post\">";
 echo '<b>Цена:</b><br/>';
 echo '<input name="mycena"/><br/>';
 echo '<input type="submit" value="Продолжить"/></form>';
 }else{
-if($_POST[mycena]<=0){
+if((float)$_POST['mycena']<=0){
 echo"Минимальная цена одна монета!";
 include($path.'inc/down.php');exit;
 }
@@ -257,7 +257,7 @@ echo"Ошибка!<br/>";
 echo"<hr/><div class=silka><a href=\"bazar.php?\">Назад</a></div>";
 break;
 case 'back':
-if(empty($_GET[tip]) or empty($_GET[id])){
+if(empty($_GET['tip']) or empty($_GET['id'])){
 $b = mysql_query("SELECT * FROM bazar WHERE usr = '$log' and city = '$udata[city]' ORDER BY id");
 ////////////////////////////
 $avto=mysql_num_rows($b);
@@ -269,7 +269,7 @@ echo "<p> <font color=grey> &#160 Забрать с продажи &#160 </font>
 While($best = mysql_fetch_array($b))
 {
 echo"<div class=dot> $i. <a href=\"bazar.php?mod=info&amp;tip=$best[baz_tip]&amp;id=$best[id]\">$best[name]</a> ";
-if($best[baz_tip]==res){echo" ($best[kol] штук - $best[mycena] Аден)";}
+if($best['baz_tip']=='res'){echo" ($best[kol] штук - $best[mycena] Аден)";}
 else{echo" ($best[mycena] Аден)";}
 echo" <a href=\"bazar.php?mod=back&amp;tip=$best[baz_tip]&amp;id=$best[id]\">[забрать]</a></div>";
 $i++;
@@ -277,7 +277,7 @@ $i++;
 }else{
 echo"Нет вещей на продаже<br/>";
 }
-}elseif($_GET[tip]==pit and !empty($_GET[id])){
+}elseif($_GET['tip']=='pit' and !empty($_GET['id'])){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `usr` = '$log' and `id`='$_GET[id]' and `city` = '$udata[city]'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
@@ -308,7 +308,7 @@ echo"Вещь $item[name] забрана с продажи!<br/>";
 echo"Нет такой вещи<br/>";
 }
 }
-elseif($_GET[tip]==item and !empty($_GET[id])){
+elseif($_GET['tip']=='item' and !empty($_GET['id'])){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `usr` = '$log' and `id`='$_GET[id]' and `city` = '$udata[city]'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
@@ -338,7 +338,7 @@ echo"Вещь $item[name] забрана с продажи!<br/>";
 }else{
 echo"Нет такой вещи<br/>";
 }
-}elseif($_GET[tip]==res and !empty($_GET[id])){
+}elseif($_GET['tip']=='res' and !empty($_GET['id'])){
 
 $req = mysql_query("SELECT * FROM `bazar` WHERE `usr` = '$log' and `id`='$_GET[id]' and city = '$udata[city]' LIMIT 1");
 ////////////////////////////
@@ -363,7 +363,7 @@ mysql_query("INSERT INTO
         `cena` = '$res[cena]'");
 }else{
 $myres=mysql_fetch_array($req);
-$myres[kol]=$myres[kol]+$res[kol];
+$myres['kol']=$myres['kol']+$res['kol'];
 mysql_query("UPDATE `res` SET `kol` = '$myres[kol]' WHERE `usr` = '$log' and `lat_name`='$res[lat_name]'");
 }
 /////////////////////
@@ -379,26 +379,26 @@ echo"Ошибка!<br/>";
 echo"<hr/><div class=silka><a href=\"bazar.php?\">Назад</a></div>";
 break;
 case 'by':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo'Невыбрана вещь для покупки!';
 include($path.'inc/down.php');exit;
 }
-if($_GET[tip]==item){
+if($_GET['tip']=='item'){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `id`='$_GET[id]' and `city` = '$udata[city]'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
 if($avto==1){
 $item = mysql_fetch_array($req);
-if($item[usr]==$log and $log!='Admin'){
+if($item['usr']==$log and $log!='Admin'){
 echo'Свои товары нельзя покупать!';
 include($path.'inc/down.php');exit;
 }
-if($udata[money]<$item[mycena]){
+if($udata['money']<$item['mycena']){
 echo'Нехватает монет!';
 include($path.'inc/down.php');exit;
 }
 
-$udata[money]=$udata[money]-$item[mycena];//mony
+$udata['money']=$udata['money']-$item['mycena'];//mony
 
         
 		
@@ -422,11 +422,11 @@ $udata[money]=$udata[money]-$item[mycena];//mony
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $city = mysql_fetch_array($req);
-if($city[clan]!='not' and $udata[clan]!=$city[clan]){
+if($city['clan']!='not' and $udata['clan']!=$city['clan']){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider`='$city[clan]'");
 ////////////////////////////
 $clan = mysql_fetch_array($req);
-$clan[money]=$clan[money]+round(($item[mycena]/100)*4);
+$clan['money']=$clan['money']+round(($item['mycena']/100)*4);
 
 mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$udata[clan]'");
 }
@@ -438,7 +438,7 @@ mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$udata[
         $req = mysql_query("SELECT money FROM `users` WHERE `usr` = '$item[usr]' LIMIT 1");
 ////////////////////////////
 $m = mysql_fetch_array($req);
-$m[money]=$m[money]+$item[mycena];
+$m['money']=$m['money']+$item['mycena'];
 mysql_query("UPDATE `users` SET `money` = '$m[money]' WHERE `usr` = '$item[usr]'");
 
 $time = date("H:i d.m.y");
@@ -449,22 +449,22 @@ echo"Вещь $item[name] куплена за $item[mycena] монет!<br/>";
 }else{
 echo"Нет такой вещи<br/>";
 }
-}elseif($_GET[tip]==pit){
+}elseif($_GET['tip']=='pit'){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `id`='$_GET[id]' and `city` = '$udata[city]'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
 if($avto==1){
 $item = mysql_fetch_array($req);
-if($item[usr]==$log){
+if($item['usr']==$log){
 echo'Свои товары нельзя покупать!';
 include($path.'inc/down.php');exit;
 }
-if($udata[money]<$item[mycena]){
+if($udata['money']<$item['mycena']){
 echo'Нехватает монет!';
 include($path.'inc/down.php');exit;
 }
 
-$udata[money]=$udata[money]-$item[mycena];//mony
+$udata['money']=$udata['money']-$item['mycena'];//mony
 
         
         mysql_query("INSERT INTO
@@ -491,11 +491,11 @@ $udata[money]=$udata[money]-$item[mycena];//mony
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $city = mysql_fetch_array($req);
-if($city[clan]!='not' and $udata[clan]!=$city[clan]){
+if($city['clan']!='not' and $udata['clan']!=$city['clan']){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider`='$city[clan]'");
 ////////////////////////////
 $clan = mysql_fetch_array($req);
-$clan[money]=$clan[money]+round(($item[mycena]/100)*4);
+$clan['money']=$clan['money']+round(($item['mycena']/100)*4);
 
 mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$udata[clan]'");
 }
@@ -507,7 +507,7 @@ mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$udata[
         $req = mysql_query("SELECT money FROM `users` WHERE `usr` = '$item[usr]' LIMIT 1");
 ////////////////////////////
 $m = mysql_fetch_array($req);
-$m[money]=$m[money]+$item[mycena];
+$m['money']=$m['money']+$item['mycena'];
 mysql_query("UPDATE `users` SET `money` = '$m[money]' WHERE `usr` = '$item[usr]'");
 
 $time = date("H:i d.m.y");
@@ -518,23 +518,23 @@ echo"Вещь $item[name] куплена за $item[mycena] монет!<br/>";
 }else{
 echo"Нет такой вещи<br/>";
 }
-}elseif($_GET[tip]==res){
+}elseif($_GET['tip']=='res'){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `id`='$_GET[id]' and `city` = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $avto=mysql_num_rows($req);
 if($avto==1){
 $res = mysql_fetch_array($req);
 
-if($res[usr]==$log){
+if($res['usr']==$log){
 echo'Свои товары нельзя покупать!';
 include($path.'inc/down.php');exit;
 }
-if($udata[money]<$res[mycena]){
+if($udata['money']<$res['mycena']){
 echo'Нехватает монет!';
 include($path.'inc/down.php');exit;
 }
 
-$udata[money]=$udata[money]-$res[mycena];//mony
+$udata['money']=$udata['money']-$res['mycena'];//mony
 
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `lat_name`='$res[lat_name]' LIMIT 1");
 ////////////////////////////
@@ -555,18 +555,18 @@ mysql_query("INSERT INTO
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $city = mysql_fetch_array($req);
-if($city[clan]!='not' and $udata[clan]!=$city[clan]){
+if($city['clan']!='not' and $udata['clan']!=$city['clan']){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider`='$city[clan]'");
 ////////////////////////////
 $clan = mysql_fetch_array($req);
-$clan[money]=$clan[money]+round(($item[mycena]/100)*2);
+$clan['money']=$clan['money']+round(($item['mycena']/100)*2);
 
 mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$city[clan]'");
 }
         
 }else{
 $myres=mysql_fetch_array($req);
-$myres[kol]=$myres[kol]+$res[kol];
+$myres['kol']=$myres['kol']+$res['kol'];
 mysql_query("UPDATE `res` SET `kol` = '$myres[kol]' WHERE `usr` = '$log' and `lat_name`='$res[lat_name]'");
 }
 /////////////////////
@@ -577,7 +577,7 @@ mysql_query("UPDATE `res` SET `kol` = '$myres[kol]' WHERE `usr` = '$log' and `la
 $req = mysql_query("SELECT money FROM `users` WHERE `usr` = '$res[usr]' LIMIT 1");
 ////////////////////////////
 $m = mysql_fetch_array($req);
-$m[money]=$m[money]+$res[mycena];
+$m['money']=$m['money']+$res['mycena'];
 mysql_query("UPDATE `users` SET `money` = '$m[money]' WHERE `usr` = '$res[usr]'");
 
 $time = date("H:i d.m.y");
@@ -594,7 +594,7 @@ echo'Ошибка!<br/>';
 echo"<hr/><div class=silka><a href=\"bazar.php?\">Назад</a></div>";
 break;
 case 'info':
-if($_GET[tip]==res){
+if($_GET['tip']=='res'){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `id`='$_GET[id]' and `city` = '$udata[city]'");
 
 $avto=mysql_num_rows($req);
@@ -604,7 +604,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'res':
 $tip='Ресурс';
 break;
@@ -622,7 +622,7 @@ echo"<b>$mag[name]</b><br/>
 Тип: $tip<br/>
 Количество: $mag[kol]<br/>
 ";
-}elseif($_GET[tip]==pit){
+}elseif($_GET['tip']=='pit'){
 $req = mysql_query("SELECT * FROM `bazar` WHERE `id`='$_GET[id]' and `city` = '$udata[city]'");
 
 $avto=mysql_num_rows($req);
@@ -633,7 +633,7 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -647,7 +647,7 @@ case 'nogi':
 $tip='Сапоги';
 break;
 }
-switch($mag[rasa]){
+switch($mag['rasa']){
 case 'not':
 $rasa='Все';
 break;
@@ -683,7 +683,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -717,20 +717,20 @@ break;
 }
 
 ///////////////////////
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 echo"<br/><img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b><br/>
 Тип: $tip ";
 
-if ($mag[ruka]=='ydar'){echo"Ударное";}
-if ($mag[ruka]=='luk'){echo"Лук";}
-if ($mag[ruka]=='kin'){echo"Кинжал";}
-if ($mag[ruka]=='sdv'){echo"Сдвоенное";}
-if ($mag[ruka]=='kas'){echo"Кастет";}
-if ($mag[ruka]=='kniga'){echo"Книга";}
-if ($mag[ruka]=='koppik'){echo"Копьё/Пика";}
-if ($mag[ruka]=='me4'){echo"Меч";}
-if ($mag[ruka]=='rap'){echo"Рапира";}
-if ($mag[ruka]=='fish'){echo"Удочка";}
+if ($mag['ruka']=='ydar'){echo"Ударное";}
+if ($mag['ruka']=='luk'){echo"Лук";}
+if ($mag['ruka']=='kin'){echo"Кинжал";}
+if ($mag['ruka']=='sdv'){echo"Сдвоенное";}
+if ($mag['ruka']=='kas'){echo"Кастет";}
+if ($mag['ruka']=='kniga'){echo"Книга";}
+if ($mag['ruka']=='koppik'){echo"Копьё/Пика";}
+if ($mag['ruka']=='me4'){echo"Меч";}
+if ($mag['ruka']=='rap'){echo"Рапира";}
+if ($mag['ruka']=='fish'){echo"Удочка";}
 
 
 echo "<hr/><b>Характеристика</b><br/>";
@@ -786,7 +786,7 @@ echo"Нет вещей на продаже<br/>";
 }
 echo"<hr/><div class=silka><a href=\"bazar.php?\">Назад</a></div>";
 break;
-case 'res';
+case 'res':
 $b = mysql_query("SELECT * FROM bazar WHERE baz_tip = 'res' and `city` = '$udata[city]' ORDER BY id DESC");
 ////////////////////////////
 $avto=mysql_num_rows($b);
@@ -805,7 +805,7 @@ echo"Нет ресурсов продаже<br/>";
 echo"<hr/><div class=silka><a href=\"bazar.php?\">Назад</a></div>";
 break;
 case 'shop':
-$_GET[usr] = htmlspecialchars(stripslashes(addslashes($_GET[usr])));
+$_GET['usr'] = htmlspecialchars(stripslashes(addslashes($_GET['usr'])));
 $b2 = mysql_query("SELECT usr FROM bazar WHERE usr = '$_GET[usr]' and city = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $avto2=mysql_num_rows($b2);

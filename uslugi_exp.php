@@ -1,4 +1,4 @@
-<?
+<?php
 include_once("inc/zag.php");
 switch($_GET['go'])
 {

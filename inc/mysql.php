@@ -1,4 +1,4 @@
-<?
+<?php
 ///////////////класс зля работы с бд//////////////////
 class mysql
 {
@@ -90,7 +90,7 @@ class mysql
 	
 	function insert_id()
 	{
-		return mysql_insert_id($this->db_id);
+		return mysql_insert_id();
 	}
 
 	function get_result_fields($query_id = '') {
@@ -144,8 +144,8 @@ class mysql
 		$trace = debug_backtrace();
 
 		$level = 0;
-		if ($trace[1]['function'] == "query" ) $level = 1;
-		if ($trace[2]['function'] == "super_query" ) $level = 2;
+		if (isset($trace[1]['function']) && $trace[1]['function'] == "query" ) $level = 1;
+		if (isset($trace[2]['function']) && $trace[2]['function'] == "super_query" ) $level = 2;
 
 		$trace[$level]['file'] = str_replace("", "", $trace[$level]['file']);
 

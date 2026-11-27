@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'karma';//фикс. места
@@ -12,7 +12,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-$nick=$_GET[usr];
+$nick=$_GET['usr'];
 $nick = htmlspecialchars(stripslashes($nick));
 
 $req = mysql_query("SELECT `id` FROM `users` WHERE `usr` = '$nick'");
@@ -26,7 +26,7 @@ $usdata = mysql_fetch_array($req);
 
 $req = mysql_query("SELECT * FROM `karma` WHERE `usr` = '$nick' and `from`='$log' LIMIT 1");
 $avto=mysql_num_rows($req);
-if($avto==1 or $udata[lvl]<101 or $log==$nick){
+if($avto==1 or $udata['lvl']<101 or $log==$nick){
 echo'Невозможно увеличить карму, возможно вы голосовали за этого игрока! Либо вы ниже 101 лвл!';
 include($path.'inc/down.php');exit;
 }

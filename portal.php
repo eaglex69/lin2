@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'portal';//фикс. места
@@ -16,7 +16,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"<center><img src=\"pic/roz/tp.png\" alt=\"\"></center>";
@@ -28,7 +28,7 @@ $avto=mysql_num_rows($req);
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-echo"<div class=inoy> <a href=\"portal.php?mod=go&amp;id=$mag[id]&amp;tip=city\"><img src=\"pic/gorodaaa.png\" alt=\"pic\"/> &#160 $mag[name]  <font color=#ffffcc> - ".number_format($mag[cena], 0, ',', "`")." Aden </font></a> </div>";
+echo"<div class=inoy> <a href=\"portal.php?mod=go&amp;id=$mag[id]&amp;tip=city\"><img src=\"pic/gorodaaa.png\" alt=\"pic\"/> &#160 $mag[name]  <font color=#ffffcc> - ".number_format($mag['cena'], 0, ',', "`")." Aden </font></a> </div>";
 }
 }else{
 echo"Нет активных порталов<br/>";
@@ -41,7 +41,7 @@ $avto=mysql_num_rows($req);
 if($avto>=1){
 While($mag = mysql_fetch_array($req))
 {
-echo"<div class=inoy> <a href=\"portal.php?mod=okr&amp;id=$mag[id]&amp;tip=city\"><img src=\"pic/okraaa.png\" alt=\"pic\"/> &#160 $mag[name]  <font color=#ffffcc> - ".number_format($mag[cena], 0, ',', "`")." Aden </font></a> </div>";
+echo"<div class=inoy> <a href=\"portal.php?mod=okr&amp;id=$mag[id]&amp;tip=city\"><img src=\"pic/okraaa.png\" alt=\"pic\"/> &#160 $mag[name]  <font color=#ffffcc> - ".number_format($mag['cena'], 0, ',', "`")." Aden </font></a> </div>";
 }
 }else{
 echo"Нет активных порталов<br/>";
@@ -56,18 +56,18 @@ $req = mysql_query("SELECT * FROM `gorod` WHERE `name` != '$udata[city]' and id=
 $avto=mysql_num_rows($req);
 if($avto>=1){
 $mag = mysql_fetch_array($req);
-if($udata[money]<$mag[cena]){
+if($udata['money']<$mag['cena']){
 echo'<p><center>Нехватает денег!</center></p>';
-}elseif($udata[lvl]<$mag[lvl]){
+}elseif($udata['lvl']<$mag['lvl']){
 echo'<p><center>Маленький уровень!</center></p>';
 }else{
-switch($_GET[tip]){
+switch($_GET['tip']){
 default:
 echo'<p><center>Ошибка!Несуществует такого портала!<p></center>';
 include($path.'inc/down.php');exit;
 break;
 case 'city':
-$udata[money]=$udata[money]-$mag[cena];
+$udata['money']=$udata['money']-$mag['cena'];
 mysql_query("UPDATE `users` SET `money` = '$udata[money]',`city`='$mag[name]' WHERE `usr` = '$log'");
 // ЗАПИСАТЬ ЮЗЕРУ КООРДИНАТЫ ГОРОДА	
 $req22 = mysql_query("SELECT * FROM `okra` WHERE `gorod` = '$mag[name]' Limit 1");
@@ -100,18 +100,18 @@ $req = mysql_query("SELECT * FROM `okra` WHERE `gorod` = '$udata[city]' and id='
 $avto=mysql_num_rows($req);
 if($avto>=1){
 $mag = mysql_fetch_array($req);
-if($udata[money]<$mag[cena]){
+if($udata['money']<$mag['cena']){
 echo'<p><center>Нехватает денег!</center></p>';
-}elseif($udata[lvl]<$mag[lvl]){
+}elseif($udata['lvl']<$mag['lvl']){
 echo'<p><center>Мал уровень!</center></p>';
 }else{
-switch($_GET[tip]){
+switch($_GET['tip']){
 default:
 echo'<p><center>Нет такого портала!</center></p>';
 include($path.'inc/down.php');exit;
 break;
 case 'city':
-$udata[money]=$udata[money]-$mag[cena];
+$udata['money']=$udata['money']-$mag['cena'];
 mysql_query("UPDATE `users` SET `money` = '$udata[money]' WHERE `usr` = '$log'");
 // ЗАПИСАТЬ ЮЗЕРУ КООРДИНАТЫ ГОРОДА	http://l3n.ru/to_world.php?
 mysql_query("UPDATE `mesto` SET `mesto` = '$mag[name]',`page`='0' WHERE `usr` = '$log'");

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shop_chat';//фикс. места
@@ -18,6 +18,7 @@ include($path.'inc/zag.php');
 
 $tip2=$_GET['tip2'];
 $lvlus=abs(intval($_GET['lvlus']));
+$o=isset($_GET['o'])?$_GET['o']:'';
 
 
 
@@ -61,7 +62,7 @@ echo"<br/><a href=\"shop_chat.php?\">Назад</a>";
 echo "</div>";
 
 }else{
-if($_GET[o]!=grocery && $_GET[o]!=shit && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=poyas && $_GET[o]!=rpoyas && $_GET[o]!=kolco && $_GET[o]!=rkolco && $_GET[o]!=amulet && $_GET[o]!=plash && $_GET[o]!=ruki && $_GET[o]!=nogi && $_GET[o]!=pants){
+if($_GET['o']!='grocery' && $_GET['o']!='shit' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='poyas' && $_GET['o']!='rpoyas' && $_GET['o']!='kolco' && $_GET['o']!='rkolco' && $_GET['o']!='amulet' && $_GET['o']!='plash' && $_GET['o']!='ruki' && $_GET['o']!='nogi' && $_GET['o']!='pants'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -110,10 +111,10 @@ $avto= mysql_num_rows($req);
 
 While($mag =  mysql_fetch_assoc($req))
 {
-$mag[name] = htmlspecialchars(stripslashes(addslashes($mag[name])));
+$mag['name'] = htmlspecialchars(stripslashes(addslashes($mag['name'])));
 
 echo" <img src=\"/shmot/$mag[name].png\" alt=\"pic\"/>
- <a href=\"shop_chat.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag[cena])." <hr/>";
+ <a href=\"shop_chat.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag['cena'])." <hr/>";
 }
 
 echo"<br/><a href=\"shop_chat.php?mod=b\">Назад</a>";
@@ -184,7 +185,7 @@ While($mag =  mysql_fetch_assoc($req))
 
 echo"	<img src=\"/shmot/$mag[name].png\" alt=\"pic\"/>
 		<a href=\"shop_chat.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/>
-		Цена: ".number_format($mag[cena])." Постов "; 
+		Цена: ".number_format($mag['cena'])." Постов "; 
 		//[<a href=\"sell_chat.php?act=ask&amp;id=$mag[id]\">купить</a>]<br/>";
 echo "<hr/>";
 }
@@ -200,7 +201,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag =  mysql_fetch_assoc($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -241,7 +242,7 @@ case 'ruki':
 $tip='Рукавицы';
 break;
 }
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -267,7 +268,7 @@ elseif($mag['nlvl']>=111){$st="R111";}
 
 echo"<b></div></div></div><div class=menu><img src=\"/shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b><br/>
 Тип: $tip<br/>
-Цена: ".number_format($mag[cena], 0, ',', "'")." Постов <br/><br/>";
+Цена: ".number_format($mag['cena'], 0, ',', "'")." Постов <br/><br/>";
 
 if ($tip=="Оружие"){
 echo "

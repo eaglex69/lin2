@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,20 +19,20 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup]>=3){
+if ($udata['dostup']>=3){
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-if(empty($_POST[nick])){ $nick = $_GET[nick];}else{$nick = $_POST[nick];}
+if(empty($_POST['nick'])){ $nick = $_GET['nick'];}else{$nick = $_POST['nick'];}
 
-if(!empty($_GET[nick]))  {$_POST[nick]=$_GET[nick];}
+if(!empty($_GET['nick']))  {$_POST['nick']=$_GET['nick'];}
    
 
    
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 
    echo "<p><b><font color=grey>Данные игрока ______ !</font></b></p>";
 
@@ -52,7 +52,7 @@ echo "<p><b><font color=grey>Данные игрока $nick !</font></b></p>";
 
 //////////
 // Выводим прошлые данные входа
-$lim = $_GET[lim];
+$lim = $_GET['lim'];
 if (empty($lim)){$lim=1;} // если лимит не указан то он равен 1
 echo "<font color=#A0A0A0>Показать последние <br/>";
 

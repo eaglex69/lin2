@@ -14,16 +14,16 @@ include($path.'inc/head.php');
 
 
 echo "<p><font color=#057F46><b>Новости игры!</b></font></p>";
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT title FROM news"));
 $puslap = floor($viso/10);
 if (is_double($num) || !is_integer($num))
@@ -49,16 +49,16 @@ echo "</div>";
 
 
 echo '<p><hr/></p><center>';
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"?page=$back\"><---</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "<---";
 }
 echo"-|-";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"?page=$next&\">---></a><br/>";}
 else
 {echo "---><br/>";}

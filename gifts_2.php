@@ -1,4 +1,4 @@
-<?
+<?php
 
 define('PROTECTOR', 1);
 
@@ -17,12 +17,12 @@ include($path.'inc/zag.php');
 
 //include_once 'sys/inc/compress.php';
 
-if (empty($_GET[id])){$_GET[id]=$udata[id];}
+if (empty($_GET['id'])){$_GET['id']=$udata['id'];}
 
 
 
 $ank=mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `id` = '$_GET[id]' LIMIT 1"));
-if(empty($ank[usr])){
+if(empty($ank['usr'])){
 echo'<font color=red>Нет такого игрока!</font>';
 echo"<br/><div class=silka><a href=\"/?\">Главная</a>";
 include($path.'inc/down.php');exit;
@@ -76,7 +76,7 @@ echo "</div>";
 }
 
 
-echo "</div><hr><p>Страниц: "; navig2($page, '?id='.$ank[id].'&', $pages);
+echo "</div><hr><p>Страниц: "; navig2($page, '?id='.$ank['id'].'&', $pages);
 
 include($path.'inc/down.php');
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 
 
 $tm = time(); // time
@@ -24,18 +24,18 @@ $req54554654 = mysql_query("SELECT * FROM online_time WHERE usr ='$log' LIMIT 1"
 $onl = mysql_fetch_array($req54554654);
 
 
-$seknew = $tm - $onl[tm]; // +сек онлайна
+$seknew = $tm - $onl['tm']; // +сек онлайна
 if ($seknew > 1800){$seknew = 0;} // если афк 1800сек то приравниваем к нолю
 
-$sek = $onl[sek] + $seknew; // резулт
+$sek = $onl['sek'] + $seknew; // резулт
 
 //-------------------------------------
   $req987846565 = mysql_query("SELECT * FROM users WHERE usr = '$log' LIMIT 1");
   $udata = mysql_fetch_array($req987846565);
 //-------------------------------------
 
-$udatatime = $udata[time]+$seknew; // секунд всего
-$udatatimebon = $udata[time_bon]+$seknew; // секунд бонус
+$udatatime = $udata['time']+$seknew; // секунд всего
+$udatatimebon = $udata['time_bon']+$seknew; // секунд бонус
 
 /*										*/
 
@@ -67,16 +67,16 @@ $udatatimebon = $udata[time_bon]+$seknew; // секунд бонус
 
 // бонус за онлайн
 
-if ($udata[time_bon]>36000)
+if ($udata['time_bon']>36000)
 {
-if ($udata[dostup]==0){$col = 10;} 
-if ($udata[dostup]==1){$col = 30;} 
-if ($udata[dostup]==2){$col = 40;}
-if ($udata[dostup]==3){$col = 50;}
-if ($udata[dostup]==4){$col = 100;}
-if ($udata[dostup]==5){$col = 150;}
+if ($udata['dostup']==0){$col = 10;} 
+if ($udata['dostup']==1){$col = 30;} 
+if ($udata['dostup']==2){$col = 40;}
+if ($udata['dostup']==3){$col = 50;}
+if ($udata['dostup']==4){$col = 100;}
+if ($udata['dostup']==5){$col = 150;}
 
-$alm = $udata[almaz]+$col;
+$alm = $udata['almaz']+$col;
 mysql_query ("UPDATE users SET `almaz` = '$alm',`time_bon` = '0' WHERE usr='$log' LIMIT 1");
 
 $time = date("H:i d.m.y");

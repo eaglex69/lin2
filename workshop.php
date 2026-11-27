@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'workshop';//фикс. места
@@ -17,13 +17,13 @@ include($path.'inc/zag.php');
 
 
 // доступ по профам
-if ($udata[prof]!='Artisan' && $udata[prof]!='Warsmith'  && $udata[prof]!='Maestro'){echo' <p><font color=red>Доступ в мастерскую закрыт</font></p>';include($path.'inc/down.php');exit;}
+if ($udata['prof']!='Artisan' && $udata['prof']!='Warsmith'  && $udata['prof']!='Maestro'){echo' <p><font color=red>Доступ в мастерскую закрыт</font></p>';include($path.'inc/down.php');exit;}
 // приравнюем номер профы
-if ($udata[prof]=='Artisan'){$prof = 1;}	if ($udata[prof]=='Warsmith'){$prof = 2;}	if ($udata[prof]=='Maestro'){$prof = 3;}
+if ($udata['prof']=='Artisan'){$prof = 1;}	if ($udata['prof']=='Warsmith'){$prof = 2;}	if ($udata['prof']=='Maestro'){$prof = 3;}
 //-----------------
 
 //-----------------Убираем рецепт с книгу-----------------------------------------------------------------
-if (isset($_GET[del])){
+if (isset($_GET['del'])){
 
 $av47 = mysql_num_rows(mysql_query("SELECT * FROM `kraft` WHERE `usr` = '$log' and `id`='$_GET[del]' LIMIT 1"));
 	
@@ -36,12 +36,12 @@ echo "<p><font color=#999900> Удалено </font></p><hr/>";
 
 }}
 //-------------------------------------------------------------------------------------------------------------
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 //-----------------Добавляем рецепт в книгу-----------------------------------------------------------------
-if ($_GET[mod]==go){
+if ($_GET['mod']=='go'){
 
 $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `id`='$_GET[go]' LIMIT 1");
 $recept = mysql_fetch_array($req); // открыли рецепт
@@ -50,9 +50,9 @@ $reqsh = mysql_query("SELECT * FROM `shop` WHERE `id`='$recept[give]' LIMIT 1");
 $shmot = mysql_fetch_array($reqsh); // открыли шмот
 
 // выщитуем шмот с 1 по 40 уровень 1 профа, 41-72 эт 2-я профа и с 73 третья
-if ($shmot[nlvl] < 40){$profa = 1;}
-if ($shmot[nlvl] >= 40 and $shmot[nlvl] < 72){$profa = 2;}
-if ($shmot[nlvl] >= 72){$profa = 3;}
+if ($shmot['nlvl'] < 40){$profa = 1;}
+if ($shmot['nlvl'] >= 40 and $shmot['nlvl'] < 72){$profa = 2;}
+if ($shmot['nlvl'] >= 72){$profa = 3;}
 //--------
 
 
@@ -69,12 +69,12 @@ if ($droprand==60) {$droprand=59;}
 if ($droprand==11 or $droprand==12) {$droprand=13;}
 $reqshop = mysql_query("SELECT * FROM `mdrop` WHERE `id` = '$droprand' LIMIT 1"); // случайный с таблици
 $rezresurs=mysql_fetch_array($reqshop);
-$skoko=rand(14,26); if ($shmot[nlvl]<=0){$shmot[nlvl] = 7;} $skoko=$skoko*$shmot[nlvl];
+$skoko=rand(14,26); if ($shmot['nlvl']<=0){$shmot['nlvl'] = 7;} $skoko=$skoko*$shmot['nlvl'];
 $reit=rand(4,15);
-$patt=$reit*$shmot[patt];
-$pdef=$reit*$shmot[pdef];
-$matt=$reit*$shmot[matt];
-$mdef=$reit*$shmot[mdef];
+$patt=$reit*$shmot['patt'];
+$pdef=$reit*$shmot['pdef'];
+$matt=$reit*$shmot['matt'];
+$mdef=$reit*$shmot['mdef'];
 // ---------------------		
 		
 mysql_query("INSERT INTO
@@ -92,8 +92,8 @@ mysql_query("INSERT INTO
         `lat_name` = '$recept[lat_name]'");
 
 // если такой рецепт один удаляем иначе минусуем
-if ($recept[kol]>1){ // более одного минусуем
-$nkol=$recept[kol]-1;
+if ($recept['kol']>1){ // более одного минусуем
+$nkol=$recept['kol']-1;
 mysql_query("UPDATE `res` SET `kol` = '$nkol' WHERE `usr` = '$log' and `id`='$_GET[go]' LIMIT 1");     
 }else{ //иначе удаляем
 mysql_query("DELETE FROM `res` WHERE `usr` = '$log' and `id`='$_GET[go]' LIMIT 1");
@@ -115,12 +115,12 @@ if ($avto>0){
 
 While($mag = mysql_fetch_array($req))
 {
-$mag[name] = htmlspecialchars(stripslashes(addslashes($mag[name])));
+$mag['name'] = htmlspecialchars(stripslashes(addslashes($mag['name'])));
 
 		$reqkr = mysql_query("SELECT * FROM `kraft` WHERE `usr` = '$log' and `id`='$_GET[go]' LIMIT 1");
 		$kr = mysql_fetch_array($reqkr);
 
-if ($kr[lvl]<=$udata[lvl]){echo"<div class=inoy><a href=\"?mod=kraft&go=$mag[id]\"><img src=\"shmot/$mag[name].png\"  height=30 width=30/> $mag[name] </a></div> ";}
+if ($kr['lvl']<=$udata['lvl']){echo"<div class=inoy><a href=\"?mod=kraft&go=$mag[id]\"><img src=\"shmot/$mag[name].png\"  height=30 width=30/> $mag[name] </a></div> ";}
 else {echo"<div class=dot><a href=\"?mod=kraft&go=$mag[id]\"><img src=\"shmot/$mag[name].png\"  height=30 width=30/> $mag[name] </a></div> ";}
 
 }
@@ -130,7 +130,7 @@ break;
 
 //------------------крафт-----------------
 
-case 'kraft';
+case 'kraft':
 
 echo '<font color=#9999CC> <p><b>Вы собираетесь создать:</b></p></font>';
 
@@ -153,12 +153,12 @@ echo'<font color=red><p> Нет такой вещи! </p></font>';
 include($path.'inc/down.php');exit;}
 
 
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':$klas='Все';break;
 case 'wizard':$klas='Маг';break;
 case 'fighert':$klas='Воин';break;}
 
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':$tip='Оружие';break;
 case 'body':$tip='Доспехи';break;
 case 'golova':$tip='Шлем';break;
@@ -175,7 +175,7 @@ case 'amulet':$tip='Амулет';break;
 
 //--------------------------------------------
 
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 echo"<img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b><br/>
 Тип: $tip<hr/>
 <b>Характеристика</b><br/>";
@@ -191,10 +191,10 @@ echo "
 Физ. защ.: $kr[pdef]<br/>
 Маг. защ.: $kr[mdef]<br/>";}
 
-$res=explode('|',$kr[res]);
+$res=explode('|',$kr['res']);
 // приравнюем номер профы
 //if ($udata[prof]=='Artisan'){$prof = 1;}	if ($udata[prof]=='Warsmith'){$prof = 2;}	if ($udata[prof]=='Maestro'){$prof = 3;}
-if ($kr[profa]==1){$pr = 'Artisan';}	if ($kr[profa]==2){$pr = 'Warsmith';}	if ($kr[profa]==3){$pr = 'Maestro';}
+if ($kr['profa']==1){$pr = 'Artisan';}	if ($kr['profa']==2){$pr = 'Warsmith';}	if ($kr['profa']==3){$pr = 'Maestro';}
 //-----------------
 echo "<hr/>
 <b><u>Нужно</b></u>		<br/>
@@ -203,14 +203,14 @@ echo "<hr/>
 Професия:				$pr<br/>
 ";
 
-if ($prof>=$kr[profa] and $udata[lvl]>=$kr[lvl]){echo"<div class=inoy><a href=\"?mod=kraft_yes&go=$kr[id]\"> Создать </a></div> ";}
+if ($prof>=$kr['profa'] and $udata['lvl']>=$kr['lvl']){echo"<div class=inoy><a href=\"?mod=kraft_yes&go=$kr[id]\"> Создать </a></div> ";}
 echo"<div class=inoy><a href=\"?del=$kr[id]\"><font color=red> Удалить </font></a></div> ";
 echo' <div class=inoy> <a href="workshop.php?">Назад в книгу</a> </div>';
 
 break;
 
 //-------------после подтверждения создаём вещь---------------------
-case 'kraft_yes';
+case 'kraft_yes':
 
 	$reqkr = mysql_query("SELECT * FROM `kraft` WHERE `usr` = '$log' and `id`='$_GET[go]' LIMIT 1"); 
 $avtokr=mysql_num_rows($reqkr);			$kr = mysql_fetch_array($reqkr);
@@ -223,7 +223,7 @@ $mag = mysql_fetch_array($req);				$avto=mysql_num_rows($req);
 
 if($avto=="0"){echo'<font color=red><p> Нет такой вещи! </p></font>';echo' <div class=inoy> <a href="workshop.php?">Назад в книгу</a> </div>';include($path.'inc/down.php');exit;} // если шмота нет
 
-$r=explode("|",$kr[res]);
+$r=explode("|",$kr['res']);
 $lat_name=$r[0];
 $kol=$r[1];
 
@@ -234,19 +234,19 @@ if($avto15==0){echo'<font color=red><p> Недостаточно ресурсо�
 
 $reqre = mysql_query("SELECT * FROM `res` WHERE `usr`='$log' and `lat_name`='$lat_name' LIMIT 1");
 $re = mysql_fetch_array($reqre);
-if(($re[kol]-$kol)<=0){
+if(($re['kol']-$kol)<=0){
 mysql_query("DELETE FROM `res` WHERE `usr`='$log' and `lat_name`='$lat_name' LIMIT 1");//чистим логи
 }else{
-$ros=$re[kol]-$kol;
+$ros=$re['kol']-$kol;
 mysql_query("UPDATE `res` SET `kol` = '$ros' WHERE `usr`='$log' and `lat_name`='$lat_name' LIMIT 1");
 }
 
 
-$mag[patt]=$kr[patt];
-$mag[matt]=$kr[matt];
-$mag[pdef]=$kr[pdef];
-$mag[mdef]=$kr[mdef];
-$mag[cena]=round($mag[cena]/2);
+$mag['patt']=$kr['patt'];
+$mag['matt']=$kr['matt'];
+$mag['pdef']=$kr['pdef'];
+$mag['mdef']=$kr['mdef'];
+$mag['cena']=round($mag['cena']/2);
 //-----------------------------------------
 
 //------------------------------------------

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'dress';//фикс. места
@@ -31,17 +31,17 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-if($mag[nlvl] > $udata[lvl]){
+if($mag['nlvl'] > $udata['lvl']){
 echo'<p>Вещь не подходит по уровню! Иди в окрестности и подними свой level.</p>';
 include($path.'inc/down.php');
 exit;
 }
 
-$npatt=$mag[patt]+$udata[patt];
-$nmatt=$mag[matt]+$udata[matt];
+$npatt=$mag['patt']+$udata['patt'];
+$nmatt=$mag['matt']+$udata['matt'];
 
-$npdef=$mag[pdef]+$udata[pdef];
-$nmdef=$mag[mdef]+$udata[mdef];
+$npdef=$mag['pdef']+$udata['pdef'];
+$nmdef=$mag['mdef']+$udata['mdef'];
 
 
 mysql_query("UPDATE `users` SET

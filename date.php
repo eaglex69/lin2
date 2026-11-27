@@ -1,3 +1,3 @@
 <?php
-print strftime('%c');
+print date('D M j H:i:s Y');
 ?>

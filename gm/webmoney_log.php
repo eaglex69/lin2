@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='GM-Panel WebMoney';
@@ -14,7 +14,7 @@ include($path.'inc/zag.php');
 ///////////////
 
 
-if ($udata[dostup] < 4){
+if ($udata['dostup'] < 4){
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
 mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
@@ -22,7 +22,7 @@ mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` =
 include($path.'inc/down.php');
 exit;}
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 
 
@@ -58,8 +58,8 @@ if ($zakazavto > 0){
 		echo "<div class=dot>";
 		echo"";
 		echo"Перс: <a href=\"/search.php?nick=$zakaz[usr]&amp;go=go\"><b>$zakaz[usr]</b></a> <font color=gold>(ID: $zakaz[id]) </font><br/>";
-		$zakaz[col] = $zakaz[col]/100;
-		echo"WMR: <b>".number_format($zakaz[col], 2, ',', "`")."</b><br/>";
+		$zakaz['col'] = $zakaz['col']/100;
+		echo"WMR: <b>".number_format($zakaz['col'], 2, ',', "`")."</b><br/>";
 		echo"Полученно: <b>$zakaz[data]</b><br/>";
 		echo"<b>$zakaz[text]</b><br/>";
 

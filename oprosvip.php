@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'oprosvip';//фикс. места
@@ -14,7 +14,7 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -72,7 +72,7 @@ while ($usr = mysql_fetch_array($reqop))
 {
 
 
-if ($usr[sms]==1){$col=10;}else{$col=10;}
+if ($usr['sms']==1){$col=10;}else{$col=10;}
 
 echo "<div class=adm>";
 echo "<a href=\"search.php?nick=$usr[char]&amp;go=go\"> $usr[char] <font color=#ffffff>|</font><font color=grey>  $usr[date] </font><font color=#ffffff>|</font><font color=green> ID : $usr[voteId] </font>|<font color=orange> + 5	VoteCoin</font></a>";

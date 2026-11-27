@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Рыбалка';
@@ -16,7 +16,7 @@ include($path.'inc/zag.php');
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -58,15 +58,15 @@ $fish = mysql_fetch_array($req); $avto=mysql_num_rows($req);
 if ($avto > 0){
 
 
-if (isset($_GET[ns])){ $uroli = yesmp;} if (isset($_GET[vp])){ $uroli = yesmp;} if (isset($_GET[vl])){ $uroli = yesmp;}
-if ($uroli == yesmp){
+if (isset($_GET['ns'])){ $uroli = 'yesmp';} if (isset($_GET['vp'])){ $uroli = 'yesmp';} if (isset($_GET['vl'])){ $uroli = 'yesmp';}
+if ($uroli == 'yesmp'){
 ////////////		открываем информацию о данных игрока снова 	//////////////
 //-------------------------------------
   $req1 = mysql_query("SELECT * FROM `users` WHERE `usr` = '$log' and `id` = '$udata[id]' LIMIT 1");
   $udata45 = mysql_fetch_assoc($req1);
 //-------------------------------------
 // ------атака прошла-----------
-$newmp=$udata45[mp]-$fish[mp];
+$newmp=$udata45['mp']-$fish['mp'];
 //$newhp=$udata45[hp]-$fish[mp];
 if ($newmp>=0){
 mysql_query("UPDATE `users` SET `mp` = '$newmp' WHERE `usr` = '$log'");
@@ -85,7 +85,7 @@ include($path.'inc/down.php');
 //-----------------------------------
 ///////////////////////////////////////////////////////////////////////////////////////
  
-$ur = rand(1,3); if (isset($_GET[ns])){ $uro = 1;} if (isset($_GET[vp])){ $uro = 2;} if (isset($_GET[vl])){ $uro = 3;}
+$ur = rand(1,3); if (isset($_GET['ns'])){ $uro = 1;} if (isset($_GET['vp'])){ $uro = 2;} if (isset($_GET['vl'])){ $uro = 3;}
 
 if ($ur == $uro)
 {
@@ -93,36 +93,36 @@ if ($ur == $uro)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($udata[klas]=="wizard") {$uron = $udata[matt];} // если маг, то маг атака работает
-if ($udata[klas]=="fighert") {$uron = $udata[patt];} // если воин, то физ атака работает
+if ($udata['klas']=="wizard") {$uron = $udata['matt'];} // если маг, то маг атака работает
+if ($udata['klas']=="fighert") {$uron = $udata['patt'];} // если воин, то физ атака работает
 
-$ur = $fish[hp]-$uron;
+$ur = $fish['hp']-$uron;
 if ($ur <=0) { // убил рыбку
 
 
 // рыбок от уровня игрока
-if($udata[lvl]<40){
+if($udata['lvl']<40){
 $st=1;}
-elseif($udata[lvl]>=40 and $udata[lvl]<72){
+elseif($udata['lvl']>=40 and $udata['lvl']<72){
 $st=1;}
-elseif($udata[lvl]>=72 and $udata[lvl]<100){
+elseif($udata['lvl']>=72 and $udata['lvl']<100){
 $st=2;}
-elseif($udata[lvl]>=100 and $udata[lvl]<130){
+elseif($udata['lvl']>=100 and $udata['lvl']<130){
 $st=2;}
-elseif($udata[lvl]>=130 and $udata[lvl]<160){
+elseif($udata['lvl']>=130 and $udata['lvl']<160){
 $st=3;}
-elseif($udata[lvl]>=160){
+elseif($udata['lvl']>=160){
 $st=3;}
 //------------------------------
 // рыбок от уровня удки
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `tip`='weapon' and `image`='yes' and `ruka`='fish'");
 $mag = mysql_fetch_array($req);
-$u = explode("*",$mag[name]);
+$u = explode("*",$mag['name']);
 
-if($mag[nlvl]==0){$st_ud=1;}
-if($mag[nlvl]==40){$st_ud=2;}
-if($mag[nlvl]==62){$st_ud=3;}
-if($mag[nlvl]==96){$st_ud=4;}
+if($mag['nlvl']==0){$st_ud=1;}
+if($mag['nlvl']==40){$st_ud=2;}
+if($mag['nlvl']==62){$st_ud=3;}
+if($mag['nlvl']==96){$st_ud=4;}
 
 //-----------------------------------
 // сколько рыбинок в итоге
@@ -145,9 +145,9 @@ mysql_query("INSERT INTO
         `give` = '0',
         `kol` = '$co',
         `cena` = '10000'");
-$nk=$rs[kol]+$co;
+$nk=$rs['kol']+$co;
 }else{
-$nk=$rs[kol]+$co;
+$nk=$rs['kol']+$co;
 mysql_query("UPDATE `res` SET `kol` = '$nk' WHERE `usr` = '$log' and `lat_name` = 'fish'");
 }
 //------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ $reqev = mysql_query("SELECT * FROM `fish_log_w` WHERE `ids` = '$udata[id]' and 
 $eve = mysql_fetch_array($reqev);
 if(mysql_num_rows($reqev)>=1) // если уже участвует в рейтинге то дописываем
 {
-$skoko=$eve[skoko]+$co;
+$skoko=$eve['skoko']+$co;
 mysql_query("UPDATE fish_log_w SET skoko='$skoko' WHERE ids='$udata[id]' and usr='$log'");} // дописываем +1 к количеству
 
 else{ // если нет игрока в рейтинге то создаем ему
@@ -186,7 +186,7 @@ $reqev = mysql_query("SELECT * FROM `fish_log` WHERE `ids` = '$udata[id]' and `u
 $eve = mysql_fetch_array($reqev);
 if(mysql_num_rows($reqev)>=1) // если уже участвует в рейтинге то дописываем
 {
-$skoko=$eve[skoko]+$co;
+$skoko=$eve['skoko']+$co;
 mysql_query("UPDATE fish_log SET skoko='$skoko' WHERE ids='$udata[id]' and usr='$log'");} // дописываем +1 к количеству
 else{ // если нет игрока в рейтинге то создаем ему
 mysql_query("INSERT INTO fish_log SET usr='$log',ids='$udata[id]',skoko='$co'"); // создаем таблицу юзеру
@@ -198,13 +198,13 @@ mysql_query("INSERT INTO fish_log SET usr='$log',ids='$udata[id]',skoko='$co'");
 
 
 //	---	//	---	//	---	//	//	 	ЗАДАНИЯ		//	//	---	//	---	//	---	//
-if ($udata[lvl]>49){
+if ($udata['lvl']>49){
 $reqev = mysql_query("SELECT * FROM job_fish WHERE `usr` = '$log' Limit 1");
 ////////////////////////////
 $jm = mysql_fetch_array($reqev);
 if(mysql_num_rows($reqev)>=1){ // если уже участвует  то дописываем
-if ($jm[kill]!=='off'){ // если уже получил вознагр то табла не созд
-$kill=$jm[kill]+$co; if ($kill>1000){$kill=1000;}
+if ($jm['kill']!=='off'){ // если уже получил вознагр то табла не созд
+$kill=$jm['kill']+$co; if ($kill>1000){$kill=1000;}
 mysql_query("UPDATE job_fish SET `kill` = '$kill' WHERE `usr` = '$log' Limit 1");}} // дописываем +1 к количеству
 else{ // если нет игрока в рейтинге то создаем ему
 mysql_query("INSERT INTO job_fish SET `usr` = '$log', `kill`='1', `data`='no'"); // создаем таблицу юзеру
@@ -253,11 +253,11 @@ $avto=mysql_num_rows($req);
 
 if ($avto > 0){ 
 
-$t = $fish[time]-$tim;
+$t = $fish['time']-$tim;
 
 
 echo "Осталось рыбачить: $t сек <br/>";
-echo "<b>Рыбка <font color=ff4040>HP</font></b> ".number_format($fish[hp], 0, ',', "`")." / ".number_format($fish[hpall], 0, ',', "`")."";
+echo "<b>Рыбка <font color=ff4040>HP</font></b> ".number_format($fish['hp'], 0, ',', "`")." / ".number_format($fish['hpall'], 0, ',', "`")."";
 echo "</div>";
 
 $t44 = rand(1,4);
@@ -289,7 +289,7 @@ $avto=mysql_num_rows($req);
 if ($avto > 0){ 
 
 // -- если ловить тогда ---//
-if (isset($_GET[go])){ $fs=rand(1,2);
+if (isset($_GET['go'])){ $fs=rand(1,2);
 
 
 // -забираем наживку---
@@ -305,7 +305,7 @@ echo "<div class=inoy><a href=\"/fishing.php\">Рыбак</a></div>";
 include($path.'inc/down.php');
 
 }else{
-$nk=$rs[kol]-1;
+$nk=$rs['kol']-1;
 mysql_query("UPDATE `res` SET `kol` = '$nk' WHERE `usr` = '$log' and `lat_name` = 'lure'");
 
 if($nk <= 0){ //удаляем
@@ -320,17 +320,17 @@ mysql_query("DELETE FROM `res` WHERE `id` = '$rs[id]' LIMIT 1");
 
 if ($fs == 2){ // один шанс из трёх удачно закинуть наживку
 
-if($udata[lvl]<20){
+if($udata['lvl']<20){
 $hp=1444; $mp=17;}
-elseif($udata[lvl]>=20 and $udata[lvl]<40){
+elseif($udata['lvl']>=20 and $udata['lvl']<40){
 $hp=2133; $mp=26;}
-elseif($udata[lvl]>=40 and $udata[lvl]<52){
+elseif($udata['lvl']>=40 and $udata['lvl']<52){
 $hp=4511; $mp=41;}
-elseif($udata[lvl]>=52 and $udata[lvl]<62){
+elseif($udata['lvl']>=52 and $udata['lvl']<62){
 $hp=6213; $mp=66;}
-elseif($udata[lvl]>=62 and $udata[lvl]<76){
+elseif($udata['lvl']>=62 and $udata['lvl']<76){
 $hp=9223; $mp=82;}
-elseif($udata[lvl]>=76){
+elseif($udata['lvl']>=76){
 $hp=25000; $mp=99;}
 
 $time=time()+90;

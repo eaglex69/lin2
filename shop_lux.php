@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shop_lux';//фикс. места
@@ -16,11 +16,12 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-$tip2=$_GET[tip2];
-$lvlus=$_GET[lvlus];
+$tip2=$_GET['tip2'];
+$lvlus=$_GET['lvlus'];
+$o=isset($_GET['o'])?$_GET['o']:'';
 
 
-if ($udata[lvl]<85){
+if ($udata['lvl']<85){
 
 echo "<hr/><p><font color=#ff4040>Люкс магазин доступен с 85 уровня!</p></font><hr/></b></div></div></center>";
  include($path.'inc/end.php');exit;
@@ -28,7 +29,7 @@ echo "<hr/><p><font color=#ff4040>Люкс магазин доступен с 85
 }
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo" <b><font color=#f4d06e> Люкс Магазин. <br/><br/></b>
@@ -59,7 +60,7 @@ break;
 
 
 case 'b':
-if(empty($_GET[o])){
+if(empty($_GET['o'])){
 echo" <b><font color=#007F46> Люкс Магазин. </font></b><br/>Выберай что нужно:<br/><br/>";
 echo"<div class=inoy><a href=\"shop_lux.php?mod=weapon\">Магазин оружия</a>";
 echo"<a href=\"shop_lux.php?mod=b&amp;o=shit\">Отдел щитов</a>";
@@ -73,7 +74,7 @@ echo"<a href=\"shop_lux.php?mod=b&amp;o=pants\">Отдел штанов</a></div
 echo"<br/> <div class=inoy><a href=\"gorod.php?pl=shop_zone\">В город</a></div>";
 
 }else{
-if($_GET[o]!=shit && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=poyas && $_GET[o]!=plash&& $_GET[o]!=pants && $_GET[o]!=ruki && $_GET[o]!=nogi){
+if($_GET['o']!='shit' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='poyas' && $_GET['o']!='plash'&& $_GET['o']!='pants' && $_GET['o']!='ruki' && $_GET['o']!='nogi'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -109,11 +110,11 @@ $avto=mysql_num_rows($req);
 
 While($mag = mysql_fetch_array($req))
 {
-$mag[name] = htmlspecialchars(stripslashes(addslashes($mag[name])));
+$mag['name'] = htmlspecialchars(stripslashes(addslashes($mag['name'])));
 
 echo "<div class=silka><a href=\"shop_lux.php?mod=info&amp;id=$mag[id]\">
 <img src=\"shmot/$mag[name].png\"  align='left' width='36' height='36' alt='' style='margin-right:10px;border:1px solid #383838'/>
- $mag[name] <br/><span style=color:#C2B6B2;>&nbsp;Цена: ".number_format($mag[cena], 0, ',', " ")." CoL</span></a></div><hr/>";
+ $mag[name] <br/><span style=color:#C2B6B2;>&nbsp;Цена: ".number_format($mag['cena'], 0, ',', " ")." CoL</span></a></div><hr/>";
 }
 
 echo"<br/><div class=inoy><a href=\"shop_lux.php?mod=b\">Назад</a></div>";
@@ -161,7 +162,7 @@ While($mag = mysql_fetch_array($req))
 
 echo "<div class=silka><a href=\"shop_lux.php?mod=info&amp;id=$mag[id]\">
 <img src=\"shmot/$mag[name].png\"  align='left' width='36' height='36' alt='' style='margin-right:10px;border:1px solid #383838'/>
- $mag[name] <br/><span style=color:#C2B6B2;>&nbsp;Цена: ".number_format($mag[cena], 0, ',', " ")." CoL</span></a></div><hr/>";
+ $mag[name] <br/><span style=color:#C2B6B2;>&nbsp;Цена: ".number_format($mag['cena'], 0, ',', " ")." CoL</span></a></div><hr/>";
 
 }
 echo"<br/><div class=inoy><a href=\"shop_lux.php?\">Назад</a></div>";
@@ -176,7 +177,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -205,7 +206,7 @@ case 'pants':
 $tip='Штаны';
 break;
 }
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -220,18 +221,18 @@ break;
 
 
 
-if($mag[nlvl]<20){$st="NG";}
-elseif($mag[nlvl]>=20 and $mag[nlvl]<40){$st="D";}
-elseif($mag[nlvl]>=40 and $mag[nlvl]<52){$st="C";}
-elseif($mag[nlvl]>=52 and $mag[nlvl]<62){$st="B";}
-elseif($mag[nlvl]>=62 and $mag[nlvl]<76){$st="A";}
-elseif($mag[nlvl]>=76 and $mag[nlvl]<91){$st="S";}
-elseif($mag[nlvl]>=91){$st="R";}
+if($mag['nlvl']<20){$st="NG";}
+elseif($mag['nlvl']>=20 and $mag['nlvl']<40){$st="D";}
+elseif($mag['nlvl']>=40 and $mag['nlvl']<52){$st="C";}
+elseif($mag['nlvl']>=52 and $mag['nlvl']<62){$st="B";}
+elseif($mag['nlvl']>=62 and $mag['nlvl']<76){$st="A";}
+elseif($mag['nlvl']>=76 and $mag['nlvl']<91){$st="S";}
+elseif($mag['nlvl']>=91){$st="R";}
 
 
 echo"<b></div></div></div><div class=menu><img src=\"shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b> <br/>
 Тип: $tip <font color=grey>($mag[nlvl] lvl)</font><br/>
-Цена: ".number_format($mag[cena], 0, ',', " ")." CoL <br/><br/>";
+Цена: ".number_format($mag['cena'], 0, ',', " ")." CoL <br/><br/>";
 
 if ($tip=="Оружие"){
 echo "

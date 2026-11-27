@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,7 +19,7 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup] >= 4){
+if ($udata['dostup'] >= 4){
 
 echo "<p><hr/></p><center>";
 
@@ -32,7 +32,7 @@ echo "</center><p><hr/></p>";
 
 // --------------------------- загрузка картинки и создание вещи ------------------------------------
 
-if(empty($_POST[nw])){
+if(empty($_POST['nw'])){
 echo '<form action="?" method="post" enctype="multipart/form-data">';
 
 //<form action=?yes method=post enctype=multipart/form-data>
@@ -175,19 +175,19 @@ else { echo "<h3>Ошибка! Не удалось загрузить файл �
 
 
 
-$_POST[name] = $_POST[nw];
+$_POST['name'] = $_POST['nw'];
 
 
-if ($_POST[tip2]=="ps"){echo "Тип оружия не выбран<hr/>";}
-if ($_POST[nlvl]=="ps"){echo "Клас оружия не выбран"; include($path.'inc/down.php'); exit;}
-if(empty($_POST[cena])){$_POST[cena]=100000;}
-if(empty($_POST[pdef])){$_POST[pdef]=0;}
-if(empty($_POST[mdef])){$_POST[mdef]=0;}
-if(empty($_POST[patt])){$_POST[patt]=0;}
-if(empty($_POST[matt])){$_POST[matt]=0;}
+if ($_POST['tip2']=="ps"){echo "Тип оружия не выбран<hr/>";}
+if ($_POST['nlvl']=="ps"){echo "Клас оружия не выбран"; include($path.'inc/down.php'); exit;}
+if(empty($_POST['cena'])){$_POST['cena']=100000;}
+if(empty($_POST['pdef'])){$_POST['pdef']=0;}
+if(empty($_POST['mdef'])){$_POST['mdef']=0;}
+if(empty($_POST['patt'])){$_POST['patt']=0;}
+if(empty($_POST['matt'])){$_POST['matt']=0;}
 
-if(empty($_POST[soul])){$_POST[soul]=0;}
-if(empty($_POST[spirit])){$_POST[spirit]=0;}
+if(empty($_POST['soul'])){$_POST['soul']=0;}
+if(empty($_POST['spirit'])){$_POST['spirit']=0;}
 
 
 mysql_query("INSERT INTO

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'search';//фикс. места
@@ -11,17 +11,17 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-if(empty($_POST[nick])){
-$nick=$_GET[nick];
+if(empty($_POST['nick'])){
+$nick=$_GET['nick'];
 }else{
-$nick=$_POST[nick];}
+$nick=$_POST['nick'];}
 $nick = htmlspecialchars(stripslashes($nick));
 
-switch($_GET[go]) {
+switch($_GET['go']) {
 
 default:
 
-if($_GET[act]!=deluser and $_GET[act]!=mag){
+if($_GET['act']!='deluser' and $_GET['act']!='mag'){
 
 
 echo "<form action=\"search.php?go=go\" method=\"post\">Введите ник:<br/>";
@@ -33,33 +33,33 @@ echo "<input type=\"submit\" value=\"Найти\" /></form>";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////// Доступно только с правами выше 3 //////////////////////////////////////////////////////
-if($_GET[act]==deluser && $udata[dostup]>3){
+if($_GET['act']=='deluser' && $udata['dostup']>3){
 echo'Удалить игрока игрока <b>'.$nick.'</b><br/>';
 echo'<a href="adm_panel.php?mod=deluser&nick='.$nick.' ">Удалить</a><br/>';
 echo'<a href="search.php?nick='.$nick.'&go=go">Не удалять</a><br/>';
 }
 
 
-if($_GET[act]==mag && $udata[dostup]>3){
+if($_GET['act']=='mag' && $udata['dostup']>3){
 
 echo " Умения игрока <b>$nick</b> <br/><br/>";
 
-if($_GET[activ]==yes){
+if($_GET['activ']=='yes'){
 
 mysql_query("UPDATE `mag` SET `activ` = 'yes' WHERE  id = '$_GET[id]'");} // скил активен
 
-if($_GET[activ]==no){
+if($_GET['activ']=='no'){
 
 mysql_query("UPDATE `mag` SET `activ` = 'no' WHERE  id = '$_GET[id]'");}	//скил отключ
 
-if($_GET[activ]==del){
+if($_GET['activ']=='del'){
 
-if (!empty($_POST[result])){
+if (!empty($_POST['result'])){
 $ressave = mysql_query("DELETE FROM `mag` WHERE id = '$_POST[result]'");	//удаляем скил
 
 				if ($ressave == 'true')
 					{
-					echo '<font color=#007F46><p>Умение удаленно '.$nick.' - '.$_POST[result].' !</p></font>'; // удачно
+					echo '<font color=#007F46><p>Умение удаленно '.$nick.' - '.$_POST['result'].' !</p></font>'; // удачно
 					}
 					else
 					{
@@ -76,39 +76,39 @@ if(mysql_num_rows($req)>=1)
 {
 While($mag = mysql_fetch_array($req))
 {
-$maglvl=$mag[lvl]-1;
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[$maglvl];//мп
+$maglvl=$mag['lvl']-1;
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[$maglvl];//мп
 
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[$maglvl];//хп
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[$maglvl];//хп
 
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[$maglvl];//+хп
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[$maglvl];//+хп
 
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[$maglvl];//+урон
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[$maglvl];//+урон
 echo'<div class="event">';
 
-if ($mag[ruka]=='me4'){$tp="Меч";}
-if ($mag[ruka]=='kas'){$tp="Кастет";}
-if ($mag[ruka]=='rap'){$tp="Рапиру";}
-if ($mag[ruka]=='luk'){$tp="Лук";}
-if ($mag[ruka]=='kin'){$tp="Кинжал";}
+if ($mag['ruka']=='me4'){$tp="Меч";}
+if ($mag['ruka']=='kas'){$tp="Кастет";}
+if ($mag['ruka']=='rap'){$tp="Рапиру";}
+if ($mag['ruka']=='luk'){$tp="Лук";}
+if ($mag['ruka']=='kin'){$tp="Кинжал";}
 
-if ($mag[tip]=='atack'){$tip="Атака";}
-if ($mag[tip]=='bafkrit'){$tip="Баф Критов";}
-if ($mag[tip]=='bafat'){$tip="Баф Атаки";}
-if ($mag[tip]=='bafzash'){$tip="Баф Защиты";}
-if ($mag[tip]=='bafzat'){$tip="Баф Защиты и Атаки";}
-if ($mag[tip]=='hpot'){$tip="Отжор";}
-if ($mag[tip]=='hp'){$tip="Реген. HP";}
-if ($mag[tip]=='mp'){$tip="Реген. MP";}
-if ($mag[tip]=='bafmp'){$tip="Баф на ману";}
-if ($mag[tip]=='bafhp'){$tip="Баф на жизни";}
-if ($mag[tip]=='resp'){$tip="Респ. игрока";}
-if ($mag[tip]=='spoil'){$tip="Спойлинг";}
-if ($mag[tip]=='spoilall'){$tip="Спойлинг всех вещей";}
+if ($mag['tip']=='atack'){$tip="Атака";}
+if ($mag['tip']=='bafkrit'){$tip="Баф Критов";}
+if ($mag['tip']=='bafat'){$tip="Баф Атаки";}
+if ($mag['tip']=='bafzash'){$tip="Баф Защиты";}
+if ($mag['tip']=='bafzat'){$tip="Баф Защиты и Атаки";}
+if ($mag['tip']=='hpot'){$tip="Отжор";}
+if ($mag['tip']=='hp'){$tip="Реген. HP";}
+if ($mag['tip']=='mp'){$tip="Реген. MP";}
+if ($mag['tip']=='bafmp'){$tip="Баф на ману";}
+if ($mag['tip']=='bafhp'){$tip="Баф на жизни";}
+if ($mag['tip']=='resp'){$tip="Респ. игрока";}
+if ($mag['tip']=='spoil'){$tip="Спойлинг";}
+if ($mag['tip']=='spoilall'){$tip="Спойлинг всех вещей";}
 
 echo "<form action=\"search.php?act=mag&activ=del&nick=$nick\" method=\"POST\">";
 
@@ -117,9 +117,9 @@ echo"<hr/><img src=\"pic/skils/$mag[name].jpg\" alt=\"pic\"/> ";
 
 echo " <label><input type='radio' name='result' value='$mag[id]' /></label>\n";
 
-if ($mag[activ]=='' or $mag[activ]=='yes'){
+if ($mag['activ']=='' or $mag['activ']=='yes'){
 echo"	<a href=\"search.php?act=mag&activ=no&id=$mag[id]&nick=$nick\"><b><font color=green>$mag[name]</font></b></a>				";}
-if ($mag[activ]=='no'){
+if ($mag['activ']=='no'){
 echo"	<a href=\"search.php?act=mag&activ=yes&id=$mag[id]&nick=$nick\"><b><font color=red>$mag[name]</font></b></a>				";}
 
 
@@ -127,14 +127,14 @@ echo"<br/> Уровень: $mag[lvl]<br/>";
 
 
 echo"Класс: ";
-if($mag[klas]=="wizard"){echo"Маг<br/>";}
-if($mag[klas]=="fighert"){echo"Воин<br/>";}
+if($mag['klas']=="wizard"){echo"Маг<br/>";}
+if($mag['klas']=="fighert"){echo"Воин<br/>";}
 echo"Урон: $mag[uron]<br/>";
 echo"Забирает маны: $mag[mp]<br/>";
 echo"Забирает здоровья: $mag[hp]<br/>";
 echo"Даёт здоровья: $mag[plushp]<br/>";
 echo"Тип умения: $tip</div>";
-if ($mag[ruka] =="not" or $mag[ruka]==""){}else
+if ($mag['ruka'] =="not" or $mag['ruka']==""){}else
 {
 echo "<font color=grey>Для использования нужно держать в руках <b>$tp</b></font><br/>";
 }
@@ -179,7 +179,7 @@ $avto=mysql_num_rows($req);
 			include($path.'inc/meny.php');
 			exit;}
 	$usdata = mysql_fetch_array($req);
-			if(empty($_GET[nick])){
+			if(empty($_GET['nick'])){
 			echo"Ошибка невыбран игрок!";
 			include($path.'inc/down.php');
 			include($path.'inc/meny.php');
@@ -191,12 +191,12 @@ $avto=mysql_num_rows($req);
 		include($path.'inc/down.php');
 		include($path.'inc/meny.php');
 	exit;}
-			if($usdata[dostup]>1){
+			if($usdata['dostup']>1){
 				echo'Администрацию добавлять в игнор запрещено!<br/>';
 				include($path.'inc/down.php');
 				include($path.'inc/meny.php');
 			exit;}
-	if($_GET[nick]==$log){
+	if($_GET['nick']==$log){
 		echo'Cебя добавить нельзя!<br/>';
 		include($path.'inc/down.php');
 		include($path.'inc/meny.php');
@@ -211,7 +211,7 @@ break;
 ////*******
 
 case 'del_ign':
-if(empty($_GET[contact])){
+if(empty($_GET['contact'])){
 echo"Ошибка невыбран игрок!";
 include($path.'inc/down.php');
 include($path.'inc/meny.php');
@@ -242,7 +242,7 @@ $avto = mysql_fetch_array($req);
 			include($path.'inc/meny.php');
 			exit;}
 	$usdata = mysql_fetch_array($req);
-			if(empty($_GET[nick])){
+			if(empty($_GET['nick'])){
 			echo"Ошибка не выбран игрок!";
 			include($path.'inc/down.php');
 			include($path.'inc/meny.php');
@@ -255,7 +255,7 @@ $avto=mysql_num_rows($req);
 		include($path.'inc/down.php');
 		include($path.'inc/meny.php');
 	exit;}
-        if($_GET[nick]==$log){
+        if($_GET['nick']==$log){
 		echo'Cебя добавить нельзя!<br/>';
 		include($path.'inc/down.php');
 		include($path.'inc/meny.php');
@@ -291,35 +291,35 @@ $usdata = mysql_fetch_array($req);
 
 
 
-if ($usdata[st]==0) {$st='Бродяга';}
-if ($usdata[st]==1) {$st='Вассал';}
-if ($usdata[st]==2) {$st='Рыцарь';}
-if ($usdata[st]==3) {$st='Маркиз';}
+if ($usdata['st']==0) {$st='Бродяга';}
+if ($usdata['st']==1) {$st='Вассал';}
+if ($usdata['st']==2) {$st='Рыцарь';}
+if ($usdata['st']==3) {$st='Маркиз';}
 
 
-if(!empty($usdata[clan])){
+if(!empty($usdata['clan'])){
 $req = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$usdata[clan]'");
 $wh = mysql_fetch_array($req);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 echo "<img src=\"pic/clan/$wh[emblema]\" alt=\"clan\"/> <font color=#f4d06e>$nick $st<br/>";}else{
 echo" <font color=#f4d06e>$nick [$st]<br/>";
 }
 }else{
 echo"<font color=#f4d06e><b> $nick <font color=#f4d06e> [$st]</b><br/>";}
-if($usdata[dostup]==5){
+if($usdata['dostup']==5){
 echo"<font color=#ff4040><i> Создатель </i></font><br/>";
 }
-if($usdata[dostup]==4){
+if($usdata['dostup']==4){
 echo"<font color=#6fcd72><i> Администратор </i></font><br/>";
 }
-if($usdata[dostup]==3){
+if($usdata['dostup']==3){
 echo"<font color=#547ef4><i> Старший Модератор </i></font><br/>";
 }
-if($usdata[dostup]==2){
+if($usdata['dostup']==2){
 echo"<font color=#547ef4><i> Модератор </i></font><br/>";
 }
-if($usdata[dostup]==1){
+if($usdata['dostup']==1){
 echo"<font color=silver><i> Консультант </i></font><br/>";
 }
 
@@ -328,17 +328,17 @@ $acc=mysql_fetch_assoc(mysql_query("SELECT * FROM `account` WHERE `id` = '".$usd
 echo'Персонаж находится на аккаунте <b><font color=#f4d06e>'.$acc['nick'].'</b></br>';
 }
 
-echo'<font color=#ffffcc>Ресетов <font color=#f4d06e>'.$usdata[res].' ';
+echo'<font color=#ffffcc>Ресетов <font color=#f4d06e>'.$usdata['res'].' ';
 echo"<font color='#ffffcc'>";
-if($usdata[klas]=="wizard"){$kl="m";$kln="Маг";}
-if($usdata[klas]=="fighert"){$kl="f";$kln="Воин";}
+if($usdata['klas']=="wizard"){$kl="m";$kln="Маг";}
+if($usdata['klas']=="fighert"){$kl="f";$kln="Воин";}
 
-if($usdata[storona]=="ork"){echo"Орк ";}
-if($usdata[storona]=="elf"){echo"Cветлый Эльф ";}
-if($usdata[storona]=="darkelf"){echo"Темный Эльф ";}
-if($usdata[storona]=="human"){echo"Человек ";}
-if($usdata[storona]=="gnom"){echo"Гном ";}
-if($usdata[storona]=="kamael"){echo"Камаэль ";}
+if($usdata['storona']=="ork"){echo"Орк ";}
+if($usdata['storona']=="elf"){echo"Cветлый Эльф ";}
+if($usdata['storona']=="darkelf"){echo"Темный Эльф ";}
+if($usdata['storona']=="human"){echo"Человек ";}
+if($usdata['storona']=="gnom"){echo"Гном ";}
+if($usdata['storona']=="kamael"){echo"Камаэль ";}
 
 
 
@@ -349,7 +349,7 @@ echo"</b></font></b>";
 $whiel = mysql_query("SELECT * FROM `msg_users` WHERE `user_id` = '$udata[id]'");
 $lists = mysql_fetch_array($whiel);
 
-if ($nick == $lists[contact]){echo "<br/>";} else{echo "<a href=\"search.php?go=adding&nick=$nick\"> + </a><br>";}
+if ($nick == $lists['contact']){echo "<br/>";} else{echo "<a href=\"search.php?go=adding&nick=$nick\"> + </a><br>";}
 // если есть бафы
 $reqi222 = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log' and 
 `tip` = 'bafat' or `usr` = '$log' and
@@ -361,34 +361,34 @@ $reqi222 = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log' and
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //	статус 
-if (!empty($usdata[status])){
+if (!empty($usdata['status'])){
 echo "<small><img src=\"pic/pers.png\" > <font color=#af9878><b><i> $udata[status] </i></b></center></font></small>";
 echo '</div>';
 }
-if($usdata[lvl]<20){
+if($usdata['lvl']<20){
 $st="NG";}
-elseif($usdata[lvl]>=20 and $usdata[lvl]<40){
+elseif($usdata['lvl']>=20 and $usdata['lvl']<40){
 $st="D";}
-elseif($usdata[lvl]>=40 and $usdata[lvl]<52){
+elseif($usdata['lvl']>=40 and $usdata['lvl']<52){
 $st="C";}
-elseif($usdata[lvl]>=52 and $usdata[lvl]<62){
+elseif($usdata['lvl']>=52 and $usdata['lvl']<62){
 $st="B";}
-elseif($usdata[lvl]>=62 and $usdata[lvl]<76){
+elseif($usdata['lvl']>=62 and $usdata['lvl']<76){
 $st="A";}
-elseif($usdata[lvl]>=76){
+elseif($usdata['lvl']>=76){
 $st="S";}
 
 
 
 	echo '<table><tr>';
-if (is_file('foto/'.$usdata[usr].'.gif'))
+if (is_file('foto/'.$usdata['usr'].'.gif'))
 {
-echo'<td><img src="foto/'.$usdata[usr].'.gif" alt="pic" style="margin-right:10px;border:2px solid #383838"/></td>'; } else {
+echo'<td><img src="foto/'.$usdata['usr'].'.gif" alt="pic" style="margin-right:10px;border:2px solid #383838"/></td>'; } else {
 echo"<td><img src='pic/avatar/$usdata[storona]/$kl/$usdata[pol]/$st.png' style='margin-right:10px;border:2px solid #383838'/></td>"; }
 echo '<td align="left">';
 
-if (!empty($usdata[zamujem])){
-echo'<font color=#f4d06e><left><img src="pic/ring.png" alt=""/> В браке с <a href="/search.php?nick='.$usdata[zamujem].'&go=go"><font color=#ffffcc>'.$usdata[zamujem].'</left></a></font><br/>';
+if (!empty($usdata['zamujem'])){
+echo'<font color=#f4d06e><left><img src="pic/ring.png" alt=""/> В браке с <a href="/search.php?nick='.$usdata['zamujem'].'&go=go"><font color=#ffffcc>'.$usdata['zamujem'].'</left></a></font><br/>';
 echo '</div>';
 }
 echo"<img src=\"pic/life.png\" > <font color=#ff4040>Жизни : $usdata[hp]/$usdata[hpall]</font><br/>";
@@ -398,20 +398,20 @@ $reqbf = mysql_query("SELECT * FROM `baf` WHERE `usr`='$nick'");
 $avto=mysql_num_rows($reqbf);
 while($mag = mysql_fetch_array($reqbf))
 {
-$at=$mag[bafat]+$at;
-$df=$mag[pmdef]+$df;
-if (!empty($mag[bafat])){$bafat="<font color=#FFffcc><small>+	[".number_format($at, 0, ',', "`")."]</small></font>";}
-if (!empty($mag[pmdef])){$pmdef="<font color=#FFffcc><small>+	[".number_format($df, 0, ',', "`")."]</small></font>";}
+$at=$mag['bafat']+$at;
+$df=$mag['pmdef']+$df;
+if (!empty($mag['bafat'])){$bafat="<font color=#FFffcc><small>+	[".number_format($at, 0, ',', "`")."]</small></font>";}
+if (!empty($mag['pmdef'])){$pmdef="<font color=#FFffcc><small>+	[".number_format($df, 0, ',', "`")."]</small></font>";}
 }
-echo"<img src=\"pic/ipvp.png\" > <font color=#f4d06e>Физ. защита :  <font color=#ffffcc>".number_format($usdata[pdef], 0, ',', "`")."  $pmdef</font>";
+echo"<img src=\"pic/ipvp.png\" > <font color=#f4d06e>Физ. защита :  <font color=#ffffcc>".number_format($usdata['pdef'], 0, ',', "`")."  $pmdef</font>";
 echo"<br/>";
-echo"<img src=\"pic/ipvp.png\" > <font color=#f4d06e>Маг. защита :  <font color=#ffffcc> ".number_format($usdata[mdef], 0, ',', "`")."  $pmdef</font>";
+echo"<img src=\"pic/ipvp.png\" > <font color=#f4d06e>Маг. защита :  <font color=#ffffcc> ".number_format($usdata['mdef'], 0, ',', "`")."  $pmdef</font>";
 echo'<br/>';
-echo"<img src=\"pic/battles.png\" > <font color=#f4d06e>Физ. атака :  <font color=#ffffcc> ".number_format($usdata[patt], 0, ',', "`")."  $bafat</font>";
+echo"<img src=\"pic/battles.png\" > <font color=#f4d06e>Физ. атака :  <font color=#ffffcc> ".number_format($usdata['patt'], 0, ',', "`")."  $bafat</font>";
 echo'<br/>';
-echo"<img src=\"pic/battles.png\" > <font color=#f4d06e>Маг. атака :  <font color=#ffffcc> ".number_format($usdata[matt], 0, ',', "`")."  $bafat</font>";
+echo"<img src=\"pic/battles.png\" > <font color=#f4d06e>Маг. атака :  <font color=#ffffcc> ".number_format($usdata['matt'], 0, ',', "`")."  $bafat</font>";
 
-if(!empty($usdata[clan])){
+if(!empty($usdata['clan'])){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider` = '$usdata[clan]' LIMIT 1");
 $clan = mysql_fetch_array($req);
 echo"<br/><img src=\"pic/iclan.png\" > <font color=#f4d06e>В клане : <b><a href=\"clan.php?id=$clan[id]\"><font color=#FFffcc>$clan[name]</a></b><br/>";}else{
@@ -421,11 +421,11 @@ $avto=mysql_num_rows($req);
 echo'<font color=#f4d06e><img src="pic/olymp.png" alt=""/> Рейтинг: <font color=#FFffcc>'.$avto.'</b><br/>';
 $req = mysql_query("SELECT * FROM `karma` WHERE `usr` = '$nick' and `from`='$log' LIMIT 1");
 $avto=mysql_num_rows($req);
-if($avto==0 and $udata[lvl]>=101 and $log!=$nick){
+if($avto==0 and $udata['lvl']>=101 and $log!=$nick){
 echo"<a href=\"karma.php?usr=$nick\"><font color=#f4d06e>[увеличить рейтинг]</a><br/>";
 }
-echo'<br/> <font color=#f4d06e><img src="pic/battles.png" alt=""/> Побед : <font color=#FFffcc>'.$usdata[wins].'<br/>';
-echo'<font color=#f4d06e><img src="pic/ipvp.png" alt=""/> Поражений : <font color=#FFffcc>'.$usdata[loses].' <br/>';
+echo'<br/> <font color=#f4d06e><img src="pic/battles.png" alt=""/> Побед : <font color=#FFffcc>'.$usdata['wins'].'<br/>';
+echo'<font color=#f4d06e><img src="pic/ipvp.png" alt=""/> Поражений : <font color=#FFffcc>'.$usdata['loses'].' <br/>';
 
 $reqs= mysql_query("SELECT id,name FROM `pit` WHERE `usr` = ''.$nick.'' and `status`='on'");
 $avtos=mysql_num_rows($reqs);
@@ -438,15 +438,15 @@ $dabar = time();
 $timeout = $dabar - $laikas;
 $asd = mysql_num_rows(mysql_query("SELECT laikas, usr FROM online WHERE laikas > '$timeout' AND usr='$nick'"));
 ////////////////////////////
-if($asd==0 && $usdata[dostup]<3){
+if($asd==0 && $usdata['dostup']<3){
 echo"<font color=#f4d06e>Статус : <font color=#ff4040><b>Offline</b></font><br/>";
 echo"<font color=#f4d06e>Последнее посещение : <font color=#FFffcc>$usdata[lvisit]<br/><br/>";
 }else{
 $reqs = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$nick' LIMIT 1");
 $mesto = mysql_fetch_array($reqs);//место
-if($mesto[city]==0){
+if($mesto['city']==0){
 echo"<font color=#f4d06e>Локация : <font color=#FFffcc>Город</b><br/>";
-}elseif($mesto[city]==1){
+}elseif($mesto['city']==1){
 $reqs = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$nick' LIMIT 1");
 $wor = mysql_fetch_array($reqs);//место
 echo"<font color=#f4d06e>Локация : <font color=#FFffcc>$wor[mesto] </b><br/>";
@@ -465,26 +465,26 @@ $reqvip = mysql_query("SELECT * FROM `vip` WHERE `usr` = '$nick' LIMIT 1");
 $avto=mysql_num_rows($reqvip);
 if($avto==1){
 $vip = mysql_fetch_array($reqvip);
-echo' <font color=#6fcd72>Вип акаунт : <font color=#6fcd72>x'.$vip[tip].'</b> <br/>';
-$vip[time]=$vip[time]-time();
+echo' <font color=#6fcd72>Вип акаунт : <font color=#6fcd72>x'.$vip['tip'].'</b> <br/>';
+$vip['time']=$vip['time']-time();
 
 
 
-												$time_dd = floor($vip[time]/86400); // сколько дней										
-												$vip[time] = floor($vip[time]-($time_dd*86400)); // остача дня
+												$time_dd = floor($vip['time']/86400); // сколько дней										
+												$vip['time'] = floor($vip['time']-($time_dd*86400)); // остача дня
 
 												
 												
-												$time_ch = floor($vip[time]/3600); // сколько часов										
-												$vip[time] = floor($vip[time]-($time_ch*3600)); // остача часов
+												$time_ch = floor($vip['time']/3600); // сколько часов										
+												$vip['time'] = floor($vip['time']-($time_ch*3600)); // остача часов
 												
-												$time_min = floor($vip[time]/60);
+												$time_min = floor($vip['time']/60);
 												
-												$time_sek = floor($vip[time]-($time_min*60));
+												$time_sek = floor($vip['time']-($time_min*60));
 												
 													if ($time_sek<0) {
 																	$time_min=$time_min-1;
-																	$time_sek = floor($udata[time]-($time_min*60));
+																	$time_sek = floor($udata['time']-($time_min*60));
 																	}
 	
 											echo "<font color=#6fcd72>Осталось :<font color=#6fcd72> $time_dd Дн. $time_ch Ч.";
@@ -503,16 +503,16 @@ $avtoanti=mysql_num_rows($reqanti);
 if($avtoanti==1){
 $anti = mysql_fetch_array($reqanti);
 echo'<font color=#ff4040>АнтиРК Акаунт!<br/>';
-$anti[time]=$anti[time]-time();
-$antitime_dd = floor($anti[time]/86400); // сколько дней										
-$anti[time] = floor($anti[time]-($antitime_dd*86400)); // остача дня
-$antitime_ch = floor($anti[time]/3600); // сколько часов										
-$anti[time] = floor($anti[time]-($antitime_ch*3600)); // остача часов
-$antitime_min = floor($anti[time]/60);
-$antitime_sek = floor($anti[time]-($antitime_min*60));
+$anti['time']=$anti['time']-time();
+$antitime_dd = floor($anti['time']/86400); // сколько дней										
+$anti['time'] = floor($anti['time']-($antitime_dd*86400)); // остача дня
+$antitime_ch = floor($anti['time']/3600); // сколько часов										
+$anti['time'] = floor($anti['time']-($antitime_ch*3600)); // остача часов
+$antitime_min = floor($anti['time']/60);
+$antitime_sek = floor($anti['time']-($antitime_min*60));
 if ($antitime_sek<0) {
 $antitime_min=$antitime_min-1;
-$antitime_sek = floor($udata[time]-($antitime_min*60));
+$antitime_sek = floor($udata['time']-($antitime_min*60));
 }
 echo "$antitime_dd дн. $antitime_ch ч. $antitime_min мин. $time_sek сек.";
 echo "</font><hr/>";
@@ -540,7 +540,7 @@ $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);
     
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `block` WHERE `usr` = '$usdata[usr]'");
     }else{
     echo"<b>
@@ -549,15 +549,15 @@ if ($avto == 1) {
 	<font color=#f4d06e>Причина: <font color=#ffffcc>$ban[text]!</font><br/> 
 	Осталось:</font> <font color=#f4d06e>";
     
-$ban[ban_time]=$ban[ban_time]-time();
+$ban['ban_time']=$ban['ban_time']-time();
 
-if ($ban[ban_time]>=86400){
-$ban[ban_time]=round($ban[ban_time]/86400);
+if ($ban['ban_time']>=86400){
+$ban['ban_time']=round($ban['ban_time']/86400);
 
-if ($ban[ban_time]>3650){
-$ban[ban_time]=round($ban[ban_time]/365);
-echo " более 10 лет";}elseif ($ban[ban_time]>365){
-$ban[ban_time]=round($ban[ban_time]/365);
+if ($ban['ban_time']>3650){
+$ban['ban_time']=round($ban['ban_time']/365);
+echo " более 10 лет";}elseif ($ban['ban_time']>365){
+$ban['ban_time']=round($ban['ban_time']/365);
 echo " больше $ban[ban_time] г.";}
 
 else{
@@ -566,27 +566,27 @@ echo " Осталось: $ban[ban_time] дн.";}
 }
 
 
-if($ban[ban_time]<60){
+if($ban['ban_time']<60){
 echo " $ban[ban_time] сек.";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo " $ban[ban_time] мин.";
-}elseif($ban[ban_time]>3600 and $ban[ban_time]<86400){
-$ban[ban_time]=round($ban[ban_time]/3600);
+}elseif($ban['ban_time']>3600 and $ban['ban_time']<86400){
+$ban['ban_time']=round($ban['ban_time']/3600);
 echo " $ban[ban_time] часов.";
 }
  
- if ($udata[dostup]>3){
+ if ($udata['dostup']>3){
  echo "<br/><font color=#f4d06e> ID - $ban[id] </font> <a href=\"adm_panel.php?mod=block&amp;id=$ban[id]&amp;delbl=1\"><font color=#ff4040>[x]</font></a>";
  
- if ($ban[cena]>0){echo "<br/><font color=#2F4F4F> Цена разбл: - $ban[cena] CoL</font>";}
+ if ($ban['cena']>0){echo "<br/><font color=#2F4F4F> Цена разбл: - $ban[cena] CoL</font>";}
  
  }
  
  }
  
- if ($udata[dostup]>2){
- echo'<a href="/gm/blok.php?usr='.$usdata[usr].'&b='.$ban[id].'"> &#187; Редактировать </div></a>';
+ if ($udata['dostup']>2){
+ echo'<a href="/gm/blok.php?usr='.$usdata['usr'].'&b='.$ban['id'].'"> &#187; Редактировать </div></a>';
 }
  
     echo "</font></b></b><br/><br/>";}
@@ -601,7 +601,7 @@ $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);
     
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `block` WHERE `usr` = '$usdata[usr]'");
     }else{
     echo"<b>
@@ -610,15 +610,15 @@ if ($avto == 1) {
 	<font color=#f4d06e>Причина: <font color=#ffffcc>$ban[text]!</font><br/> 
 	<font color=#f4d06e>Осталось:</font></font> <font color=#ffffcc>";
     
-$ban[ban_time]=$ban[ban_time]-time();
+$ban['ban_time']=$ban['ban_time']-time();
 
-if ($ban[ban_time]>=86400){
-$ban[ban_time]=round($ban[ban_time]/86400);
+if ($ban['ban_time']>=86400){
+$ban['ban_time']=round($ban['ban_time']/86400);
 
-if ($ban[ban_time]>3650){
-$ban[ban_time]=round($ban[ban_time]/365);
-echo " более 10 лет";}elseif ($ban[ban_time]>365){
-$ban[ban_time]=round($ban[ban_time]/365);
+if ($ban['ban_time']>3650){
+$ban['ban_time']=round($ban['ban_time']/365);
+echo " более 10 лет";}elseif ($ban['ban_time']>365){
+$ban['ban_time']=round($ban['ban_time']/365);
 echo " больше $ban[ban_time] г.";}
 
 else{
@@ -627,20 +627,20 @@ echo "  $ban[ban_time] дн.";}
 }
 
 
-if($ban[ban_time]<60){
+if($ban['ban_time']<60){
 echo " $ban[ban_time] сек.";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo " $ban[ban_time] мин.";
-}elseif($ban[ban_time]>3600 and $ban[ban_time]<86400){
-$ban[ban_time]=round($ban[ban_time]/3600);
+}elseif($ban['ban_time']>3600 and $ban['ban_time']<86400){
+$ban['ban_time']=round($ban['ban_time']/3600);
 echo " $ban[ban_time] часов.";
 }
 
- if ($udata[dostup]>3){
+ if ($udata['dostup']>3){
  echo "<br/><font color=#f4d06e> Номер блока <u>$ban[id]</u> </font> <a href=\"adm_panel.php?mod=12&amp;id=$ban[id]\"><font color=#ff4040>[x]</font></a>";
  
- if ($ban[cena]>0){echo "<br/><font color=#2F4F4F> Цена разбл: - $ban[cena] CoL</font>";}
+ if ($ban['cena']>0){echo "<br/><font color=#2F4F4F> Цена разбл: - $ban[cena] CoL</font>";}
  
  }
  
@@ -650,10 +650,10 @@ echo " $ban[ban_time] часов.";
     echo "</font></b></b><hr/>";}
 	echo "</b>";
 //-----------------------------------------------------------------------------------------
-if ($usdata[prof]=='' or $usdata[prof]=='no'){$usdata[prof]='Нет';}
+if ($usdata['prof']=='' or $usdata['prof']=='no'){$usdata['prof']='Нет';}
 echo "<font color=#f4d06e><img src=\"pic/prof.png\" > Проффесия: <font color=#ffffcc>$usdata[prof]</font><br/>";
-if ($usdata[titul]=='' or $usdata[titul]=='no')
-{$usdata[titul]='Нет';}
+if ($usdata['titul']=='' or $usdata['titul']=='no')
+{$usdata['titul']='Нет';}
 echo "<font color=#f4d06e><img src=\"pic/prof.png\" > Титул: <font color=#ffffcc>$usdata[titul]</font><br/>";
 
 include($path.'inc/opit.php');
@@ -662,15 +662,15 @@ if ($exp2>100){ $lvlplus="<font color=red> + </font>"; $exp2=100;}
 echo '<table><tr>';
 echo'<td>';
 echo"<font color=#f4d06e><img src=\"pic/rate.png\" > Уровень:<font color=#ffffcc> $usdata[lvl] <br/>";
-echo" <font color=#f4d06e><img src=\"pic/rate.png\" > Опыт :<font color=#ffffcc>      ".number_format($udata[exp], 0, ',', "`")."<br/>";
-echo" <font color=#f4d06e><img src=\"pic/battles.png\" > Очки умений :<font color=#ffffcc> 		".number_format($udata[sp], 0, ',', "`")."<br/>";
+echo" <font color=#f4d06e><img src=\"pic/rate.png\" > Опыт :<font color=#ffffcc>      ".number_format($udata['exp'], 0, ',', "`")."<br/>";
+echo" <font color=#f4d06e><img src=\"pic/battles.png\" > Очки умений :<font color=#ffffcc> 		".number_format($udata['sp'], 0, ',', "`")."<br/>";
 echo'</td>';
 echo'<td>';
-if($udata[dostup]>3){
+if($udata['dostup']>3){
 
-echo" <font color=#f4d06e><img src=\"pic/col.png\" > Аден :<font color=#ffffcc> ".number_format($udata[money], 0, ',', " ")."<br/>";
-echo" <font color=#f4d06e><img src=\"pic/col.png\" > Gold Bar :<font color=#ffffcc> ".number_format($udata[gold], 0, ',', " ")."<br/>";
-echo" <font color=#f4d06e><img src=\"pic/col.png\" > Coin of Luck :<font color=#ffffcc> ".number_format($udata[almaz], 0, ',', " ")."</font><br/>";
+echo" <font color=#f4d06e><img src=\"pic/col.png\" > Аден :<font color=#ffffcc> ".number_format($udata['money'], 0, ',', " ")."<br/>";
+echo" <font color=#f4d06e><img src=\"pic/col.png\" > Gold Bar :<font color=#ffffcc> ".number_format($udata['gold'], 0, ',', " ")."<br/>";
+echo" <font color=#f4d06e><img src=\"pic/col.png\" > Coin of Luck :<font color=#ffffcc> ".number_format($udata['almaz'], 0, ',', " ")."</font><br/>";
 /*$usdata[wmr] = $usdata[wmr]/100;
 echo"<font color=#CC6633><b>WMR: ".number_format($usdata[wmr], 2, ',', "`")."</font></b> <a href=\"/gm/wmr_obmen.php?pers=$usdata[usr]\"> + </a>";*/
 echo'</td>';
@@ -690,53 +690,53 @@ echo'</tr></table>';
 // расчёт онлайна
 
 
-if ($usdata[time]<60){$tim = "$usdata[time] сек";} // cек
+if ($usdata['time']<60){$tim = "$usdata[time] сек";} // cек
 
-if ($usdata[time]>59 and $usdata[time]<3600)	{ // мин и cек
+if ($usdata['time']>59 and $usdata['time']<3600)	{ // мин и cек
 												
-												$time_min = floor($usdata[time]/60);
-												$time_sek = floor($usdata[time]-($time_min*60));
+												$time_min = floor($usdata['time']/60);
+												$time_sek = floor($usdata['time']-($time_min*60));
 												
 											
 											$tim = "$time_min мин $time_sek сек";
 											} 
 
 
-if ($usdata[time]>=3600 and $usdata[time]<86400)	{ // часы, мин и cек
+if ($usdata['time']>=3600 and $usdata['time']<86400)	{ // часы, мин и cек
 												
-												$time_ch = floor($usdata[time]/3600); // сколько часов										
-												$usdata[time] = floor($usdata[time]-($time_ch*3600)); // остача часов
+												$time_ch = floor($usdata['time']/3600); // сколько часов										
+												$usdata['time'] = floor($usdata['time']-($time_ch*3600)); // остача часов
 												
-												$time_min = floor($usdata[time]/60);
+												$time_min = floor($usdata['time']/60);
 												
-												$time_sek = floor($usdata[time]-($time_min*60));
+												$time_sek = floor($usdata['time']-($time_min*60));
 												
 													if ($time_sek<0) {
 																	$time_min=$time_min-1;
-																	$time_sek = floor($usdata[time]-($time_min*60));
+																	$time_sek = floor($usdata['time']-($time_min*60));
 																	}
 	
 											$tim = "$time_ch ч. $time_min мин. $time_sek сек.";
 											} 
 											
 											
-if ($usdata[time]>=86400)	{ // дни, часы, мин и cек
+if ($usdata['time']>=86400)	{ // дни, часы, мин и cек
 												
-												$time_dd = floor($usdata[time]/86400); // сколько дней										
-												$usdata[time] = floor($usdata[time]-($time_dd*86400)); // остача дня
+												$time_dd = floor($usdata['time']/86400); // сколько дней										
+												$usdata['time'] = floor($usdata['time']-($time_dd*86400)); // остача дня
 
 												
 												
-												$time_ch = floor($usdata[time]/3600); // сколько часов										
-												$usdata[time] = floor($usdata[time]-($time_ch*3600)); // остача часов
+												$time_ch = floor($usdata['time']/3600); // сколько часов										
+												$usdata['time'] = floor($usdata['time']-($time_ch*3600)); // остача часов
 												
-												$time_min = floor($usdata[time]/60);
+												$time_min = floor($usdata['time']/60);
 												
-												$time_sek = floor($usdata[time]-($time_min*60));
+												$time_sek = floor($usdata['time']-($time_min*60));
 												
 													if ($time_sek<0) {
 																	$time_min=$time_min-1;
-																	$time_sek = floor($usdata[time]-($time_min*60));
+																	$time_sek = floor($usdata['time']-($time_min*60));
 																	}
 	
 											$tim = "<b>$time_dd</b> дн. <b>$time_ch</b> ч. <b>$time_min</b> мин<b>$time_sek</b> сек.";
@@ -753,8 +753,8 @@ echo' <img src="pic/olymp.png" alt=""/> Рекомендации: <a href="/rekc
 echo"<table class='msg'>";
  $gallery =mysql_result(mysql_query("SELECT COUNT(*) FROM `gallery` WHERE `user` = '$usdata[usr]'"), 0);
 echo'<a href="search.php?go=gallery_user&nick='.$nick.'"> <img src="pic/fot.png" alt=""/> Фотографии юзера</a><font color=#ffffcc>  '.$gallery.'</br>';
-if($udata[dostup]>2 and $udata[dostup]>=$usdata[dotup]){
-echo'<a href="players.php?a=account&amp;id='.$usdata[account].'">Все персонажи этого аккаунта</a></div>';}
+if($udata['dostup']>2 and $udata['dostup']>=$usdata['dotup']){
+echo'<a href="players.php?a=account&amp;id='.$usdata['account'].'">Все персонажи этого аккаунта</a></div>';}
 echo "<font color=#007F46>$usdata[dat_reg]</font></div>";
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 echo"<table class='msg'>";
@@ -784,14 +784,14 @@ echo "<div class=inoy><a href=\"/gifts.php?id=$usdata[id]&pod=1\">Подарит
 				//// 		мини админка		////////////
 				echo "<div class=admin><center>";
 				///////// 	GM -  создатель 	////////////
-				if($udata[dostup] == 5)
+				if($udata['dostup'] == 5)
 				{
 
 
 
 				}
 				////////	Admin 	//////////////////
-				if($udata[dostup] >= 4)
+				if($udata['dostup'] >= 4)
 				{
 				echo "<hr/>";
                                 echo"<font color=#af9878> | <a href=\"adm_panel.php?mod=red&nick=$nick\"><font color=#f4d06e> Ред </a> ";
@@ -809,11 +809,11 @@ echo "<div class=inoy><a href=\"/gifts.php?id=$usdata[id]&pod=1\">Подарит
 				}
 
 				///////// модер и ст.модер  ///////////
-				if($udata[dostup] == 2 or $udata[dostup] == 3)
+				if($udata['dostup'] == 2 or $udata['dostup'] == 3)
 				{
                                                         echo"<font color=#af9878> | <a href=\"/gm/poisk.php?&p=poisk_ip&ip=$usdata[ip]\"><font color=#f4d06e>Поиск мультов</a> ";
 				echo"<a href=\"mod_panel.php?mod=1&amp;usr=$nick\"><font color=#ff4040>Бан(блок)</a> ";
-						if($udata[dostup] == 3)
+						if($udata['dostup'] == 3)
 						{
 						echo"<font color=#af9878> | <a href=\"/gm/msg.php?nick=$nick\"><font color=#f4d06e>Почта (Вход)</a>";
 						echo"<font color=#af9878> | <a href=\"/gm/my_msg.php?nick=$nick\"><font color=#f4d06e>Почта (Исх)</a>";
@@ -822,9 +822,9 @@ echo "<div class=inoy><a href=\"/gifts.php?id=$usdata[id]&pod=1\">Подарит
 				}
 				///////////////////////////////////////
 				echo "</center></div></b></b></font></font>";
-if ($udata[dostup]>1 and $usdata[dostup]<5){ // мд и выше видят IP
+if ($udata['dostup']>1 and $usdata['dostup']<5){ // мд и выше видят IP
 
-$ip_br = explode("|||",$usdata[ip_br]);
+$ip_br = explode("|||",$usdata['ip_br']);
 
 if (empty($ip_br[0])){$ip_br[0] = "нет данных";}
 if (empty($ip_br[1])){$ip_br[1] = "нет данных";}
@@ -884,10 +884,10 @@ break;
 case 'blog_user':
 echo "<p><font color=#057F46><b>Блог пользователя $nick!</b></font></p>";
 //-------------------------------------- Удаление коментариев ---------------------------------------------------------
-if (isset($_GET[del])){
-if($udata[dostup] >= 2)
+if (isset($_GET['del'])){
+if($udata['dostup'] >= 2)
 {
-if(empty($_GET[del])){
+if(empty($_GET['del'])){
 echo"<hr/><font color=red><p>Не выбран пост!</p></font>";
 }else{
 $asd = mysql_query("SELECT * FROM blog_kom WHERE id='$_GET[del]' LIMIT 1");
@@ -904,11 +904,11 @@ echo "Ошибка!Доступ закрыт!";
 }
 }
 /////////////////////////////		Коментарии	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET[kom])){
+if (isset($_GET['kom'])){
 //-------------------------------------------
-if (!empty($_POST[text])) // если естьтекст записуем сообщение
+if (!empty($_POST['text'])) // если естьтекст записуем сообщение
 {
-$msg = $_POST[text];
+$msg = $_POST['text'];
 $msg = htmlspecialchars(stripslashes(trim($msg)));
 $log = htmlspecialchars(stripslashes(trim($log)));
 $currHour=date("H",time());
@@ -918,7 +918,7 @@ $currTime=date("$currHour:i", time());
 // пишем антифлуд
 $req6546 = mysql_query("SELECT * FROM `blog_kom` WHERE `usr` = '$log' && `id_tm` = '$_GET[kom]' ORDER BY id DESC LIMIT 1");
 $pr = mysql_fetch_array($req6546);
-if($pr[text] == $msg){
+if($pr['text'] == $msg){
 echo'<font color=#9E0000>Антифлуд!</font><br/>';}else{
 
 $ressave = mysql_query("INSERT INTO `blog_kom` SET
@@ -987,12 +987,12 @@ if($avt>=1)
 
 function smilesmsg($string54545){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string54545=str_replace(":$file2",'<img src="pic/smiles/'.$file.'" alt="" height="30" width="30">',$string54545);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string54545;  }
 
 
@@ -1001,18 +1001,18 @@ While($tk = mysql_fetch_array($req))
 {
 $us = mysql_query("SELECT * FROM `users` WHERE usr = '$tk[usr]' LIMIT 1");
 $usr = mysql_fetch_array($us);
-if ($usr[dostup]>=4)						{$color = '<font color=lime>'; $color2 = '<font color=#5e995c>';}
-if ($usr[dostup]==2 or $usr[dostup]==3)	{$color = '<font color=#0026FF>'; $color2 = '<font color=#6DC2FF>';}
-if ($usr[dostup]==1) 					{$color = '<font color=#7F6A00>'; $color2 = '<font color=#A09353>';}
-if ($usr[dostup]==0) 					{$color = ''; $color2 = '';}
+if ($usr['dostup']>=4)						{$color = '<font color=lime>'; $color2 = '<font color=#5e995c>';}
+if ($usr['dostup']==2 or $usr['dostup']==3)	{$color = '<font color=#0026FF>'; $color2 = '<font color=#6DC2FF>';}
+if ($usr['dostup']==1) 					{$color = '<font color=#7F6A00>'; $color2 = '<font color=#A09353>';}
+if ($usr['dostup']==0) 					{$color = ''; $color2 = '';}
 
 
-if($udata[dostup]>=2){
+if($udata['dostup']>=2){
 $silka = " <a href=\"blog_user.php?kom=$_GET[kom]&amp;del=$tk[id]\"><font color=red><small> [x] </small></font></a>";
 }
 
 
-$text = $tk[text];
+$text = $tk['text'];
 
 $text = smilesmsg($text);
 $text = nl2br($text);
@@ -1023,7 +1023,7 @@ $color2 $text</font></div><hr/>";
 }
 
 echo "<div class=dot><p>";
-	navig2($page, 'blog_user.php?kom='.$_GET[kom].'&amp;', $pages);
+	navig2($page, 'blog_user.php?kom='.$_GET['kom'].'&amp;', $pages);
 echo "</p></div>";
 	
 }else{
@@ -1044,16 +1044,16 @@ include($path.'inc/down.php');
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT `title` FROM `blog` WHERE `nick` = '$nick'"));
 $puslap = floor($viso/10);
 if (is_double($num) || !is_integer($num))
@@ -1080,16 +1080,16 @@ echo "<div class=silka><a href=\"blog_user.php?kom=$dsa[id]\"><font color=#47ba8
 }
 //echo '<br/>';
 echo '<hr/>';
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"blog_user.php?page=$back\">back</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "back";
 }
 echo"|";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"blog_user.php?page=$next&\">next</a><br/>";}
 else
 {echo "next<br/>";}
@@ -1163,7 +1163,7 @@ break;
 }
 $req = mysql_query("SELECT id,name FROM `item` WHERE `usr` = '$nick' and `tip`='$gt' and `image`='yes'");
 $mag = mysql_fetch_array($req);
-$u = explode("*",$mag[name]);
+$u = explode("*",$mag['name']);
 if($gt!='skolco'){
 //echo"$tip: ";
 $req = mysql_query("SELECT id,name FROM `item` WHERE `usr` = '$nick' and `tip`='$gt' and `image`='yes'");
@@ -1185,7 +1185,7 @@ echo"<a href='inventar.php?mod=in&amp;id=$mag[id]'> <img src=\"shmot/$u[0].png\"
 echo"<img src=\"shmot/pusto/$gt.gif\" alt=\"pic\"/>  Ничего не одето<hr/> ";
 }elseif($avto==2){
 While($best = mysql_fetch_array($req))
-{		$u = explode("*",$best[name]);
+{		$u = explode("*",$best['name']);
 echo"<a href='inventar.php?mod=in&amp;id=$best[id]'> <img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$best[name]</b></a><hr/>";
 }
 }
@@ -1206,7 +1206,7 @@ echo"<b>Статистика:</b><br/>
 
 Побед на арене: $usdata[arenawins]<br/>
 Поражений на арене: $usdata[arenaloses]<br/>
-Побед: ".$usdata[wins]."<br/>
+Побед: ".$usdata['wins']."<br/>
 Поражений: $usdata[loses]<br/>";
 echo"<br/><a href=\"search.php?go=go&amp;nick=$nick\">Назад</a>";
 
@@ -1227,40 +1227,40 @@ if(mysql_num_rows($req)>=1)
 {
 While($mag = mysql_fetch_array($req))
 {
-$maglvl=$mag[lvl]-1;
-$magmp=explode("|",$mag[mp]);
-$mag[mp]=$magmp[$maglvl];//мп
+$maglvl=$mag['lvl']-1;
+$magmp=explode("|",$mag['mp']);
+$mag['mp']=$magmp[$maglvl];//мп
 
-$maghp=explode("|",$mag[hp]);
-$mag[hp]=$maghp[$maglvl];//хп
+$maghp=explode("|",$mag['hp']);
+$mag['hp']=$maghp[$maglvl];//хп
 
-$maghp=explode("|",$mag[plushp]);
-$mag[plushp]=$maghp[$maglvl];//+хп
+$maghp=explode("|",$mag['plushp']);
+$mag['plushp']=$maghp[$maglvl];//+хп
 
-$maghp=explode("|",$mag[uron]);
-$mag[uron]=$maghp[$maglvl];//+урон
-
-
-if ($mag[ruka]=='me4'){$tp="Меч";}
-if ($mag[ruka]=='kas'){$tp="Кастет";}
-if ($mag[ruka]=='rap'){$tp="Рапиру";}
-if ($mag[ruka]=='luk'){$tp="Лук";}
-if ($mag[ruka]=='kin'){$tp="Кинжал";}
+$maghp=explode("|",$mag['uron']);
+$mag['uron']=$maghp[$maglvl];//+урон
 
 
-if ($mag[tip]=='atack'){$tip="Атака";}
-if ($mag[tip]=='bafkrit'){$tip="Баф Критов";}
-if ($mag[tip]=='bafat'){$tip="Баф Атаки";}
-if ($mag[tip]=='bafzash'){$tip="Баф Защиты";}
-if ($mag[tip]=='bafzat'){$tip="Баф Защиты и Атаки";}
-if ($mag[tip]=='hpot'){$tip="Отжор";}
-if ($mag[tip]=='hp'){$tip="Реген. HP";}
-if ($mag[tip]=='mp'){$tip="Реген. MP";}
-if ($mag[tip]=='bafmp'){$tip="Баф на ману";}
-if ($mag[tip]=='bafhp'){$tip="Баф на жизни";}
-if ($mag[tip]=='resp'){$tip="Респ. игрока";}
-if ($mag[tip]=='spoil'){$tip="Спойлинг";}
-if ($mag[tip]=='spoilall'){$tip="Спойлинг всех вещей";}
+if ($mag['ruka']=='me4'){$tp="Меч";}
+if ($mag['ruka']=='kas'){$tp="Кастет";}
+if ($mag['ruka']=='rap'){$tp="Рапиру";}
+if ($mag['ruka']=='luk'){$tp="Лук";}
+if ($mag['ruka']=='kin'){$tp="Кинжал";}
+
+
+if ($mag['tip']=='atack'){$tip="Атака";}
+if ($mag['tip']=='bafkrit'){$tip="Баф Критов";}
+if ($mag['tip']=='bafat'){$tip="Баф Атаки";}
+if ($mag['tip']=='bafzash'){$tip="Баф Защиты";}
+if ($mag['tip']=='bafzat'){$tip="Баф Защиты и Атаки";}
+if ($mag['tip']=='hpot'){$tip="Отжор";}
+if ($mag['tip']=='hp'){$tip="Реген. HP";}
+if ($mag['tip']=='mp'){$tip="Реген. MP";}
+if ($mag['tip']=='bafmp'){$tip="Баф на ману";}
+if ($mag['tip']=='bafhp'){$tip="Баф на жизни";}
+if ($mag['tip']=='resp'){$tip="Респ. игрока";}
+if ($mag['tip']=='spoil'){$tip="Спойлинг";}
+if ($mag['tip']=='spoilall'){$tip="Спойлинг всех вещей";}
 
 echo'<div class="event">';
 
@@ -1268,26 +1268,26 @@ echo"<img src=\"pic/skils/$mag[name].jpg\" alt=\"pic\"/> ";
 
 echo"<b>$mag[name]:</b><br/>";
 // видно ток админам и выше
-if ($udata[dostup]>3) {
+if ($udata['dostup']>3) {
 
 echo"<font color=#007F46>  $mag[lat_name] </font></b><br/>";
 
-$lv=explode("|",$mag[lv]); // уровень начала скила
+$lv=explode("|",$mag['lv']); // уровень начала скила
 echo"<font color=#007F46>Доступно с $lv[0] уровня</font></b><br/>";
 
 }
 /////////////////////////////
 echo"Уровень: $mag[lvl]<br/>";
 echo"Класс: ";
-if($mag[klas]=="wizard"){echo"Маг<br/>";}
-if($mag[klas]=="fighert"){echo"Воин<br/>";}
+if($mag['klas']=="wizard"){echo"Маг<br/>";}
+if($mag['klas']=="fighert"){echo"Воин<br/>";}
 echo"Урон: $mag[uron]<br/>";
 echo"Забирает маны: $mag[mp]<br/>";
 echo"Забирает здоровья: $mag[hp]<br/>";
 echo"Даёт здоровья: $mag[plushp]<br/>";
 echo"Тип умения: $tip</div>";
 
-if ($mag[ruka] =="not" or $mag[ruka]==""){}else
+if ($mag['ruka'] =="not" or $mag['ruka']==""){}else
 {
 echo "<font color=grey>Для использования нужно держать в руках <b>$tp</b></font><br/>";
 }

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'coin_sms';//фикс. места
@@ -18,7 +18,7 @@ include($path.'inc/zag.php');
 include($path.'inc/smsbill.class.php');
 include($path.'inc/settings_sms.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //--------монеты покупка---------------
 

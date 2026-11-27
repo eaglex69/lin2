@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'adm_panel';//фикс. места
@@ -12,7 +12,7 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-if($udata[dostup]<4){
+if($udata['dostup']<4){
 echo'Доступ закрыт!';
 mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в адм панель $udata[usr]' ");
@@ -20,7 +20,7 @@ include($path.'inc/down.php');
 exit;
 }
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo "</div><div class=silka> <b>Админка:</b><hr/> ";
@@ -71,15 +71,15 @@ break;
 
 // просмотр шмота юзера и удаление
 
-case 'shmot'; // изменяем строки
+case 'shmot': // изменяем строки
 
-if (!empty($_GET[id])){mysql_query("DELETE FROM `item` WHERE `id` = '$_GET[id]' LIMIT 1");
+if (!empty($_GET['id'])){mysql_query("DELETE FROM `item` WHERE `id` = '$_GET[id]' LIMIT 1");
 echo "<p><font color=red>Удаленно</font></p><hr/>";}
 
 
-if (!empty($_GET[nick])) {$_POST[nick] = $_GET[nick];}
+if (!empty($_GET['nick'])) {$_POST['nick'] = $_GET['nick'];}
 
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="adm_panel.php?mod=shmot" method="post">';
 
 echo"Логин:<br/>
@@ -99,7 +99,7 @@ if($avto>=1){
 echo "<p>Вещи юзера <b>$_GET[nick]</b></p><hr/>";
 While($mag = mysql_fetch_array($req))
 {
-$u=explode('*',$mag[name]);
+$u=explode('*',$mag['name']);
 echo"<img src=\"shmot/$u[0].png\" alt=\"pic\"/> $p333 <a href=\"inventar.php?mod=info&amp;id=$mag[id]\">$mag[name]</a>
  <a href=\"adm_panel.php?mod=shmot&amp;id=$mag[id]&nick=$_GET[nick]\"> <font color=red>[x]</font> </a><hr/>";
 }
@@ -113,7 +113,7 @@ break;
 
 
 //---------Лог заказов по WebMoney-----------
-case 'logwm'; // изменяем строки
+case 'logwm': // изменяем строки
  
 	echo "<b>Лог покупок WM</b>";echo "</br>"; echo "</br>";
 
@@ -163,7 +163,7 @@ break;
 
 
 //---------Лог заказов по смс-----------
-case 'logsms'; // изменяем строки
+case 'logsms': // изменяем строки
  
 	echo "<b>Лог покупок </b>";echo "</br>"; echo "</br>";
 
@@ -230,9 +230,9 @@ break;
 
 //--------Редактор ЮЗЕРА---------------------------------
 case 'deluser':
-if(!empty($_GET[nick]))  {$_POST[nick]=$_GET[nick];}
+if(!empty($_GET['nick']))  {$_POST['nick']=$_GET['nick'];}
    
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="adm_panel.php?mod=deluser" method="post">';
 echo"Ник:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$nick\" name=\"nick\"/><br/>";
@@ -315,24 +315,24 @@ mysql_query("DELETE FROM `ya_zamujem` WHERE `usr` = '$_POST[nick]'");
 mysql_query("DELETE FROM `zamuj` WHERE `clan` = '$_POST[nick]'");
 mysql_query("DELETE FROM `zamuj` WHERE `usr` ='$_POST[nick]'");
 mysql_query("INSERT INTO `l2warmobi`.`block_ip` (`id`, `usr`, `log`, `ban_time`, `text`, `ip`) VALUES (NULL, '$_POST[nick]', '$log', '99999999', 'удаление юзера', '$user[ip]')");
-echo'Пользователь '.$_POST[nick].' удален';
+echo'Пользователь '.$_POST['nick'].' удален';
 }
 break;
 
-   case 'red'; // изменяем строки
+   case 'red': // изменяем строки
  
 $data = mysql_query("SELECT * FROM `users` where `usr`='$_POST[nick]'");
 $datas= mysql_fetch_array($data);
-if($datas[dostup]>$udata[dostup])  {echo'Запрещено редактировать старших по званию';include($path.'inc/down.php');exit;}
-if($datas[usr]=='Ultimate' and $udata[usr]!='Ultimate'){echo'Запрещено редактировать Ultimate';
+if($datas['dostup']>$udata['dostup'])  {echo'Запрещено редактировать старших по званию';include($path.'inc/down.php');exit;}
+if($datas['usr']=='Ultimate' and $udata['usr']!='Ultimate'){echo'Запрещено редактировать Ultimate';
 mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Облом)))', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался Вас отредактировать $udata[usr]' ");
 include($path.'inc/down.php');
 exit;}
 
-if(!empty($_GET[nick]))  {$_POST[nick]=$_GET[nick];}
+if(!empty($_GET['nick']))  {$_POST['nick']=$_GET['nick'];}
    
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="adm_panel.php?mod=red" method="post">';
 echo"Ник:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$nick\" name=\"nick\"/><br/>";
@@ -358,7 +358,7 @@ E-mail: <br/>
 <input type=\"text\" name=\"email\" value=\"$user[email]\" maxlength=\"25\"/> <br/>";
 
 //задаем условие если парень то первым в списке парень
-if ($user[pol]=="m") 
+if ($user['pol']=="m") 
 {
 echo "
 Пол:<br/>
@@ -377,7 +377,7 @@ echo "
 }
 //-----------------------------------------------------
 // задаем условие если права равны или выше 4 то
-if ($user[dostup]>="5")
+if ($user['dostup']>="5")
 {
 echo "
 Права:<br/>
@@ -391,7 +391,7 @@ echo "
 </select><br/>";
 //делаем двойное условие (если права равны 2 то)
 }else{ 
-if ($user[dostup]>="4")
+if ($user['dostup']>="4")
 {
 echo "
 Права:<br/>
@@ -404,7 +404,7 @@ echo "
 </select><br/>";
 //делаем двойное условие (если права равны 2 то)
 }else{ 
-if ($user[dostup]=="2")
+if ($user['dostup']=="2")
 {
 echo "
 Права:<br/>
@@ -429,7 +429,7 @@ echo "
 }}}
 //---------------------------------------------------------------------------
 // Задаем условие если
-if ($user[storona]=="human"){
+if ($user['storona']=="human"){
 echo "
 Расса:($user[storona])<br/>
 <select name=\"storona\">
@@ -440,7 +440,7 @@ echo "
 <option value=\"ork\">Орк</option>
 </select><br/>";
 }
-if ($user[storona]=="gnom"){
+if ($user['storona']=="gnom"){
 echo "
 Расса:($user[storona])<br/>
 <select name=\"storona\">
@@ -451,7 +451,7 @@ echo "
 <option value=\"ork\">Орк</option>
 </select><br/>";
 }
-if ($user[storona]=="elf"){
+if ($user['storona']=="elf"){
 echo "
 Расса:($user[storona])<br/>
 <select name=\"storona\">
@@ -462,7 +462,7 @@ echo "
 <option value=\"ork\">Орк</option>
 </select><br/>";
 }
-if ($user[storona]=="darkelf"){
+if ($user['storona']=="darkelf"){
 echo "
 Расса:($user[storona])<br/>
 <select name=\"storona\">
@@ -473,7 +473,7 @@ echo "
 <option value=\"ork\">Орк</option>
 </select><br/>";
 }
-if ($user[storona]=="ork"){
+if ($user['storona']=="ork"){
 echo "
 Расса:($user[storona])<br/>
 <select name=\"storona\">
@@ -486,11 +486,11 @@ echo "
 }
 
 if (
-   $user[storona]!=="ork" 
-&& $user[storona]!=="darkelf" 
-&& $user[storona]!=="elf" 
-&& $user[storona]!=="gnom" 
-&& $user[storona]!=="human"){
+   $user['storona']!=="ork" 
+&& $user['storona']!=="darkelf" 
+&& $user['storona']!=="elf" 
+&& $user['storona']!=="gnom" 
+&& $user['storona']!=="human"){
 //иначе вывод 
 echo "
 Расса:($user[storona])<br/>
@@ -504,7 +504,7 @@ echo "
 </select><br/>";}
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($user[klas]=="wizard")
+if ($user['klas']=="wizard")
 {echo "Класс:<br/>
 <select  name=\"klas\">
 <option value=\"wizard\">Маг</option>
@@ -517,7 +517,7 @@ else
 </select><br/>";}
 
 
-if ($udata[dostup]>$user[dostup]){$ps = $user[ps];}else{$ps = 'no';}
+if ($udata['dostup']>$user['dostup']){$ps = $user['ps'];}else{$ps = 'no';}
 if (empty($ps)){$ps = 'no';}
 
 //Coin of Luck: <br/> убрал iNoY
@@ -534,7 +534,7 @@ echo "
 Gold Bar: <br/>
 <input type=\"text\" name=\"gold\" value=\"$user[gold]\" size=\"20\" maxlength=\"11\"/> <br/>";
 
-if ($udata[dostup]>4){
+if ($udata['dostup']>4){
 echo "
 Coin of Luck: <br/>
 <input type=\"text\" name=\"almaz\" value=\"$user[almaz]\" size=\"20\" maxlength=\"25\"/> <br/>
@@ -613,9 +613,9 @@ echo"<br/><a href=\"adm_panel.php?\">Назад</a>";
 			//------------//
 			
 			
-case 'yesred';  // сохраняем изменения
+case 'yesred':  // сохраняем изменения
  
- $nik = $_GET[nik];
+ $nik = $_GET['nik'];
  
 $req = mysql_query("SELECT * FROM `users` where `usr`='$nik'");
 $avto=mysql_num_rows($req);
@@ -624,17 +624,17 @@ if($avto==0){echo"Нет такого игрока!";include($path.'inc/down.php
 
  
  
-if ($_POST[pass]=="no")
-		{	$pass = $user[pass];}
+if ($_POST['pass']=="no")
+		{	$pass = $user['pass'];}
 
 else{		$pass = addslashes("$_POST[pass]");       
-			$pass = htmlspecialchars($_POST[pass]);
+			$pass = htmlspecialchars($_POST['pass']);
 			$ps = $pass;
-			$pass = md5($_POST[pass]);
+			$pass = md5($_POST['pass']);
 	}
  
  
- if ($udata[dostup]<5){$_POST[almaz]=$user[almaz];}
+ if ($udata['dostup']<5){$_POST['almaz']=$user['almaz'];}
  
  //        almaz='$_POST[almaz]', // iNoY
 
@@ -706,7 +706,7 @@ echo"<b>Нет вещей</b><br/>";
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 break;
 case '3':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -729,7 +729,7 @@ break;
 ////////////
 //////////
 case '5':
-if(empty($_POST[name])){
+if(empty($_POST['name'])){
 echo '<form action="adm_panel.php?mod=5" method="post">';
 /*
 echo "Город:<br/>
@@ -828,7 +828,7 @@ mysql_query("INSERT INTO
 		`tip` = '$_POST[tip]',
         `quest` = '$_POST[quest]'");
 
-echo'Монстр '.$_POST[name].' создана!Чтобы создать точно такого же рядом ОБНОВИТЕ СТРАНИЦУ!<br/>';
+echo'Монстр '.$_POST['name'].' создана!Чтобы создать точно такого же рядом ОБНОВИТЕ СТРАНИЦУ!<br/>';
 
 }
 echo"<a href=\"adm_panel.php?\">Назад</a>";
@@ -916,7 +916,7 @@ break;
 */
 
 case '10':
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="adm_panel.php?mod=10" method="post">';
 
 echo "Наложить:<br/>
@@ -950,7 +950,7 @@ $req = mysql_query("SELECT * FROM `users` where `usr`='$_POST[nick]'");
 $avto=mysql_num_rows($req);
 	$usdata_bl = mysql_fetch_array($req);
 
-if($udata[dostup] < $usdata_bl[dostup]){echo"У Вас права меньше... Так что не выйдет...=)!";include($path.'inc/down.php');exit;}
+if($udata['dostup'] < $usdata_bl['dostup']){echo"У Вас права меньше... Так что не выйдет...=)!";include($path.'inc/down.php');exit;}
 
 if($avto==0){echo"Нет такого игрока!";include($path.'inc/down.php');exit;}
 
@@ -958,11 +958,11 @@ $req = mysql_query("SELECT * FROM `$_POST[tip]` where `usr`='$_POST[nick]'");
 $avto=mysql_num_rows($req);
 if($avto==1){echo"Игрок уже в бане(блоке)!";include($path.'inc/down.php');exit;}
 
-if($_POST[times]==sec){$_POST[time]=$_POST[time];}
-if($_POST[times]==min){$_POST[time]=$_POST[time]*60;}
-if($_POST[times]==cha){$_POST[time]=$_POST[time]*3600;}
+if($_POST['times']=='sec'){$_POST['time']=$_POST['time'];}
+if($_POST['times']=='min'){$_POST['time']=$_POST['time']*60;}
+if($_POST['times']=='cha'){$_POST['time']=$_POST['time']*3600;}
 
-$time_ban=time()+$_POST[time];
+$time_ban=time()+$_POST['time'];
 
 mysql_query("INSERT INTO
         `$_POST[tip]` SET
@@ -971,15 +971,15 @@ mysql_query("INSERT INTO
         `text` = '$_POST[text]',
         `ban_time` = '$time_ban' ");
 
-echo'Игрок '.$_POST[nick].' забанен(-блочен)/заблокирован айпи!<br/>';
+echo'Игрок '.$_POST['nick'].' забанен(-блочен)/заблокирован айпи!<br/>';
 }
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 break;
 /////////////////////////////////
 case 'block':
 
-if ($_GET[delbl]==1){
-if(empty($_GET[id])){
+if ($_GET['delbl']==1){
+if(empty($_GET['id'])){
 echo"<p>Ошибка невыбран игрок!</p>";
 }else{
 
@@ -1028,7 +1028,7 @@ echo"<a href=\"adm_panel.php?\">Назад</a>";
 break;
 
 case '12':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбран игрок!";
 include($path.'inc/down.php');
 exit;
@@ -1044,7 +1044,7 @@ echo"<a href=\"adm_panel.php?\">Назад</a>";
 break;
 
 case '777':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбран игрок!";
 include($path.'inc/down.php');
 exit;
@@ -1206,7 +1206,7 @@ echo"<a href=\"adm_panel.php?\">Назад</a>";
 break;
 */
 case '14':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбрана вещь!";
 include($path.'inc/down.php');
 exit;
@@ -1217,8 +1217,8 @@ $req = mysql_query("SELECT * FROM `shop` WHERE `id`='$_GET[id]' LIMIT 1");
 if (mysql_num_rows($req)==0){echo"Такой вещи не существует.";include($path.'inc/down.php');exit;}
 $item = mysql_fetch_array($req);
 
-if(empty($_POST[name])){
-echo '<form action="adm_panel.php?mod=14&amp;id='.$_GET[id].'" method="post">';
+if(empty($_POST['name'])){
+echo '<form action="adm_panel.php?mod=14&amp;id='.$_GET['id'].'" method="post">';
 
 echo"Имя<br/>
 <input class='input' type=\"text\" value=\"$item[name]\" size=\"10\" name=\"name\"/><br/>";
@@ -1264,13 +1264,13 @@ mysql_query("UPDATE `shop` SET
         `spirit` = '$_POST[spirit]',
         `nlvl` = '$_POST[nlvl]' WHERE id='$_GET[id]' LIMIT 1");
 
-echo'Вещь '.$_POST[name].' изменена!<br/>';
+echo'Вещь '.$_POST['name'].' изменена!<br/>';
 
 }
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 break;
 case '15':
-if(empty($_POST[name])){
+if(empty($_POST['name'])){
 echo '<form action="adm_panel.php?mod=15" method="post">';
 
 echo"Название:<br/>
@@ -1286,7 +1286,7 @@ mysql_query("INSERT INTO `library` SET
         `text` = '$_POST[text]',
         `author` = '$log',`time`='".date("d.m.y")."'");
 
-echo'Статья '.$_POST[name].' написана!<br/>';
+echo'Статья '.$_POST['name'].' написана!<br/>';
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 }
 break;
@@ -1296,7 +1296,7 @@ break;
 case 'new15':
 
 echo 'Новости!<br><br>';
-if(empty($_POST[name])){
+if(empty($_POST['name'])){
 echo '<form action="adm_panel.php?mod=new15" method="post">';
 
 echo"Название:<br/>
@@ -1323,16 +1323,16 @@ $url .= "&data=".urlencode($text);
 $url .= "&title=".urlencode($title);
 $url .= "&sign=".urlencode($sign);
 $response = file_get_contents($url);
-echo'Статья '.$_POST[name].' написана!<br/>';
-echo'Заголовок: <b>'.$_POST[name].'!</b><br/>';
-echo'Текст: <b>'.$_POST[text].'!</b><br/>';
+echo'Статья '.$_POST['name'].' написана!<br/>';
+echo'Заголовок: <b>'.$_POST['name'].'!</b><br/>';
+echo'Текст: <b>'.$_POST['text'].'!</b><br/>';
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 }
 break;
 
 case 'teh_news':
 echo 'Тех новости!<br><br>';
-if(empty($_POST[name])){
+if(empty($_POST['name'])){
 echo '<form action="adm_panel.php?mod=teh_news" method="post">';
 echo"Название:<br/>
 <input class='input' type=\"text\" size=\"20\" name=\"name\"/><br/>";
@@ -1344,8 +1344,8 @@ mysql_query("INSERT INTO `teh_news` SET
         `title` = '$_POST[name]',
         `text` = '$_POST[text]',
         `nick` = '$log',`time`='".date("d.m.y")."'");
-echo'Заголовок: <b>'.$_POST[name].'!</b><br/>';
-echo'Текст: <b>'.$_POST[text].'!</b><br/>';
+echo'Заголовок: <b>'.$_POST['name'].'!</b><br/>';
+echo'Текст: <b>'.$_POST['text'].'!</b><br/>';
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 }
 break;

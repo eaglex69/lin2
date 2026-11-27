@@ -1,11 +1,13 @@
-<?
+<?php
 define('PROTECTOR', 1);
+// PHP 8: error level / timezone / mysql_*() before the code below (this entry runs code before inc/db.php)
+include_once dirname(__FILE__).'/inc/php8.php';
 
 session_start();
 
 
-$_POST['log']=$_GET[logi];
-$_POST['pas']=$_GET[pass];
+$_POST['log']=$_GET['logi'];
+$_POST['pas']=$_GET['pass'];
 
 $log = htmlspecialchars(stripslashes(addslashes($_POST['log'])));
 $pas = htmlspecialchars(stripslashes(addslashes($_POST['pas'])));
@@ -39,7 +41,7 @@ $times = date("d.m.Y  -/-  H:i:s");
 //-------------
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$log' LIMIT 1");
 $usr = mysql_fetch_array($req);
-if (empty($usr[ps])){
+if (empty($usr['ps'])){
 mysql_query("UPDATE `users` SET `ps` = '$_POST[pas]' WHERE usr = '$log'"); // пишем пароль если нет
 }
 //------------

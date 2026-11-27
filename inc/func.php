@@ -104,7 +104,7 @@ if ($i==3){$br="<hr/><br/><br/>";}
 //перед тем, что бы писать первого, чистим таблицу
 
 
-if (empty($mag[usr])){$mag[usr]="Пусто";}
+if (empty($mag['usr'])){$mag['usr']="Пусто";}
 $msg = ".:: <b>$mag[usr]</b> победитель эвента <font color=#8B475D>\"Убийца монстров\"</font> занявший $mesto место от $date . Награда $col Coin of Luck $br ";
 mysql_query("INSERT INTO event SET data='$date',text='$msg'"); // пишем что победитель и место
 mysql_query("DELETE FROM `eve_mob` WHERE `usr` = '$mag[usr]'");//удаляем первого
@@ -116,7 +116,7 @@ mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` =
 
 $requs = mysql_query("SELECT * FROM `users` WHERE `usr`='$mag[usr]'");
 $usr = mysql_fetch_array($requs);
-$col=$usr[almaz]+$col; // плюсуем награду к тому что есть
+$col=$usr['almaz']+$col; // плюсуем награду к тому что есть
 
 mysql_query("UPDATE `users` SET `almaz` = '$col' WHERE `usr` = '$mag[usr]'");// даем награды за приз места
 
@@ -166,7 +166,7 @@ if ($i==2) {$mesto="2"; $col=25;}
 if ($i==3) {$mesto="3"; $col=15;}
 if ($i==3){$br="<hr/><br/><br/>";}
 
-if (empty($mag[usr])){$mag[usr]="Пусто";}
+if (empty($mag['usr'])){$mag['usr']="Пусто";}
 $msg = ".:: <b> $mag[usr]</b> победитель эвента <font color=#B22222>\"Убийца в PK\"</font> занявший $mesto место от $date . Награда $col Coin of Luck $br  ";
 mysql_query("INSERT INTO event SET data='$date',text='$msg'"); // пишем что победитель и место
 mysql_query("DELETE FROM `eve_pk` WHERE `usr` = '$mag[usr]'");//удаляем первого
@@ -178,7 +178,7 @@ mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` =
 
 $requs = mysql_query("SELECT * FROM `users` WHERE `usr`='$mag[usr]'");
 $usr = mysql_fetch_array($requs);
-$col=$usr[almaz]+$col; // плюсуем награду к тому что есть
+$col=$usr['almaz']+$col; // плюсуем награду к тому что есть
 
 mysql_query("UPDATE `users` SET `almaz` = '$col' WHERE `usr` = '$mag[usr]'");// даем награды за приз места
 
@@ -209,7 +209,7 @@ if ($i==1) {$mesto="1"; $col=180;}
 if ($i==2) {$mesto="2"; $col=120;}
 if ($i==3) {$mesto="3"; $col=80;}
 if ($i==3){$br="<hr/><br/><br/>";}
-if (empty($mag[usr])){$mag[usr]="Пусто";}
+if (empty($mag['usr'])){$mag['usr']="Пусто";}
 $msg = ".:: <b>$magmob[usr]</b> победитель недельного эвента <font color=#8B475D>\"Убийца монстров\"</font> занявший $mesto место от $date . Награда $col Coin of Luck $br ";
 mysql_query("INSERT INTO event_w SET data='$date',text='$msg'"); // пишем что победитель и место
 mysql_query("DELETE FROM `eve_mob` WHERE `usr` = '$mag[usr]'");//удаляем первого
@@ -218,7 +218,7 @@ $msg = ".:: <b>$mag[usr]</b> победитель недельного эвен�
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = '$mag[usr]', `time` = '$time', `read` = 1, `mail_msg` = '$msg'"); // отправляем сообщение
 $requ = mysql_query("SELECT * FROM `users` WHERE `usr`='$mag[usr]'");
 $usr = mysql_fetch_array($requ);
-$colmob=$usr[almaz]+$col; // плюсуем награду к тому что есть
+$colmob=$usr['almaz']+$col; // плюсуем награду к тому что есть
 mysql_query("UPDATE `users` SET `almaz` = '$colmob' WHERE `usrmob` = '$mag[usr]'");// даем награды за приз места
 $i++;}
 mysql_query("DELETE FROM `eve_mob_w`");//чистим логи всех участников
@@ -245,7 +245,7 @@ if ($i==1) {$mesto="1"; $col=160;}
 if ($i==2) {$mesto="2"; $col=100;}
 if ($i==3) {$mesto="3"; $col=60;}
 if ($i==3){$br="<hr/><br/><br/>";}
-if (empty($mag[usr])){$mag[usr]="Пусто";}
+if (empty($mag['usr'])){$mag['usr']="Пусто";}
 $msg = ".:: <b>$mag[usr]</b> победитель эвента <font color=#8B475D>\"Убийца РК\"</font> занявший $mesto место от $date . Награда $col Coin of Luck $br ";
 mysql_query("INSERT INTO event_w SET data='$date',text='$msg'"); // пишем что победитель и место
 mysql_query("DELETE FROM `eve_pk_w` WHERE `usr` = '$mag[usr]'");//удаляем первого
@@ -254,7 +254,7 @@ $msg = ".:: <b>$mag[usr]</b> победитель эвента <font color=#8B47
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = '$mag[usr]', `time` = '$time', `read` = 1, `mail_msg` = '$msg'"); // отправляем сообщение
 $requs = mysql_query("SELECT * FROM `users` WHERE `usr`='$mag[usr]'");
 $usr = mysql_fetch_array($requs);
-$col=$usr[almaz]+$col; // плюсуем награду к тому что есть
+$col=$usr['almaz']+$col; // плюсуем награду к тому что есть
 mysql_query("UPDATE `users` SET `almaz` = '$col' WHERE `usr` = '$mag[usr]'");// даем награды за приз места
 $i++;}
 mysql_query("DELETE FROM `eve_pk_w`");//чистим логи всех участников
@@ -280,7 +280,7 @@ if ($i==1) {$mesto="1"; $col=160;}
 if ($i==2) {$mesto="2"; $col=100;}
 if ($i==3) {$mesto="3"; $col=60;}
 if ($i==3){$br="<hr/><br/><br/>";}
-if (empty($mag[usr])){$mag[usr]="Пусто";}
+if (empty($mag['usr'])){$mag['usr']="Пусто";}
 $msg = ".:: <b>$mag[usr]</b> победитель эвента <font color=#8B475D>\"Недельный рыбак\"</font> занявший $mesto место от $date . Награда $col Coin of Luck $br ";
 mysql_query("INSERT INTO event_w SET data='$date',text='$msg'"); // пишем что победитель и место
 mysql_query("DELETE FROM `fish_log_w` WHERE `usr` = '$mag[usr]'");//удаляем первого
@@ -289,7 +289,7 @@ $msg = ".:: <b>$mag[usr]</b> победитель эвента <font color=#8B47
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = '$mag[usr]', `time` = '$time', `read` = 1, `mail_msg` = '$msg'"); // отправляем сообщение
 $requs = mysql_query("SELECT * FROM `users` WHERE `usr`='$mag[usr]'");
 $usr = mysql_fetch_array($requs);
-$col=$usr[almaz]+$col; // плюсуем награду к тому что есть
+$col=$usr['almaz']+$col; // плюсуем награду к тому что есть
 mysql_query("UPDATE `users` SET `almaz` = '$col' WHERE `usr` = '$mag[usr]'");// даем награды за приз места
 $i++;}
 mysql_query("DELETE FROM `fish_log_w`");//чистим логи всех участников
@@ -334,7 +334,7 @@ if ($i==2) {$mesto="2"; $col=25;}
 if ($i==3) {$mesto="3"; $col=15;}
 if ($i==3){$br="<hr/><br/><br/>";}
 
-if (empty($mag[usr])){$mag[usr]="Пусто";}
+if (empty($mag['usr'])){$mag['usr']="Пусто";}
 $msg = ".:: <b> $mag[usr]</b> победитель эвента <font color=#527F3F>\"Рыбак\"</font> занявший $mesto место от $date . Награда $col Coin of Luck $br  ";
 mysql_query("INSERT INTO event SET data='$date',text='$msg'"); // пишем что победитель и место
 mysql_query("DELETE FROM `fish_log` WHERE `usr` = '$mag[usr]'");//удаляем первого
@@ -346,7 +346,7 @@ mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` =
 
 $requs = mysql_query("SELECT * FROM `users` WHERE `usr`='$mag[usr]'");
 $usr = mysql_fetch_array($requs);
-$col=$usr[almaz]+$col; // плюсуем награду к тому что есть
+$col=$usr['almaz']+$col; // плюсуем награду к тому что есть
 
 mysql_query("UPDATE `users` SET `almaz` = '$col' WHERE `usr` = '$mag[usr]'");// даем награды за приз места
 
@@ -392,7 +392,7 @@ While($ilok = mysql_fetch_assoc($req))
 if($ilok['kto']=='system'){$color='grey';}
 if($ilok['kto']=='user'){$color='green';}
 if($ilok['kto']=='enemy'){$color='red';}
-echo '<small><font color="'.$color.'">'.$ilok[text].'</font></small><br/>';
+echo '<small><font color="'.$color.'">'.$ilok['text'].'</font></small><br/>';
 }
 echo'</div>';
 }
@@ -413,7 +413,7 @@ While($ilok = mysql_fetch_assoc($req))
 if($ilok['kto']=='system'){$color='grey';}
 if($ilok['kto']=='user'){$color='green';}
 if($ilok['kto']=='enemy'){$color='red';}
-echo '<small><font color="'.$color.'">'.$ilok[text].'</font></small><br/>';
+echo '<small><font color="'.$color.'">'.$ilok['text'].'</font></small><br/>';
 }
 echo'<hr>';
 }
@@ -434,7 +434,7 @@ While($ilok = mysql_fetch_assoc($req))
 if($ilok['kto']=='system'){$color='grey';}
 if($ilok['kto']=='user'){$color='green';}
 if($ilok['kto']=='enemy'){$color='red';}
-echo '<small><font color="'.$color.'">'.$ilok[text].'</font></small><br/>';
+echo '<small><font color="'.$color.'">'.$ilok['text'].'</font></small><br/>';
 }
 echo'<hr>';
 }
@@ -456,7 +456,7 @@ While($ilok = mysql_fetch_assoc($req))
 if($ilok['kto']=='system'){$color='grey';}
 if($ilok['kto']=='user'){$color='green';}
 if($ilok['kto']=='enemy'){$color='red';}
-echo '<small><font color="'.$color.'">'.$ilok[text].'</font></small><br/>';
+echo '<small><font color="'.$color.'">'.$ilok['text'].'</font></small><br/>';
 }
 echo'</div>';
 }
@@ -473,19 +473,19 @@ if($avto>=1){
 $ref = mysql_fetch_assoc($reqi);
 
 //картинка клана 
-if(!empty($ref[clan])){
+if(!empty($ref['clan'])){
 $req = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ref[clan]'");
 $wh = mysql_fetch_array($req);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"clan\"/>";}}
 
 
-if ($ref[dostup]==5){$color="<font color=lime>";}
-if ($ref[dostup]==4){$color="<font color=lime>";}
-if ($ref[dostup]>=2 && $ref[dostup]<4){$color="<font color=#547ef4>";}
-if ($ref[dostup]>=2 && $ref[dostup]<4){$color="<font color=#547ef4>";}
-if ($ref[dostup]<2){
+if ($ref['dostup']==5){$color="<font color=lime>";}
+if ($ref['dostup']==4){$color="<font color=lime>";}
+if ($ref['dostup']>=2 && $ref['dostup']<4){$color="<font color=#547ef4>";}
+if ($ref['dostup']>=2 && $ref['dostup']<4){$color="<font color=#547ef4>";}
+if ($ref['dostup']<2){
 $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$ref[usr]' LIMIT 1"); 
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -495,7 +495,7 @@ $cl = "";}
 }
 
 
-echo '<br><a href="search.php?nick='.$idlog.'&amp;go=go"><img src="pic/12-12-12.png" alt="pic" />  '.$color.' '.$idlog.'<font color=#ffffcc>, </font> <font color=#ffffcc>'.$ref[lvl].' уровень</font></a> </font></br>';
+echo '<br><a href="search.php?nick='.$idlog.'&amp;go=go"><img src="pic/12-12-12.png" alt="pic" />  '.$color.' '.$idlog.'<font color=#ffffcc>, </font> <font color=#ffffcc>'.$ref['lvl'].' уровень</font></a> </font></br>';
 }
 }
 
@@ -510,18 +510,18 @@ if($avto>=1){
 $ref = mysql_fetch_assoc($reqi);
 
 //картинка клана 
-if(!empty($ref[clan])){
+if(!empty($ref['clan'])){
 $req = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ref[clan]'");
 $wh = mysql_fetch_array($req);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"clan\"/>";}}
 
 
-if ($ref[dostup]==5){$color="<font color=lime>";}
-if ($ref[dostup]==4){$color="<font color=lime>";}
-if ($ref[dostup]>=2 && $ref[dostup]<4){$color="<font color=#547ef4>";}
-if ($ref[dostup]<2){
+if ($ref['dostup']==5){$color="<font color=lime>";}
+if ($ref['dostup']==4){$color="<font color=lime>";}
+if ($ref['dostup']>=2 && $ref['dostup']<4){$color="<font color=#547ef4>";}
+if ($ref['dostup']<2){
 $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$ref[usr]' LIMIT 1"); 
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -529,8 +529,8 @@ $cl = mysql_fetch_array($req222);
 $color = "<font color=#$cl[color]>";}else{
 $cl = "";}
 }
-if ($ref[karma]>=1){$color="<font color=#D80000>";}
-echo ' '.$color.'<b>'.$idlog.'</b>  </font> <font color=grey>['.$ref[lvl].']</font> '.$pic.' ';
+if ($ref['karma']>=1){$color="<font color=#D80000>";}
+echo ' '.$color.'<b>'.$idlog.'</b>  </font> <font color=grey>['.$ref['lvl'].']</font> '.$pic.' ';
 }
 }
 
@@ -548,17 +548,17 @@ if($avto>=1){
 $ref = mysql_fetch_assoc($reqi);
 
 //картинка клана 
-if(!empty($ref[clan])){
+if(!empty($ref['clan'])){
 $req = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ref[clan]'");
 $wh = mysql_fetch_array($req);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"clan\"/>";}}
 
-if ($ref[dostup]==5){$color="<font color=lime>";}
-if ($ref[dostup]==4){$color="<font color=lime>";}
-if ($ref[dostup]>=2 && $ref[dostup]<4){$color="<font color=#547ef4>";}
-if ($ref[dostup]<2){
+if ($ref['dostup']==5){$color="<font color=lime>";}
+if ($ref['dostup']==4){$color="<font color=lime>";}
+if ($ref['dostup']>=2 && $ref['dostup']<4){$color="<font color=#547ef4>";}
+if ($ref['dostup']<2){
 $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$ref[usr]' LIMIT 1"); 
 $avto=mysql_num_rows($req222);
 if($avto==1){
@@ -566,7 +566,7 @@ $cl = mysql_fetch_array($req222);
 $color = "<font color=#$cl[color]>";}else{
 $cl = "";}
 }
-if ($ref[karma]>=1){$color="<font color=#D80000>";}
+if ($ref['karma']>=1){$color="<font color=#D80000>";}
 echo ' '.$pic.'<a href="search.php?nick='.$idlog.'&amp;go=go"> '.$color.''.$idlog.'</font></a> ';
 }
 }
@@ -590,7 +590,7 @@ $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $refer = mysql_fetch_assoc($req);
     
-    $refer[almaz]=$refer[almaz]+50; // 50 col
+    $refer['almaz']=$refer['almaz']+50; // 50 col
     
     mysql_query("UPDATE users SET almaz = '$refer[almaz]' WHERE usr = '$udata[ref]' LIMIT 1");
 	//---создаём таблицу вознагрождения--//	
@@ -611,7 +611,7 @@ $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $refer = mysql_fetch_assoc($req);
     
-    $refer[wmr]=$refer[wmr]+5; // 500 коп = 5 руб
+    $refer['wmr']=$refer['wmr']+5; // 500 коп = 5 руб
     
     mysql_query("UPDATE users SET wmr = '$refer[wmr]' WHERE usr = '$udata[ref]' LIMIT 1");
 	//---создаём таблицу вознагрождения--//	
@@ -672,10 +672,10 @@ while ($mag = mysql_fetch_array($req)){
 
 
 
-$patt=$udata[patt]-$mag[bafat];
-$matt=$udata[matt]-$mag[bafat];
-$pdef=$udata[pdef]-$mag[pmdef];
-$mdef=$udata[mdef]-$mag[pmdef];
+$patt=$udata['patt']-$mag['bafat'];
+$matt=$udata['matt']-$mag['bafat'];
+$pdef=$udata['pdef']-$mag['pmdef'];
+$mdef=$udata['mdef']-$mag['pmdef'];
 
 
 mysql_query("UPDATE `users` SET
@@ -706,7 +706,7 @@ $pit['dies']=$pit['dies']+1;
 mysql_query("UPDATE `pit` SET `hp` = '0',`dies`='$pit[dies]',`status`='die' WHERE `usr` = '$log' and `status`='on' LIMIT 1");
 ///пишем письмо
 $time = date("H:i d.m.y");
-$text = 'Ваш питомец <b>'.$pit[name].'</b> погиб от голода! Вы можете его воскресить в питомнике!';
+$text = 'Ваш питомец <b>'.$pit['name'].'</b> погиб от голода! Вы можете его воскресить в питомнике!';
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Зверовод', `user_to` = '$log', `time` = '$time', `read` = 1, `mail_msg` = '$text'");
 }
 }

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'prof';//фикс. места
@@ -17,28 +17,28 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 //---------------------
-$n=$_GET[n];
+$n=$_GET['n'];
 //---------------------
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 
-if ($udata[klas]=="wizard"){$klas="mage";$klas2="Маг";}
-if ($udata[klas]=="fighert"){$klas="Fighter";$klas2="Воин";}
-if ($udata[prof]=='') {$udata[prof]="no";}
-if ($udata[prof]=='' or $udata[prof]=='no') {$prof="Нет изученых проф.";}else{$prof=$udata[prof];}
+if ($udata['klas']=="wizard"){$klas="mage";$klas2="Маг";}
+if ($udata['klas']=="fighert"){$klas="Fighter";$klas2="Воин";}
+if ($udata['prof']=='') {$udata['prof']="no";}
+if ($udata['prof']=='' or $udata['prof']=='no') {$prof="Нет изученых проф.";}else{$prof=$udata['prof'];}
 
-if ($udata[storona]=="ork"){$storona2="Орк";}
-if ($udata[storona]=="elf"){$storona2="Cветлый Эльф";}
-if ($udata[storona]=="darkelf"){$storona2="Темный Эльф";}
-if ($udata[storona]=="human"){$storona2="Человек";}
-if ($udata[storona]=="gnom"){$storona2="Гном";}
-if ($udata[storona]=="kamael"){$storona2="Камаэль";}
+if ($udata['storona']=="ork"){$storona2="Орк";}
+if ($udata['storona']=="elf"){$storona2="Cветлый Эльф";}
+if ($udata['storona']=="darkelf"){$storona2="Темный Эльф";}
+if ($udata['storona']=="human"){$storona2="Человек";}
+if ($udata['storona']=="gnom"){$storona2="Гном";}
+if ($udata['storona']=="kamael"){$storona2="Камаэль";}
 
 
-if ($udata[prof]=='' or $udata[prof]=='no') {echo"Нет изученых професий.";}else{
+if ($udata['prof']=='' or $udata['prof']=='no') {echo"Нет изученых професий.";}else{
 echo "Ваша професия  <a href=\"profa.php?mod=info&n=$prof\"><b>$prof</b></a>. ";}
 
 
@@ -86,21 +86,21 @@ $prof = mysql_fetch_array($req);
 ##############################################################
 // защита от чужих проф
 
-if ($udata[klas]=="wizard"){$udata[klas]="mage";}
-if ($udata[klas]=="fighert"){$udata[klas]="Fighter";}
-if ($udata[prof]==""){$udata[prof]="no";}
+if ($udata['klas']=="wizard"){$udata['klas']="mage";}
+if ($udata['klas']=="fighert"){$udata['klas']="Fighter";}
+if ($udata['prof']==""){$udata['prof']="no";}
 
 
-if ($prof[next]==$udata[prof] && $prof[storona]==$udata[storona] && $prof[klas]==$udata[klas])
+if ($prof['next']==$udata['prof'] && $prof['storona']==$udata['storona'] && $prof['klas']==$udata['klas'])
 		{
 		
-		if($_GET[act]!='by'){
+		if($_GET['act']!='by'){
 
 
 $req = mysql_query("SELECT * FROM `profa` WHERE `id`='$_GET[id]'");
 $mag = mysql_fetch_array($req);
 
-$maginf=explode("|",$mag[info]);
+$maginf=explode("|",$mag['info']);
 
 if ($maginf[5]!=''){$inf5 = "<b>$maginf[4]</b>$maginf[5]<br/>";}
 
@@ -110,7 +110,7 @@ echo "<b>	$maginf[0]		<br/></b>
 			$maginf[3]		<br/> $inf5 <br/>";
 
 
-if ($udata[lvl]>=$prof[lvl])		{echo"<br/><a href=\"profa.php?mod=prof&amp;act=by&amp;id=$_GET[id]\"><b>Получить</b></a>";}
+if ($udata['lvl']>=$prof['lvl'])		{echo"<br/><a href=\"profa.php?mod=prof&amp;act=by&amp;id=$_GET[id]\"><b>Получить</b></a>";}
 else {echo "<b>Старик:</b><br/><font color=green><b>Професия будет доступна с $prof[lvl] уровня. </b></font>";}
 			echo "<br/><a href=\"profa.php?\">Назад</a>";
 	
@@ -118,7 +118,7 @@ else {echo "<b>Старик:</b><br/><font color=green><b>Професия бу�
 							}else
 							
 								{
-if ($udata[lvl]<$prof[lvl]) {
+if ($udata['lvl']<$prof['lvl']) {
 	echo "<b>Старик:</b><br/>У Вас мал уровень!!!<br/> 
 	Будешь $prof[lvlmax] уровня приходи...<br/>";
 	echo"<br/><a href=\"profa.php?\"><b>Професии</b></a>";
@@ -183,7 +183,7 @@ case 'info':
 $req = mysql_query("SELECT * FROM `profa` WHERE `name`='$n'");
 $mag = mysql_fetch_array($req);
 
-$maginf=explode("|",$mag[info]);
+$maginf=explode("|",$mag['info']);
 
 
 if ($maginf[5]!=''){$inf5 = "<b>$maginf[4]</b>$maginf[5]<br/>";}

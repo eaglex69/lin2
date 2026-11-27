@@ -1,6 +1,8 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 
+// PHP 8: error level, timezone, mysql_*() on top of mysqli, exception handler (see inc/php8.php)
+include_once dirname(__FILE__).'/php8.php';
 
 
 $starttime = microtime(1);
@@ -58,15 +60,25 @@ function fields_save($field) {
 	}
 }
 
-session_start();
+// PHP 8: enter.php / avt.php start the session before including this file (notice on a repeated start)
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+// entries that do not include inc/path.php (avt.php, blog.php, enter.php, news.php ...) have no $path
+if (!isset($path)) $path = '';
 
 $db_host = "localhost";
 $db_user = "db1466666825";
 $db_table = "db1466666825";
 $db_pass = "12345";
+// PHP 8 port: connection settings can be overridden from the server environment (SetEnv / env[...] in php-fpm)
+if (getenv('LIN2_DB_HOST') !== false) $db_host = getenv('LIN2_DB_HOST');
+if (getenv('LIN2_DB_USER') !== false) $db_user = getenv('LIN2_DB_USER');
+if (getenv('LIN2_DB_NAME') !== false) $db_table = getenv('LIN2_DB_NAME');
+if (getenv('LIN2_DB_PASS') !== false) $db_pass = getenv('LIN2_DB_PASS');
 $connect = @ mysql_connect($db_host, $db_user, $db_pass) or die('Проводятся технические работы. Зайдите через день с ув.Саша');
 @ mysql_select_db($db_table) or die('Нет соединения с БД.');
 @ mysql_query("SET NAMES 'utf8'", $connect);
+// the schema and the INSERTs were written for MySQL 5.5 (empty sql_mode); MySQL 5.7/8 are strict by default
+@ mysql_query("SET SESSION sql_mode=''", $connect);
 include ($path.'inc/mysql.php');
 $mysql = new mysql;
 

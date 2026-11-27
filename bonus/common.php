@@ -8,6 +8,9 @@ define('VGR_INT_MESSAGE_INFO', 'info');
 define('VGR_INT_MESSAGE_WARN', 'warn');
 define('VGR_INT_MESSAGE_ERROR', 'error');
 
+// PHP 8: mysql_*() functions on top of mysqli
+require_once dirname(__FILE__) . '/../inc/mysql_compat.php';
+
 //Коды ошибок
 define('VGR_CORE_XML_API_ERROR_GENERAL', -2);
 define('VGR_CORE_XML_API_ERROR_SUCCESS', -1);

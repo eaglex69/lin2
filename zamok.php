@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'zamok';//фикс. места
@@ -12,7 +12,7 @@ place_city();
 place_okr();
 place_tower();
 include($path.'inc/core.php');
-if($_GET[mod]==taran or $_GET[mod]==ok){
+if($_GET['mod']=='taran' or $_GET['mod']=='ok'){
 $header=TRUE;
 }else{
 $textl='Замок';
@@ -37,13 +37,13 @@ $timer=time()+300;
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]'");
 $zamok = mysql_fetch_array($req);
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
-if($zamok[vorota]>0 and $zamok[clan]!=$udata[clan]){
+if($zamok['vorota']>0 and $zamok['clan']!=$udata['clan']){
 echo"<div align='center'><b><a href=\"zamok.php?r=$random\">Ждать</a></b></div>";
-echo'<b>Ворота (прочность: '.$zamok[vorota].')</b><br/>';
+echo'<b>Ворота (прочность: '.$zamok['vorota'].')</b><br/>';
 echo"<a href=\"zamok.php?mod=taran\"><input class=\"button\" type=\"submit\" value=\"Бить\" /></a><br/>";
 echo"<b>Локации:</b><br/>";
 echo"<a href=\"to_gorod.php?\">Город</a><br/>";
@@ -53,24 +53,24 @@ $req = mysql_query("SELECT * FROM `guards` WHERE `city` = '$udata[city]'");
 //////////////////////////////
 echo"<div align='center'><b><a href=\"zamok.php?r=$random\">Ждать</a></b></div>";
 
-if($zamok[clan]==$udata[clan]){
-echo'<b>Ворота (прочность: '.$zamok[vorota].')</b><br/>';
+if($zamok['clan']==$udata['clan']){
+echo'<b>Ворота (прочность: '.$zamok['vorota'].')</b><br/>';
 }
 While($mob = mysql_fetch_array($req))
 {
-if($mob[status]==on){
+if($mob['status']=='on'){
 echo"<a href=\"zamok.php?mod=ok&amp;id=$mob[id]\">$mob[name]($mob[hp]/$mob[hpall])</a> [<a href=\"zamok.php?mod=info&amp;id=$mob[id]\">?</a>]<br/>";
 }
-elseif($mob[status]==battle){
+elseif($mob['status']=='battle'){
 $r = mysql_query("SELECT * FROM `tmp_zamok` WHERE `city` = '$udata[city]' AND `usr`='$mob[oponent]' LIMIT 1");
 $m = mysql_fetch_array($r);
 $d = time();
-if(($d>=($m['ltime']+120) and $mob[hp]<=0) or $d>=($m['ltime']+120)){
+if(($d>=($m['ltime']+120) and $mob['hp']<=0) or $d>=($m['ltime']+120)){
 mysql_query("UPDATE `guards` SET `status`='on',`hp`='$mob[hpall]', `oponent`='not' WHERE `id` = '$mob[id]'");
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$mob[oponent]' LIMIT 1");
 $mu = mysql_fetch_array($req);
 
-$nloses=$mu[loses]+1;
+$nloses=$mu['loses']+1;
 mysql_query("UPDATE users SET loses = '$nloses',hp='0' WHERE usr = '$mob[oponent]'");//пишем данные в плэера
 mysql_query("DELETE FROM `tmp_zamok` WHERE usr='$mob[oponent]'");
 mysql_query("DELETE FROM `log` WHERE usr='$mob[oponent]'");
@@ -80,9 +80,9 @@ echo"<a href=\"zamok.php?mod=ok&amp;id=$mob[id]\">$mob[name]($mob[hpall]/$mob[hp
 echo"<b><a href=\"zamok.php?mod=info&amp;id=$mob[id]\">$mob[name]($mob[hp]/$mob[hpall])</a> против <a href=\"search.php?nick=$mob[oponent]&amp;go=go\">$mob[oponent]</a></b><br/>";
 }
 }
-elseif($mob[status]==off){
+elseif($mob['status']=='off'){
 $d = time();
-if($d>=($mob[oponent]+$mob[time])){
+if($d>=($mob['oponent']+$mob['time'])){
 
 mysql_query("UPDATE `guards` SET `status`='on',`hp`='$mob[hpall]', `oponent`='not' WHERE `id` = '$mob[id]'");
 
@@ -109,7 +109,7 @@ case 'info':/*
 if($zamok[vorota]>0){
 header ("Location: zamok.php?");exit;
 }*/
-$id=$_GET[id];
+$id=$_GET['id'];
 $req = mysql_query("SELECT * FROM `guards` WHERE `city` = '$udata[city]' and `id`='$id' LIMIT 1");
 ////////////////////////////
 if (mysql_num_rows($req)==0){echo"Такого стражника не существует.";include($path.'inc/down.php');exit;}
@@ -126,23 +126,23 @@ echo"M.Def: $mob[mdef]<br/>";
 echo"<a href=\"zamok.php?\">Назад</a>";
 break;
 case 'taran':
-if($zamok[vorota]<=0){
+if($zamok['vorota']<=0){
 header ("Location: zamok.php?");exit;
 }else{
-if($udata[lvl]<5){
+if($udata['lvl']<5){
 mysql_query("INSERT INTO log SET usr='$log',text='У вас маленький уровень!',kto='system',place='zamok',timer='$timer'");
 header ("Location: zamok.php?");exit;
 }
 
 
 
-if ($udata[klas]=="wizard") {$uron = $udata[matt];} // если маг, то маг атака работает
-if ($udata[klas]=="fighert") {$uron = $udata[patt];} // если воин, то физ атака работает
+if ($udata['klas']=="wizard") {$uron = $udata['matt'];} // если маг, то маг атака работает
+if ($udata['klas']=="fighert") {$uron = $udata['patt'];} // если воин, то физ атака работает
 
 $uron=rand(1,25)+$uron;
 
-$zamok[vorota]=$zamok[vorota]-$uron;
-if($zamok[vorota]<0){$zamok[vorota]=0;}
+$zamok['vorota']=$zamok['vorota']-$uron;
+if($zamok['vorota']<0){$zamok['vorota']=0;}
 mysql_query("UPDATE `zamok` SET `vorota` = '$zamok[vorota]' WHERE `city` = '$udata[city]'");
 
 mysql_query("INSERT INTO log SET usr='$log',text='Вы наносите воротам урон $uron',kto='user',place='zamok',timer='$timer'");
@@ -152,7 +152,7 @@ break;
 case 'ok':
 $time=time();
 ////////////////////////////////////////////////////////
-if($zamok[vorota]>0){
+if($zamok['vorota']>0){
 header ("Location: zamok.php?");exit;
 }
 if ($inaw==1){
@@ -171,7 +171,7 @@ header ("Location: zamok.php?");exit;
 }
 ///////////////////////////// 
 $mob = mysql_fetch_array($req);
-if($mob[status]==battle or $mob[status]==off){
+if($mob['status']=='battle' or $mob['status']=='off'){
 header ("Location: zamok.php?");exit;
 }
 mysql_query("UPDATE `guards` SET `status` = 'battle',`oponent`='$log' WHERE `city` = '$udata[city]' and `id`='$id' LIMIT 1");
@@ -184,7 +184,7 @@ header ("Location: fight.php?");exit;
 break;
 
 case 'citadel':
-if($zamok[vorota]>0){
+if($zamok['vorota']>0){
 echo"Ворота целы!<br/>";
 echo"<a href=\"zamok.php?\">Назад</a><br/>";
 include($path.'inc/down.php');exit;
@@ -196,23 +196,23 @@ echo"Есть живые стражники!<br/>";
 echo"<a href=\"zamok.php?\">Назад</a><br/>";
 include($path.'inc/down.php');exit;
 }
-if($_GET[act]!='zahvat'){
+if($_GET['act']!='zahvat'){
 echo"<a href=\"zamok.php?mod=citadel&amp;act=zahvat\">Захватить город</a> ";
 }else{
-if($zamok[clan]==$udata[clan]){
+if($zamok['clan']==$udata['clan']){
 echo"Этот город принадлежит вашему клану!<br/>";
 echo"<a href=\"zamok.php?\">Назад</a><br/>";
 include($path.'inc/down.php');exit;
 }
 
 
-if($udata[almaz]<20){
+if($udata['almaz']<20){
 echo"Нехватает Coin of Luck! Нужно 20 шт.<br/>";
 echo"<a href=\"zamok.php?\">Назад</a><br/>";
 include($path.'inc/down.php');exit;
 }
 
-$ncol=$udata[almaz]-20;
+$ncol=$udata['almaz']-20;
 mysql_query("UPDATE `users` SET `almaz` = '$ncol' WHERE `usr`='$udata[usr]'");
 /////////////////////////////////////////////////////////////////////////////////////
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]'");

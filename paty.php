@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'paty';//фикс. места
@@ -13,17 +13,17 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-$nick=$_GET[nick];
-$pt=$_GET[pt];
+$nick=$_GET['nick'];
+$pt=$_GET['pt'];
 
-if($udata[lvl]<21){				
+if($udata['lvl']<21){				
 echo "<p>Пати будет доступно с 21 уровня!</p>";
 echo "<a href=\"/\">Назад</a><br/>";
 include($path.'inc/down.php');
 }
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -89,9 +89,9 @@ exit;
 }
 ////////////////////////////////////////////////////////////////////////
 
-      $_POST[nick]=$nick;
+      $_POST['nick']=$nick;
 
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="paty.php?" method="post">';
 echo"Ник:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$nick\" name=\"nick\"/><br/>";
@@ -111,14 +111,14 @@ echo"<br/><a href=\"paty.php?\">Назад</a>";
 include($path.'inc/down.php');
 exit;
 }
-if($usr[lvl]<21){
+if($usr['lvl']<21){
 echo'Игрок не достиг 21 уровня для игры в пати!<br/>';
 echo"<br/><a href=\"paty.php?\">Назад</a>";
 include($path.'inc/down.php');
 exit;
 }
-$raznica=$udata[lvl]-$usr[lvl];
-$raznica1=$usr[lvl]-$udata[lvl];
+$raznica=$udata['lvl']-$usr['lvl'];
+$raznica1=$usr['lvl']-$udata['lvl'];
 if($raznica>90 or $raznica1>90)
 {
 echo'Разница в уровне не должна превышать 90 лвл<br/>';
@@ -128,14 +128,14 @@ exit;
 }
 
 
-if($usr[dostup]>3)
+if($usr['dostup']>3)
 {
 echo'Администрацию запрещено приглашать в пати<br/>';
 echo"<br/><a href=\"paty.php?\">Назад</a>";
 include($path.'inc/down.php');
 exit;
 }
-if($udata[dostup]>3)
+if($udata['dostup']>3)
 {
 echo'Администрации запрещено приглашать в пати<br/>';
 echo"<br/><a href=\"paty.php?\">Назад</a>";

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'scroll';//фикс. места
@@ -22,12 +22,12 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-if($mag[tip]!='scroll'){
+if($mag['tip']!='scroll'){
 echo'<div class=dot><p>Ошибка, доступ закрыт!</div></p>';
 include($path.'inc/down.php');
 exit;
 }
-switch($mag[what]){
+switch($mag['what']){
 case 'scroll_weapon':
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `tip`='weapon' and `image`='yes' LIMIT 1");
 $avto=mysql_num_rows($req);
@@ -38,10 +38,10 @@ exit;
 }
 $it = mysql_fetch_array($req);
 
-$u = explode("|",$mag[give]);
-$npatt=$u[0]+$udata[patt];
-$nmatt=$u[1]+$udata[matt];
-$w=explode("*",$it[name]);
+$u = explode("|",$mag['give']);
+$npatt=$u[0]+$udata['patt'];
+$nmatt=$u[1]+$udata['matt'];
+$w=explode("*",$it['name']);
 if(empty($w[1])){
 $nam="$w[0]*1";
 }else{
@@ -64,8 +64,8 @@ $priz=rand(1,100);
 
 if($priz<=$stavka){
 
-$num=$u[0]+$it[patt];
-$nux=$u[1]+$it[matt];
+$num=$u[0]+$it['patt'];
+$nux=$u[1]+$it['matt'];
 
 mysql_query("UPDATE `users` SET `patt` = '$npatt',`matt` = '$nmatt' WHERE usr = '$log'");
 mysql_query("UPDATE `item` SET
@@ -82,11 +82,11 @@ $msg="	Оружие заточено!<br/>
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `tip`='weapon' and `image`='yes'");
 $it = mysql_fetch_array($req);
 
-$npatt=$udata[patt]-$it[patt];
-$nmatt=$udata[matt]-$it[matt];
+$npatt=$udata['patt']-$it['patt'];
+$nmatt=$udata['matt']-$it['matt'];
 
-$npdef=$udata[pdef]-$it[pdef];
-$nmdef=$udata[mdef]-$it[mdef];
+$npdef=$udata['pdef']-$it['pdef'];
+$nmdef=$udata['mdef']-$it['mdef'];
 
 mysql_query("UPDATE `users` SET
          `patt` = '$npatt',
@@ -101,16 +101,16 @@ mysql_query("INSERT INTO `l2warmobi`.`logi` (`id` ,`tip` ,`text`)VALUES (NULL , 
 $msg="Оружие не выдержало очередного заряда магии из свитка!<br/><b>Оружие $it[name] сломано!</b><br/>";
 }
 //////////////
-if($mag[kol]==1){
+if($mag['kol']==1){
 mysql_query("DELETE FROM `res` WHERE `usr` = '$log' and `id`='$_GET[id]'");
 }else{
-$mag[kol]--;
+$mag['kol']--;
 mysql_query("UPDATE res SET kol = '$mag[kol]' WHERE `usr` = '$log' and `id`='$_GET[id]'");
 }
 break;
 /////////////////////
 case 'scroll_armor':
-if(empty($_GET[tip])){
+if(empty($_GET['tip'])){
 echo'<b>Заколдовать:</b><br/>';
 echo"<a href=\"scroll.php?tip=golova&amp;id=$_GET[id]\">Шлем</a><br/>";
 echo"<a href=\"scroll.php?tip=shit&amp;id=$_GET[id]\">Щит</a><br/>";
@@ -120,17 +120,17 @@ echo"<a href=\"scroll.php?tip=nogi&amp;id=$_GET[id]\">Сапоги</a><br/>- - -
 
 //echo"<a href=\"scroll.php?tip=plash&amp;id=$_GET[id]\">Плащ</a><br/>";
 //echo"<a href=\"scroll.php?tip=poyas&amp;id=$_GET[id]\">Пояс</a><br/>";
-}elseif(isset($_GET[tip]) and empty($_GET[what])){
+}elseif(isset($_GET['tip']) and empty($_GET['what'])){
 echo"<p>Выберите что повысить:</p><hr/>";
 echo"<div class=inoy><a href=\"scroll.php?tip=$_GET[tip]&amp;what=pdef&amp;id=$_GET[id]\">P.Def</a>";
 echo"<a href=\"scroll.php?tip=$_GET[tip]&amp;what=mdef&amp;id=$_GET[id]\">M.Def</a></div>";
 }else{
-if($_GET[tip]!=golova and $_GET[tip]!=body and $_GET[tip]!=nogi and $_GET[tip]!=shit and $_GET[tip]!=plash and $_GET[tip]!=ruki and $_GET[tip]!=poyas){
+if($_GET['tip']!='golova' and $_GET['tip']!='body' and $_GET['tip']!='nogi' and $_GET['tip']!='shit' and $_GET['tip']!='plash' and $_GET['tip']!='ruki' and $_GET['tip']!='poyas'){
 echo'Ошибка, доступ закрыт!';
 include($path.'inc/down.php');
 exit;
 }
-if($_GET[what]!=pdef and $_GET[what]!=mdef){
+if($_GET['what']!='pdef' and $_GET['what']!='mdef'){
 echo'Ошибка, доступ закрыт!';
 include($path.'inc/down.php');
 exit;
@@ -144,9 +144,9 @@ exit;
 }
 $it = mysql_fetch_array($req);
 
-$nprotect=$mag[give]+$udata[$_GET[what]];
+$nprotect=$mag['give']+$udata[$_GET['what']];
 
-$w=explode("*",$it[name]);
+$w=explode("*",$it['name']);
 if(empty($w[1])){
 $nam="$w[0]*1";
 }else{
@@ -169,7 +169,7 @@ $priz=rand(1,100);
 
 if($priz<=$stavka){
 
-$num=$mag[give]+$it[$_GET[what]];
+$num=$mag['give']+$it[$_GET['what']];
 
 mysql_query("UPDATE `users` SET `$_GET[what]` = '$nprotect' WHERE usr = '$log'");
 mysql_query("UPDATE `item` SET
@@ -183,11 +183,11 @@ $msg="Защита увеличена!<br/>
 $req = mysql_query("SELECT * FROM `item` WHERE `usr` = '$log' and `tip`='$_GET[tip]' and `image`='yes'");
 $it = mysql_fetch_array($req);
 
-$npatt=$udata[patt]-$it[patt];
-$nmatt=$udata[matt]-$it[matt];
+$npatt=$udata['patt']-$it['patt'];
+$nmatt=$udata['matt']-$it['matt'];
 
-$npdef=$udata[pdef]-$it[pdef];
-$nmdef=$udata[mdef]-$it[mdef];
+$npdef=$udata['pdef']-$it['pdef'];
+$nmdef=$udata['mdef']-$it['mdef'];
 
 mysql_query("UPDATE `users` SET
          `patt` = '$npatt',
@@ -204,10 +204,10 @@ mysql_query("INSERT INTO `l2warmobi`.`logi` (`id` ,`tip` ,`text`)VALUES (NULL , 
 $msg="<p>Вещь не выдержала очередного заряда магии из свитка!<br/><b>Вещь $it[name] сломана!</b></p><br/>";
 }
 //////////////
-if($mag[kol]==1){
+if($mag['kol']==1){
 mysql_query("DELETE FROM `res` WHERE `usr` = '$log' and `id`='$_GET[id]'");
 }else{
-$mag[kol]--;
+$mag['kol']--;
 mysql_query("UPDATE res SET kol = '$mag[kol]' WHERE `usr` = '$log' and `id`='$_GET[id]'");
 }
 ///////////////

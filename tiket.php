@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $head = 'tiket';//фикс. места
@@ -17,12 +17,14 @@ include($path.'inc/zag.php');
 
 
 
-switch($_GET[go]) {
+$tematik = isset($_POST['tematik']) ? $_POST['tematik'] : (isset($_GET['tematik']) ? $_GET['tematik'] : '');
+
+switch($_GET['go']) {
 
 default:
 
 //--------------------------------------Удаляем тикет и все его сообщения-----------------------------//-------------------------------------------------------------------//-------------------------------------------------------------------//-------------------------------------------------------------------
-if ($_GET[go]==del){
+if ($_GET['go']=='del'){
 
 // проверка автора тикета
 $req2 = mysql_query("SELECT * FROM `tiket_tm` WHERE `avtor` = '$log' && id = '$_GET[id]'");
@@ -68,7 +70,7 @@ $r = mysql_query("SELECT * FROM `tiket_m` WHERE `id_tm` = '$tik[id]'");
 $a = mysql_num_rows($r);
 
 echo "<a href=\"?go=tk&id=$tik[id]\">&#160 &#187 $tik[title]</a> <b>($a)</b> ";
-if  ($tik[new_adm]>0){ echo " <font color=orange><b>+$tik[new_adm]</b></font>";}
+if  ($tik['new_adm']>0){ echo " <font color=orange><b>+$tik[new_adm]</b></font>";}
  echo "&#160 <a href=\"?go=del&id=$tik[id]\"><font color=red>[x]</font></a>";
 echo "<br/>";
 }
@@ -143,7 +145,7 @@ break;
 case "sendok":
 
 if ($tematik == "nohelp") {echo "Вы не выбрали подходящий Вам раздел!"; include($path.'inc/down.php');}
-if($udata[lvl]<"5"){echo"В Центр-Помощи можно писать только с 5 уровня."; include($path.'inc/down.php');}
+if($udata['lvl']<"5"){echo"В Центр-Помощи можно писать только с 5 уровня."; include($path.'inc/down.php');}
 
 if ($_SERVER['HTTP_X_FORWARDED_FOR'])
 { $ip=htmlspecialchars(stripslashes($_SERVER['HTTP_X_FORWARDED_FOR'])); }
@@ -152,7 +154,7 @@ $currHour=date("H",time());
 $currDate=date("d.m.Y", time());
 $currTime=date("$currHour:i", time());
 
-$msg = $_POST[msg];
+$msg = $_POST['msg'];
 $str=strlen($msg);
 
 if($msg=="" || $str<6 || $str>2000){echo'Письмо должно быть не менее 6 символов и не более 2000 символов!';
@@ -160,7 +162,7 @@ echo'<br /><br /><a href="?">Вернуться</a>';
 include($path.'inc/down.php');
 exit;}
 
-$tema = $_POST[tema];
+$tema = $_POST['tema'];
 $strtema=strlen($tema);
 
 if($tema=="" || $strtema<2 || $strtema>55){echo'Тема должна быть не менее 2 символов и не более 25 символов!';
@@ -247,10 +249,10 @@ mysql_query ("UPDATE tiket_tm SET
 //if ($tiko[closed]==1){echo "********";}
 
 
-if (!empty($_POST[text]) && $tiko[closed]==0) // если естьтекст записуем сообщение
+if (!empty($_POST['text']) && $tiko['closed']==0) // если естьтекст записуем сообщение
 {
 
-$msg = $_POST[text];
+$msg = $_POST['text'];
 $msg = htmlspecialchars(stripslashes(trim($msg)));
 $log = htmlspecialchars(stripslashes(trim($log)));
 $currHour=date("H",time());
@@ -260,7 +262,7 @@ $currTime=date("$currHour:i", time());
 // пишем антифлуд
 $req6546 = mysql_query("SELECT * FROM `tiket_m` WHERE `usr` = '$log' && `id_tm` = '$_GET[id]' ORDER BY id DESC LIMIT 1");
 $pr = mysql_fetch_array($req6546);
-if($pr[text] == $msg){
+if($pr['text'] == $msg){
 echo'<font color=#9E0000>Антифлуд!</font><br/>';}else{
 
 $ressave = mysql_query("INSERT INTO `tiket_m` SET
@@ -269,7 +271,7 @@ $ressave = mysql_query("INSERT INTO `tiket_m` SET
         `data` = '$currDate в $currTime',
         `usr` = '$log'"); // создаем строку с ответом
 		
-		$news2 = $tiko[news]+1; // пишем счётчик +1
+		$news2 = $tiko['news']+1; // пишем счётчик +1
 		
 mysql_query ("UPDATE tiket_tm SET
         news='$news2'
@@ -285,7 +287,7 @@ $tik = mysql_fetch_array($req);
 echo "<div class=menu>";
 echo "<hr/>Тема тикета: <br/><u><b>$tik[title]</b></u> &#160 <a href=\"?go=del&id=$tik[id]\"><font color=red><b>[x]</b></font></a><br/>
 <a href=\"search.php?nick=$tik[avtor]&amp;go=go\">$tik[avtor]</a> <font color=grey>($tik[data])</font><br/>
-<b><u>Сообщение:</u></b><br/> ".nl2br($tik[msg])."
+<b><u>Сообщение:</u></b><br/> ".nl2br($tik['msg'])."
 
 
 
@@ -298,7 +300,7 @@ echo "<br/><font color=#407C61><b>Переписка:</b></font><hr/>";
 
 
 
-if ($tik[closed]==1){
+if ($tik['closed']==1){
 echo "<p><span style=color:#E12222;><b>Топик закрыт</b></span></p><hr/>";
 }else{
 
@@ -331,17 +333,17 @@ While($tk = mysql_fetch_array($req))
 {
 $us = mysql_query("SELECT * FROM `users` WHERE usr = '$tk[usr]' LIMIT 1");
 $usr = mysql_fetch_array($us);
-if ($usr[dostup]>=4)						{$color = '<font color=lime>'; $color2 = '<font color=#5e995c>';}
-if ($usr[dostup]==2 or $usr[dostup]==3)	{$color = '<font color=#0026FF>'; $color2 = '<font color=#6DC2FF>';}
-if ($usr[dostup]==1) 					{$color = '<font color=#7F6A00>'; $color2 = '<font color=#A09353>';}
-if ($usr[dostup]==0) 					{$color = ''; $color2 = '';}
+if ($usr['dostup']>=4)						{$color = '<font color=lime>'; $color2 = '<font color=#5e995c>';}
+if ($usr['dostup']==2 or $usr['dostup']==3)	{$color = '<font color=#0026FF>'; $color2 = '<font color=#6DC2FF>';}
+if ($usr['dostup']==1) 					{$color = '<font color=#7F6A00>'; $color2 = '<font color=#A09353>';}
+if ($usr['dostup']==0) 					{$color = ''; $color2 = '';}
 
 echo "<a href=\"search.php?nick=$tk[usr]&amp;go=go\">$color $tk[usr] </font></a> <font color=grey><small>$tk[data]</small></font><br/>
-$color2 ".nl2br($tk[text])."</font><hr/>
+$color2 ".nl2br($tk['text'])."</font><hr/>
 ";
 }
 
-	navig($page, 'tiket.php?go=tk&amp;id='.$_GET[id].'&amp;', $pages);
+	navig($page, 'tiket.php?go=tk&amp;id='.$_GET['id'].'&amp;', $pages);
 
 }else{
 echo "Сообщений нет<hr/>";}

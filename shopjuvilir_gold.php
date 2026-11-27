@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shopjuvilir';//фикс. места
@@ -16,11 +16,11 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-$tip2=$_GET[tip2];
-$lvlus=$_GET[lvlus];
+$tip2=$_GET['tip2'];
+$lvlus=$_GET['lvlus'];
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo "<div class=inoy>";
@@ -30,7 +30,7 @@ echo"<a href=\"shopjuvilir_gold.php?mod=mag&amp;o=rkolco\">Правые ольц
 break;
 
 case 'mag':
-if($_GET[o]!=amulet && $_GET[o]!=kolco && $_GET[o]!=rkolco){
+if($_GET['o']!='amulet' && $_GET['o']!='kolco' && $_GET['o']!='rkolco'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -82,7 +82,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'amulet':
 $tip='Амулет';
 break;
@@ -93,7 +93,7 @@ case 'rkolco':
 $tip='Правое кольцо';
 break;
 }
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -105,17 +105,17 @@ $klas='Воин';
 break;
 }
 
-if($mag[nlvl]<20){$st="NG";}
-elseif($mag[nlvl]>=20 and $mag[nlvl]<40){$st="D";}
-elseif($mag[nlvl]>=40 and $mag[nlvl]<52){$st="C";}
-elseif($mag[nlvl]>=52 and $mag[nlvl]<62){$st="B";}
-elseif($mag[nlvl]>=62 and $mag[nlvl]<76){$st="A";}
-elseif($mag[nlvl]>=76 and $mag[nlvl]<91){$st="S";}
-elseif($mag[nlvl]>=91){$st="R";}
+if($mag['nlvl']<20){$st="NG";}
+elseif($mag['nlvl']>=20 and $mag['nlvl']<40){$st="D";}
+elseif($mag['nlvl']>=40 and $mag['nlvl']<52){$st="C";}
+elseif($mag['nlvl']>=52 and $mag['nlvl']<62){$st="B";}
+elseif($mag['nlvl']>=62 and $mag['nlvl']<76){$st="A";}
+elseif($mag['nlvl']>=76 and $mag['nlvl']<91){$st="S";}
+elseif($mag['nlvl']>=91){$st="R";}
 
 echo"<b></div></div></div><div class=menu><img src=\"shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b><br/>
 Тип: $tip<br/>
-Цена: ".number_format($mag[cena], 0, ',', "'")." Аден <br/><br/>";
+Цена: ".number_format($mag['cena'], 0, ',', "'")." Аден <br/><br/>";
 
 
 

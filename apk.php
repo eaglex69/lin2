@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 $headmod = 'workshop';//фикс. места
 $textl='Мастерская';

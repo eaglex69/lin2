@@ -1,14 +1,14 @@
-<?
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+<?php
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT title FROM news"));
 $puslap = floor($viso/10);
 if (is_double($num) || !is_integer($num))

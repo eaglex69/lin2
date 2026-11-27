@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'kill_ob';//фикс. места
@@ -14,14 +14,14 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 
 default:
 $res = mysql_query("SELECT * FROM `kill_mob` WHERE `id` = '$udata[id]' and `usr` = '$log'"); //проверка есть ли килы, если да то открываем таблицу
 $av = mysql_num_rows($res);
 $kill = mysql_fetch_array($res);
-$av = $kill[skoko];
+$av = $kill['skoko'];
 if (empty($av)){$av = 0;}
 if ($av==0){
 // если нет kill то пишем что пусто
@@ -61,11 +61,11 @@ echo "<div class=silka><a href=\"pers.php\">Персонаж</a></div>";
 break;
 
 
-case "yes";
+case "yes":
 // пишем защиты
-$_POST['col'] = round($_POST['col']);
+$_POST['col'] = round((float)$_POST['col']);
 
-if ($_POST['col']<=0 or is_numeric($_POST['col'])==FALSE){
+if ((float)$_POST['col']<=0 or is_numeric($_POST['col'])==FALSE){
 echo "<p><font color=red><b>Ошибка! Вводите цыфры больше ноля ! </b></font></p>";
 echo "<div class=silka><a href=\"kill_ob.php\">Назад</a></div>";
 include($path.'inc/down.php');EXIT;
@@ -74,9 +74,9 @@ include($path.'inc/down.php');EXIT;
 $res = mysql_query("SELECT * FROM `kill_mob` WHERE `id` = '$udata[id]' and `usr` = '$log'"); //проверка есть ли килы, если да то открываем таблицу
 $av=mysql_num_rows($res);
 $kill = mysql_fetch_array($res);
-$av = $kill[skoko];
+$av = $kill['skoko'];
 
-$col = $_POST[col];
+$col = $_POST['col'];
 $fad = $_POST['col'] * 25;
 $nav = $av - $fad;
 
@@ -100,7 +100,7 @@ mysql_query("UPDATE `kill_mob` SET `skoko` = '$nav' WHERE `usr`='$log' and `id`=
 $reqi = mysql_query("SELECT * FROM `users` WHERE `usr`='$log' LIMIT 1");
 $udata = mysql_fetch_array($reqi);
 
-$almaz = $udata[almaz] + $col; // щитаем колы
+$almaz = $udata['almaz'] + $col; // щитаем колы
 
 mysql_query("UPDATE `users` SET `almaz` = '$almaz' WHERE `usr`='$log' LIMIT 1");
 

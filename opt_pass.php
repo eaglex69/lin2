@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'opt';//фикс. места
@@ -20,12 +20,12 @@ $timeout = $date - $taim;
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 ////////////////////////////////////////////////////////////////////////////////
 					//  СОХРАНЯЕМ НАСТРОЙКИ //
-if ($_GET[mod]==save){
+if ($_GET['mod']=='save'){
 
 
 $psstar = md5(htmlspecialchars(stripslashes(addslashes($_POST['psstar']))));

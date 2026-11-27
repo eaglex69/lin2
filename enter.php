@@ -1,5 +1,7 @@
-<?
+<?php
 define('PROTECTOR', 1);
+// PHP 8: error level / timezone / mysql_*() before the code below (this entry runs code before inc/db.php)
+include_once dirname(__FILE__).'/inc/php8.php';
 
 session_start();
 

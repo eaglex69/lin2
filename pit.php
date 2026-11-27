@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'pit';//фикс. места
@@ -11,9 +11,9 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Нет такого питомца!<br/>";
 include($path.'inc/down.php');exit;
 }
@@ -28,8 +28,8 @@ $pit = mysql_fetch_array($req);
 echo"<b>$pit[name]</b><br/>";
 echo"<img src='pic/pit/$pit[rasa].gif'/><br/>";
 echo"Раса: ";
-if($pit[rasa]=="wolf"){echo"Волк<br/>";}
-if($pit[rasa]=="dog"){echo"Собака<br/>";}
+if($pit['rasa']=="wolf"){echo"Волк<br/>";}
+if($pit['rasa']=="dog"){echo"Собака<br/>";}
 
 echo"Хозяин: <a href=\"search.php?nick=$pit[usr]&amp;go=go\"><b>$pit[usr]</b></a><br/>";
 echo"Уровень: $pit[lvl]<br/>";
@@ -37,10 +37,10 @@ echo"Опыт: $pit[exp]<br/>";
 echo"Жизни: $pit[hp]/$pit[hpall]<br/>";
 echo"Смертей: $pit[dies]<br/>";
 echo"Статус: ";
-if($pit[status]=="off"){echo"<b>В питомнике</b><br/>";}
-if($pit[status]=="on"){echo"<b>С хозяином</b><br/>";
+if($pit['status']=="off"){echo"<b>В питомнике</b><br/>";}
+if($pit['status']=="on"){echo"<b>С хозяином</b><br/>";
 }
-if($pit[status]=="die"){echo"<b>Мёртв</b><br/>";}
+if($pit['status']=="die"){echo"<b>Мёртв</b><br/>";}
 
 echo"<br/><b>Физические параметры</b><br/>";
 echo"Сила: $pit[sila]<br/>";
@@ -93,8 +93,8 @@ $pit = mysql_fetch_array($req);
 echo"<b>$pit[name]</b><br/>";
 echo"<img src='pic/pit/$pit[rasa].gif'/><br/>";
 echo"Раса: ";
-if($pit[rasa]=="wolf"){echo"Волк<br/>";}
-if($pit[rasa]=="dog"){echo"Собака<br/>";}
+if($pit['rasa']=="wolf"){echo"Волк<br/>";}
+if($pit['rasa']=="dog"){echo"Собака<br/>";}
 
 echo"Уровень: $pit[lvl]<br/>";
 echo"Опыт: $pit[exp]<br/>";
@@ -102,20 +102,20 @@ echo"Жизни: $pit[hp]/$pit[hpall]<br/>";
 echo"Свободные очки: $pit[skill]<br/>";
 echo"Смертей: $pit[dies]<br/>";
 echo"Статус: ";
-if($pit[status]=="off"){echo"<b>В питомнике</b><br/>";}
-if($pit[status]=="on"){echo"<b>С вами</b><br/>";
-$pit[lasteda]=$pit[lasteda]-time();
-if($pit[lasteda]<60){
+if($pit['status']=="off"){echo"<b>В питомнике</b><br/>";}
+if($pit['status']=="on"){echo"<b>С вами</b><br/>";
+$pit['lasteda']=$pit['lasteda']-time();
+if($pit['lasteda']<60){
 echo "Сытость: $pit[lasteda] секунд<br/>";
-}elseif($pit[lasteda]>60 and $pit[lasteda]<3600){
-$pit[lasteda]=round($pit[lasteda]/60);
+}elseif($pit['lasteda']>60 and $pit['lasteda']<3600){
+$pit['lasteda']=round($pit['lasteda']/60);
 echo "Сытость: $pit[lasteda] минут<br/>";
 }else{
-$pit[lasteda]=round($pit[lasteda]/3600);
+$pit['lasteda']=round($pit['lasteda']/3600);
 echo "Сытость: $pit[lasteda] часов<br/>";
 }
 }
-if($pit[status]=="die"){echo"<b>Мёртв</b><br/>";}
+if($pit['status']=="die"){echo"<b>Мёртв</b><br/>";}
 
 echo"<br/><b>Физические параметры</b><br/>";
 echo"Сила: $pit[sila]<br/>";
@@ -165,7 +165,7 @@ echo"С вами нет питомца!";
 include($path.'inc/down.php');exit;
 }
 
-if(empty($_GET[o])){
+if(empty($_GET['o'])){
 echo "<div class=inoy>";
 echo"<a href=\"pit.php?mod=item&amp;o=weapon\">Оружия</a>";
 echo"<a href=\"pit.php?mod=item&amp;o=golova\">Шлемы</a>";
@@ -174,7 +174,7 @@ echo"<a href=\"pit.php?mod=item&amp;o=nogi\">Сапоги</a>";
 echo"</div><br/>";
 echo"<div class=inoy><a href=\"pit.php?mod=mypit\">Назад</a></div>";
 }else{
-if($_GET[o]!=weapon && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=nogi){
+if($_GET['o']!='weapon' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='nogi'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -210,7 +210,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -224,7 +224,7 @@ case 'nogi':
 $tip='Сапоги';
 break;
 }
-switch($mag[rasa]){
+switch($mag['rasa']){
 case 'not':
 $rasa='Все';
 break;
@@ -275,12 +275,12 @@ exit;
 }
 
 
-if($mag[rasa]!='not' and $mag[rasa]!=$pit[rasa]){
+if($mag['rasa']!='not' and $mag['rasa']!=$pit['rasa']){
 echo'Эта вещь не для расы вашего питомца!';
 include($path.'inc/down.php');
 exit;
 }
-if($mag[nlvl] > $pit[lvl]){
+if($mag['nlvl'] > $pit['lvl']){
 echo'Ващь неподходит по уровню!';
 include($path.'inc/down.php');
 exit;
@@ -289,9 +289,9 @@ exit;
 
 
 ///////////////////////
-$nhp=$mag[hp]+$pit[hpall];
-$nsila=$mag[sila]+$pit[sila];
-$nprot=$mag[prot]+$pit[prot];
+$nhp=$mag['hp']+$pit['hpall'];
+$nsila=$mag['sila']+$pit['sila'];
+$nprot=$mag['prot']+$pit['prot'];
 //////////////////////
 
 mysql_query("UPDATE `pit` SET
@@ -324,9 +324,9 @@ exit;
 $mag = mysql_fetch_array($req);
 
 ///////////////////////
-$nhp=$pit[hpall]-$mag[hp];
-$nsila=$pit[sila]-$mag[sila];
-$nprot=$pit[prot]-$mag[prot];
+$nhp=$pit['hpall']-$mag['hp'];
+$nsila=$pit['sila']-$mag['sila'];
+$nprot=$pit['prot']-$mag['prot'];
 //////////////////////
 
 mysql_query("UPDATE `pit` SET

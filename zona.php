@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'zona';//фикс. места
@@ -11,7 +11,7 @@ include($path.'inc/func.php');
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo" <center><img src='/pic/roz/zona.png'   alt='' style='margin-right:10px;border:1px solid #383838' ></div><hr/>";
@@ -31,7 +31,7 @@ echo"<br/><a href=\"main.php?\">Назад</a>";
 break;
 
 case '1':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Нет такого узника!";
 include($path.'inc/down.php');
 exit;
@@ -42,19 +42,19 @@ $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);
     
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `ban` WHERE `usr` = '$log'");
     }else{
     echo"$ban[usr] находится в тюрме! Причина: $ban[text]! Осталось: ";
     
-$ban[ban_time]=$ban[ban_time]-time();
-if($ban[ban_time]<60){
+$ban['ban_time']=$ban['ban_time']-time();
+if($ban['ban_time']<60){
 echo "$ban[ban_time] сек.<br/>";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo "$ban[ban_time] мин.<br/>";
 }else{
-$ban[ban_time]=round($ban[ban_time]/3600);
+$ban['ban_time']=round($ban['ban_time']/3600);
 echo "$ban[ban_time] часов<br/>";
 }
     }

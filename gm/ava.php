@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,7 +19,7 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup] >= 4){
+if ($udata['dostup'] >= 4){
 
 echo "<p><hr/></p><center>";
 
@@ -32,22 +32,22 @@ echo "</center><p><hr/></p>";
 //-------------------------- уже с аватарками вывод ---------------------------------
 
 
-if (isset($_GET[spisok])){
+if (isset($_GET['spisok'])){
 
-if (isset($_GET[sp_del])){
-unlink('../foto/'.$_GET[sp_del].'');
+if (isset($_GET['sp_del'])){
+unlink('../foto/'.$_GET['sp_del'].'');
 echo "<p><font color=red>Удаленно аву перса $_GET[sp_del] </font></p><hr/>";
 }
 
 echo "<p>Уже с аватарками !!! (Клацнув на аву вы её удалите)</p><br/>";
-if(empty($_GET[name])){}
+if(empty($_GET['name'])){}
 
 $dira = opendir ("../foto/");
-while ($filea = readdir ($dira)) 
+while ($filea = lin2_readdir ($dira)) 
 {if (( $filea != ".") && ($filea != ".."))
 {$aa[]=$filea;}}
-closedir ($dira);
-$totala = count($aa);
+lin2_closedir ($dira);
+if (!isset($aa)) $aa = array(); $totala = count($aa);
 
 for ($ia = 0; $ia < $totala; $ia++){
 
@@ -66,7 +66,7 @@ $totala = count($dat_screena);
 
 
 if (empty($_GET['logs'])) $logs = 0;
-else $logs = $_GET['logs'];
+else $logs = (int)$_GET['logs'];
 if ($totala < $logs + 10){ $end = $totala; }
 else {$end = $logs + 10; }
 for ($ia = $logs; $ia < $end; $ia++){
@@ -91,7 +91,7 @@ echo"<br/>Всего: $totala эмблем<br/>";
 // --------------------------- загрузка аватара ------------------------------------
 
 
-if (isset($_GET[nw])){
+if (isset($_GET['nw'])){
 
 
 echo '
@@ -113,7 +113,7 @@ echo '
 	}  
 	  
 
-if (isset($_GET[yes])){
+if (isset($_GET['yes'])){
 	
 //---------------
 	

@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 $headmod = 'bazar';//фикс. места
 $textl='Базар ресурсов';
@@ -55,7 +55,7 @@ if($error) echo '<div class="error">'.$error.'</div>';
 break;
 
 
-case'sell';
+case'sell':
 $id = abs(intval($_GET['id']));
 
 if($id){
@@ -115,7 +115,7 @@ checkin::display_pagin($my_page, $all_posts, 'bazar_res.php?mod=sell&amp;p=');
 break;
 
 
-case 'add_sell';
+case 'add_sell':
 $id = abs(intval($_POST['res_id']));
 $num = abs(intval($_POST['num'])); //Количество
 $cena = abs(intval($_POST['cena'])); //Цена

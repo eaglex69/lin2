@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'index';//фикс. места
@@ -22,7 +22,7 @@ $reg = mysql_num_rows(mysql_query("SELECT * FROM users"));
 $asd = mysql_query("SELECT time FROM news ORDER BY id DESC LIMIT 1");
 $news = mysql_fetch_array($asd);
 /////////////////////
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 echo'<div class="gameBorder">';
 echo'<div class="head"><b>Lin)e(age III - Новый Мир</b></div>';
@@ -38,7 +38,7 @@ echo'<br/><font color=grey>Lineage III - это мир в котором иде�
 сможешь изменить результат этого противостояния!<br/><br/></font>';
 
 
-if (isset($_GET[error]))
+if (isset($_GET['error']))
 { echo'<hr/></div><div class="head"><font color=red>Пароль или логин введены не правильно.</font></div><div class="menu">'; }
 
 
@@ -73,6 +73,7 @@ echo '<hr/>';*/
 
 
 echo" <center><div class=\"pic\">";
+$ref = isset($_GET['ref']) ? $_GET['ref'] : (isset($_SESSION['ref']) ? $_SESSION['ref'] : '');
 echo "<a href=\"reg.php?refs=$ref\">Регистрация <b>(".$reg.")</b><small><font color=red>+$newusr</font></small></a>";
 echo "<a href=\"password.php\"> Восстановить пароль </a>";
 echo "<a href=\"index.php?mod=online\">В игре <b>($online)</b></a>";
@@ -141,7 +142,7 @@ echo "
 echo "<hr/>";
 
 echo' &#160 Адрес игры:<br/>
-&#160 <input value="http://'.$_SERVER[HTTP_HOST].'" name="ssilka"/><br/>';
+&#160 <input value="http://'.$_SERVER['HTTP_HOST'].'" name="ssilka"/><br/>';
 
 echo " &#160 Статус сервера: <font color=lime><b>On</b></font><br/><br/></div>";
 
@@ -161,10 +162,10 @@ echo'<div class="menu">';
 echo'У вас есть возможность установить на своём сайте нашу игру!<br/>
 На все страницах игры будет стоять ссылка "Главная" ведущая на ваш сайт!<br/>
 Сделайте ссылку вида:<br/>
-<b>http://'.$_SERVER[HTTP_HOST].'?site=ВАШ_САЙТ</b><br/>
+<b>http://'.$_SERVER['HTTP_HOST'].'?site=ВАШ_САЙТ</b><br/>
 Где ВАШ_САЙТ адрес вашего сайта без http://<br/>
 Скопируйте ссылку:<br/>
-<input value="http://'.$_SERVER[HTTP_HOST].'?site=ВАШ_САЙТ" name="ssilka"/><br/></div><div class="foot">
+<input value="http://'.$_SERVER['HTTP_HOST'].'?site=ВАШ_САЙТ" name="ssilka"/><br/></div><div class="foot">
 <a href="index.php">Назад</a><br/></div>
 ';
 include($path.'inc/endmain.php');
@@ -189,16 +190,16 @@ break;
 case 'news':
 echo'<div class="gameBorder">';
 echo'<div class="menu">';
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT title FROM news"));
 $puslap = floor($viso/10);
 if (is_double($num) || !is_integer($num))
@@ -215,16 +216,16 @@ $text = strip_tags($dsa['text']);
 $time = strip_tags($dsa['time']);
 echo "<b>$title</b><small><b>[$time]</b></small><br/>$text<br/>------<br/>";
 }
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"index.php?mod=news&amp;page=$back\">back</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "back";
 }
 echo"|";
-if($_GET[page] < $puslap)
+if($_GET['page'] < $puslap)
 {echo "<a href=\"index.php?mod=news&amp;page=$next&\">next</a><br/>";}
 else
 {echo "next<br/>";}
@@ -258,13 +259,13 @@ break;
 }
 include($path.'inc/end.php');
 }else{
-if($_GET[mod]=='exit'){
+if($_GET['mod']=='exit'){
 $header=TRUE;
 }
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
@@ -346,9 +347,9 @@ if (empty($arer)){$arer=0;}
 		$msg = mysql_fetch_assoc($asd);
 		$msgcol = mysql_num_rows($asd);
 
-echo' </div><div class=silka><a href="news.php?">&#187; <b>'.$msg['title'].'</b> <font color=grey>&#160; ['.$news[time].']</font></a> ';
+echo' </div><div class=silka><a href="news.php?">&#187; <b>'.$msg['title'].'</b> <font color=grey>&#160; ['.$news['time'].']</font></a> ';
 echo "<div class=news>";
-echo "<font color=grey> ".nl2br($msg[text])." </font>\n";
+echo "<font color=grey> ".nl2br($msg['text'])." </font>\n";
 ////////////////////////////////////////////////////////////////////////
 echo "</div></div><div class=inoy>";
 
@@ -357,9 +358,9 @@ echo'<hr><b> .:: Приключения ::. </b><hr/>';
 echo'  <a href="oprosvip.php?">&#187; Бонус <font color=red><b> NeW </b></font> </a>'; 
 echo'  <a href="to_towers.php?">&#187; Земли </a>'; //domin();
 echo'  <a href="arena.php?">&#187; Арена  <font color=#ffffff>('.$arer.')</font></a>';
-echo'  <a href="event.php?">&#187; Эвэнты <font color=#ffffff> ('.$event[data].')</font></a>';
-if($udata[klas]=="wizard"){echo'  <a href="akademmag.php?">&#187; Академия магии</a>';}
-if($udata[klas]=="fighert"){echo'  <a href="akademwar.php?">&#187; Академия войны</a>';}
+echo'  <a href="event.php?">&#187; Эвэнты <font color=#ffffff> ('.$event['data'].')</font></a>';
+if($udata['klas']=="wizard"){echo'  <a href="akademmag.php?">&#187; Академия магии</a>';}
+if($udata['klas']=="fighert"){echo'  <a href="akademwar.php?">&#187; Академия войны</a>';}
 echo'  <a href="asshome.php?">&#187; Гильдия наемников</a>';
 //echo' <a href="workshop.php?">&#187; Мастерская</a>  <a href="sklad.php?">&#187; Склад</a>';
 echo'  <a href="istok.php?">&#187; Источник Жизни</a>';
@@ -538,7 +539,7 @@ case 'inv':
 $req = mysql_query("SELECT * FROM `invite` WHERE `usr` = '$log'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 if($avto>=1){
 While($inv = mysql_fetch_array($req))
 {
@@ -562,7 +563,7 @@ $inv = mysql_fetch_array($req);
 
 $req = mysql_query("SELECT `name` FROM `clan` WHERE `lider` = '$inv[clan]'");
 $clan = mysql_fetch_array($req);
-if(empty($_GET[go])){
+if(empty($_GET['go'])){
 echo"Отправитель: <b>$clan[name]</b><br/>";
 echo"Текст: $inv[text]<br/>";
 
@@ -570,8 +571,8 @@ echo"<a href=\"index.php?mod=inv&amp;id=$_GET[id]&amp;go=ok\">Принять</a>
 echo"<a href=\"index.php?mod=inv&amp;id=$_GET[id]&amp;go=no\">Отказаться</a><br/>";
 echo"<a href=\"index.php?mod=inv\">Назад</a>";
 }else{
-if($_GET[go]==ok){
-if(!empty($udata[clan])){
+if($_GET['go']=='ok'){
+if(!empty($udata['clan'])){
 echo'Вы уже находитесь в клане!';
 include"inc/down.php";exit;
 }
@@ -580,7 +581,7 @@ mysql_query("UPDATE `users` SET `clan`='$inv[clan]' WHERE `usr` = '$log'");
 
 echo"Приглашение принято.Вы вступили в клан $clan[name]!<br/>";
 
-}elseif($_GET[go]==no){
+}elseif($_GET['go']=='no'){
 
 mysql_query("DELETE FROM `invite` WHERE usr='$log' and `id`='$_GET[id]'");
 
@@ -595,7 +596,7 @@ break;
 case 'quests':
 
 echo "<b><font color=grey><p> Книга заданий: </p></font></b><hr/>";
-if($_GET[act]==start){
+if($_GET['act']=='start'){
 $req = mysql_query("SELECT * FROM `userquests` WHERE `usr` = '$log' and `status`='start'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
@@ -603,7 +604,7 @@ if($avto=="0"){
 echo'Нет квестов!';
 include"inc/down.php";exit;
 }
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 While($q = mysql_fetch_array($req))
 {
 $reqo = mysql_query("SELECT * FROM `quests` WHERE `quest` = '$q[quest]'");
@@ -627,13 +628,13 @@ echo"<br/><font color=#A0A0A0>$quest[mission] </font><br/>";
 $req = mysql_query("SELECT * FROM `user_kill` WHERE `quest` = '$q[quest]' and `usr` = '$log'");
 $quest = mysql_fetch_array($req);
 $avto=mysql_num_rows($req);
-if(empty($quest[killing]) or $quest[killing]==0){echo "<font color=green><b>Выполненно</b></font><br/>";}else{
+if(empty($quest['killing']) or $quest['killing']==0){echo "<font color=green><b>Выполненно</b></font><br/>";}else{
 echo"<br/><font color=#A0A0A0>Осталось убить: $quest[killing] шт. </font><br/>";}
 
 
 }
 
-}elseif($_GET[act]==complete){
+}elseif($_GET['act']=='complete'){
 $req = mysql_query("SELECT * FROM `userquests` WHERE `usr` = '$log' and `status`='complete'");
 ////////////////////////////
 $avto=mysql_num_rows($req);
@@ -641,7 +642,7 @@ if($avto=="0"){
 echo'Нет квестов!';
 include"inc/down.php";exit;
 }
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 While($q = mysql_fetch_array($req))
 {
 $reqo = mysql_query("SELECT * FROM `quests` WHERE `quest` = '$q[quest]'");

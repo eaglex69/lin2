@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'baf';//фикс. места
@@ -19,8 +19,8 @@ $timeout = $date - $taim;
 ////////////////
 
 //---------------------
-$nick=$_GET[nick];
-$id=$_GET[id];
+$nick=$_GET['nick'];
+$id=$_GET['id'];
 //---------------------
 /*
 if ($udata[dostup]<4){
@@ -33,13 +33,13 @@ exit;
 echo"<center><img src=\"pic/roz/tp.jpg\" alt=\"\"></center>";
 echo "</div> <div class = fon><p><font color=f4d06e>Вип Бафы</font></p><hr/>";
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
-if (!empty($nick)) {$_POST[nick] = $nick;}  // если значение ник не пустое то пост ник равен нику
+if (!empty($nick)) {$_POST['nick'] = $nick;}  // если значение ник не пустое то пост ник равен нику
 
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="baf_vip.php?" method="post">';
 echo"Ник:<br/>
 <input class='input' type=\"text\" size=\"15\" value=\"$nick\" name=\"nick\"/><br/>";
@@ -53,7 +53,7 @@ echo"<div class=silka>		<a href=\"baf_vip.php?&nick=$log\">Бафнуть себ
 
 }else{
 
-if (!empty($_POST[nick])) {$nick = $_POST[nick];} // если значение пост ник не пустое то знаение ник равно ему
+if (!empty($_POST['nick'])) {$nick = $_POST['nick'];} // если значение пост ник не пустое то знаение ник равно ему
 
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$nick'");
 $avto=mysql_num_rows($req);
@@ -88,20 +88,20 @@ case 'add':
 $reqi = mysql_query("SELECT * FROM `users` WHERE `usr`='$nick' LIMIT 1");
 $usr = mysql_fetch_array($reqi);
 
-if ($_GET[tip]=="5kad" or $_GET[tip]=="40kad" or $_GET[tip]=="300" or $_GET[tip]=="4001" or $_GET[tip]=="4002" or $_GET[tip]=="4003" or $_GET[tip]=="200kad" or $_GET[tip]=="200"){
+if ($_GET['tip']=="5kad" or $_GET['tip']=="40kad" or $_GET['tip']=="300" or $_GET['tip']=="4001" or $_GET['tip']=="4002" or $_GET['tip']=="4003" or $_GET['tip']=="200kad" or $_GET['tip']=="200"){
 
 
-if ($_GET[tip]=="5kad")	{$att = 2000; $def = 2000; $alm = 0; $money = 5000000; $times = 1800; $sms="Att & Def  +2`000 / Адена -5`000`000 / 30 мин";} 
+if ($_GET['tip']=="5kad")	{$att = 2000; $def = 2000; $alm = 0; $money = 5000000; $times = 1800; $sms="Att & Def  +2`000 / Адена -5`000`000 / 30 мин";} 
 
-if ($_GET[tip]=="40kad")	{$att = 10000; $def = 10000; $alm = 40; $money = 0; $times = 10800; $sms="Att & Def  +10`000 / CoL -40 / 3 часа";} // 
+if ($_GET['tip']=="40kad")	{$att = 10000; $def = 10000; $alm = 40; $money = 0; $times = 10800; $sms="Att & Def  +10`000 / CoL -40 / 3 часа";} // 
 
-if ($_GET[tip]=="200")	{$att = round(($usr[patt]+$usr[matt])/2*2); $def = round(($usr[pdef]+$usr[mdef])/2*2); $alm = 0; $money = 1000000; $times = 1800; $sms="Att & Def  +200% / -1kk Аден / 30 мин";} // 
-if ($_GET[tip]=="300")	{$att = round(($usr[patt]+$usr[matt])/2*3); $def = round(($usr[pdef]+$usr[mdef])/2*3); $alm = 20; $money = 0; $times = 1800; $sms="Att & Def  +300% / CoL -20 / 30 мин";} // 
-if ($_GET[tip]=="4001")	{$att = round(($usr[patt]+$usr[matt])/2*4); $def = round(($usr[pdef]+$usr[mdef])/2*4); $alm = 50; $money = 0; $times = 1800; $sms="Att & Def  +400% / CoL -50 / 30 мин";} // 
-if ($_GET[tip]=="4002")	{$att = round(($usr[patt]+$usr[matt])/2*4); $def = round(($usr[pdef]+$usr[mdef])/2*4); $alm = 150; $money = 0; $times = 7200; $sms="Att & Def  +400% / CoL -150 / 2 часа";} // 
-if ($_GET[tip]=="4003")	{$att = round(($usr[patt]+$usr[matt])/2*4); $def = round(($usr[pdef]+$usr[mdef])/2*4); $alm = 250; $money = 0; $times = 18000; $sms="Att & Def  +400% / CoL -250 / 5 часов";} // 
+if ($_GET['tip']=="200")	{$att = round(($usr['patt']+$usr['matt'])/2*2); $def = round(($usr['pdef']+$usr['mdef'])/2*2); $alm = 0; $money = 1000000; $times = 1800; $sms="Att & Def  +200% / -1kk Аден / 30 мин";} // 
+if ($_GET['tip']=="300")	{$att = round(($usr['patt']+$usr['matt'])/2*3); $def = round(($usr['pdef']+$usr['mdef'])/2*3); $alm = 20; $money = 0; $times = 1800; $sms="Att & Def  +300% / CoL -20 / 30 мин";} // 
+if ($_GET['tip']=="4001")	{$att = round(($usr['patt']+$usr['matt'])/2*4); $def = round(($usr['pdef']+$usr['mdef'])/2*4); $alm = 50; $money = 0; $times = 1800; $sms="Att & Def  +400% / CoL -50 / 30 мин";} // 
+if ($_GET['tip']=="4002")	{$att = round(($usr['patt']+$usr['matt'])/2*4); $def = round(($usr['pdef']+$usr['mdef'])/2*4); $alm = 150; $money = 0; $times = 7200; $sms="Att & Def  +400% / CoL -150 / 2 часа";} // 
+if ($_GET['tip']=="4003")	{$att = round(($usr['patt']+$usr['matt'])/2*4); $def = round(($usr['pdef']+$usr['mdef'])/2*4); $alm = 250; $money = 0; $times = 18000; $sms="Att & Def  +400% / CoL -250 / 5 часов";} // 
 	
-if ($_GET[tip]=="200kad")	{$att = 60000; $def = 60000; $alm = 300; $money = 0; $times = 86400; $sms="Att & Def  +60`000 / CoL -300 / 24 часа";} // 
+if ($_GET['tip']=="200kad")	{$att = 60000; $def = 60000; $alm = 300; $money = 0; $times = 86400; $sms="Att & Def  +60`000 / CoL -300 / 24 часа";} // 
 
 
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$nick'");
@@ -114,7 +114,7 @@ exit;
 }
 $mag = mysql_fetch_array($req);
 
-if ($magiya[tip]=="bafhp" && $mag[hp]>=$mag[hpall]){echo "У игрока полно жизней!<br/>";}else{
+if ($magiya['tip']=="bafhp" && $mag['hp']>=$mag['hpall']){echo "У игрока полно жизней!<br/>";}else{
 
 
 $req1 = mysql_query("SELECT * FROM `baf` WHERE `usr` = '$nick' LIMIT 1");
@@ -129,11 +129,11 @@ include($path.'inc/down.php');exit;
 $reqi = mysql_query("SELECT * FROM `users` WHERE `usr`='$nick' LIMIT 1");
 $usr = mysql_fetch_array($reqi);
 
-if($udata[almaz]<$alm){echo'<p>Недостаточно Coin of Luck!</p></br>';
+if($udata['almaz']<$alm){echo'<p>Недостаточно Coin of Luck!</p></br>';
  echo"<hr/><a href=\"baf_vip.php?&nick=$nick\">Назад</a>";
 include($path.'inc/down.php');exit;}
 
-if($udata[money]<$money){echo'<p>Недостаточно Аден!</p></br>';
+if($udata['money']<$money){echo'<p>Недостаточно Аден!</p></br>';
  echo"<hr/><a href=\"baf_vip.php?&nick=$nick\">Назад</a>";
 include($path.'inc/down.php');exit;}
 
@@ -148,10 +148,10 @@ mysql_query("INSERT INTO
         `pmdef` = '$def',
         `time` = '$time'");}
 
-$patt=$att+$usr[patt];
-$matt=$att+$usr[matt];
-$pdef=$def+$usr[pdef];
-$mdef=$def+$usr[mdef];
+$patt=$att+$usr['patt'];
+$matt=$att+$usr['matt'];
+$pdef=$def+$usr['pdef'];
+$mdef=$def+$usr['mdef'];
 
 
 
@@ -163,8 +163,8 @@ $rezult = mysql_query("UPDATE `users` SET
           WHERE usr = '$nick'");
 
 	
-	$nmon = $udata[money] - $money;
-	$nalm = $udata[almaz] - $alm;
+	$nmon = $udata['money'] - $money;
+	$nalm = $udata['almaz'] - $alm;
 		  
 mysql_query("UPDATE `users` SET `money`='$nmon',`almaz`='$nalm' WHERE usr = '$log'");
 		  

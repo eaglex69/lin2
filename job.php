@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Задания';
@@ -24,15 +24,15 @@ echo "<p><hr/></p>";
 
 //-------------мобы в сумме 2000 доступно с 76 уровня-------------------
 // награда +5 кол -/- + опыт от уровня
-if ($udata[lvl]>76){
+if ($udata['lvl']>76){
 
 //---выполненно--
-if (isset($_GET[jbm])){
+if (isset($_GET['jbm'])){
 $jm = mysql_fetch_array(mysql_query("SELECT * FROM job_mob WHERE `usr` = '$log' LIMIT 1"));
-if($jm[kill]>=20000){
+if($jm['kill']>=20000){
 
-$newexp = $udata[exp]+5000000000;
-$newalmaz = $udata[almaz]+1200;
+$newexp = $udata['exp']+5000000000;
+$newalmaz = $udata['almaz']+1200;
 
 mysql_query("UPDATE users SET `exp` = '$newexp', `almaz` = '$newalmaz'  WHERE `usr` = '$log' Limit 1"); // вознаграждение
 
@@ -46,7 +46,7 @@ mysql_query("UPDATE job_mob SET `kill` = 'off',`data` = '$date' WHERE `usr` = '$
 
 
 $jm = mysql_fetch_array(mysql_query("SELECT * FROM `job_mob` WHERE `usr` = '$log' LIMIT 1"));
-if(empty($jm[kill])){$mobkill=0;}else{$mobkill=$jm[kill];}
+if(empty($jm['kill'])){$mobkill=0;}else{$mobkill=$jm['kill'];}
 
 $moball=20000; // при смене менять и в файле battle.php
 $mobpr = floor($mobkill / $moball*100);
@@ -70,15 +70,15 @@ echo "<p><hr/></p>";
 
 //-------------рыбалка в сумме 1000 доступно с 50 уровня-------------------
 // награда +5 кол -/- + опыт от уровня
-if ($udata[lvl]>49){
+if ($udata['lvl']>49){
 
 //---выполненно--
-if (isset($_GET[jbf])){
+if (isset($_GET['jbf'])){
 $jm = mysql_fetch_array(mysql_query("SELECT * FROM job_fish WHERE `usr` = '$log' LIMIT 1"));
-if($jm[kill]>=10000){
+if($jm['kill']>=10000){
 
-$newexp = $udata[exp]+1000000000;
-$newalmaz = $udata[almaz]+450;
+$newexp = $udata['exp']+1000000000;
+$newalmaz = $udata['almaz']+450;
 
 mysql_query("UPDATE users SET `exp` = '$newexp', `almaz` = '$newalmaz'  WHERE `usr` = '$log' Limit 1"); // вознаграждение
 
@@ -92,7 +92,7 @@ mysql_query("UPDATE job_fish SET `kill` = 'off',`data` = '$date' WHERE `usr` = '
 
 
 $jm = mysql_fetch_array(mysql_query("SELECT * FROM `job_fish` WHERE `usr` = '$log' LIMIT 1"));
-if(empty($jm[kill])){$mobkill=0;}else{$mobkill=$jm[kill];}
+if(empty($jm['kill'])){$mobkill=0;}else{$mobkill=$jm['kill'];}
 
 $moball=10000; // при смене менять и в файле fish.php
 $mobpr = floor($mobkill / $moball*100);
@@ -118,15 +118,15 @@ echo "<p><hr/></p>";
 
 //-------------Мастер PvP в сумме 100 доступно с 50 уровня-------------------
 // награда +5 кол -/- + опыт от уровня
-if ($udata[lvl]>49){
+if ($udata['lvl']>49){
 
 //---выполненно--
-if (isset($_GET[jpvp])){
+if (isset($_GET['jpvp'])){
 $jm = mysql_fetch_array(mysql_query("SELECT * FROM job_pvp WHERE `usr` = '$log' LIMIT 1"));
-if($jm[kill]>=100){
+if($jm['kill']>=100){
 
-$newexp = $udata[exp]+2000000000;
-$newalmaz = $udata[almaz]+75;
+$newexp = $udata['exp']+2000000000;
+$newalmaz = $udata['almaz']+75;
 
 mysql_query("UPDATE users SET `exp` = '$newexp', `almaz` = '$newalmaz'  WHERE `usr` = '$log' Limit 1"); // вознаграждение
 
@@ -140,7 +140,7 @@ mysql_query("UPDATE job_pvp SET `kill` = 'off',`data` = '$date' WHERE `usr` = '$
 
 
 $jm = mysql_fetch_array(mysql_query("SELECT * FROM `job_pvp` WHERE `usr` = '$log' LIMIT 1"));
-if(empty($jm[kill])){$mobkill=0;}else{$mobkill=$jm[kill];}
+if(empty($jm['kill'])){$mobkill=0;}else{$mobkill=$jm['kill'];}
 
 $moball=100; // при смене менять и в файле okar.php
 $mobpr = floor($mobkill / $moball*100);

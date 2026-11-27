@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shoppit';//фикс. места
@@ -16,18 +16,18 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 echo "<font color=#f4d06e><b><p>Вещи для питомцев</p></b></font><hr/>";
-if(empty($_GET[o])){
+if(empty($_GET['o'])){
 echo"<div class=inoy><a href=\"shoppit.php?o=weapon\">Отдел оружия</a>";
 echo"<a href=\"shoppit.php?o=golova\">Отдел шлемов</a>";
 echo"<a href=\"shoppit.php?o=body\">Отдел доспехов</a>";
 echo"<a href=\"shoppit.php?o=nogi\">Отдел сапог</a></div>";
 }else{
-if($_GET[o]!=weapon && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=nogi){
+if($_GET['o']!='weapon' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='nogi'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -53,7 +53,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -67,7 +67,7 @@ case 'nogi':
 $tip='Сапоги';
 break;
 }
-switch($mag[rasa]){
+switch($mag['rasa']){
 case 'not':
 $rasa='Все';
 break;
@@ -91,7 +91,7 @@ echo"<b>$mag[name]</b><br/>
 echo"<a href=\"shoppit.php?\">Назад</a>";
 break;
 case 'sell':
-if($_GET[act]==ask){
+if($_GET['act']=='ask'){
 echo'Вы действительно хотите купить эту вещь?<br/>';
 echo"<a href=\"shoppit.php?mod=sell&amp;id=$_GET[id]\">Да</a><br/>";
 echo"<a href=\"shoppit.php?\">Нет</a>";
@@ -116,10 +116,10 @@ $liders='black';
 $liders='not';
 }
 if($udata['storona']==$liders){
-$mag[cena]=round($mag[cena]-(($mag[cena]/100)*15));
+$mag['cena']=round($mag['cena']-(($mag['cena']/100)*15));
 }
 
-$nmoney=$udata[money]-$mag[cena];
+$nmoney=$udata['money']-$mag['cena'];
 
 if($nmoney<0){
 echo'Нехватает монет!';
@@ -143,11 +143,11 @@ mysql_query("INSERT INTO
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]' LIMIT 1");
 ////////////////////////////
 $city = mysql_fetch_array($req);
-if($city[clan]!='not' and $udata[clan]!=$city[clan]){
+if($city['clan']!='not' and $udata['clan']!=$city['clan']){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider`='$city[clan]'");
 ////////////////////////////
 $clan = mysql_fetch_array($req);
-$clan[money]=$clan[money]+round(($mag[cena]/100)*2);
+$clan['money']=$clan['money']+round(($mag['cena']/100)*2);
 
 mysql_query("UPDATE `clan` SET `money` = '$clan[money]' WHERE `lider` = '$city[clan]'");
 }

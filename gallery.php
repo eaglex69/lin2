@@ -1,4 +1,4 @@
-<?
+<?php
 
 define('PROTECTOR', 1);
 $headmod = 'gallery';//фикс. места
@@ -11,12 +11,12 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-if (isset($_GET[del])){
+if (isset($_GET['del'])){
 
 
-if($udata[dostup] >= 2)
+if($udata['dostup'] >= 2)
 {
-if(empty($_GET[del])){
+if(empty($_GET['del'])){
 echo"<hr/><font color=red><p>Не выбран пост!</p></font>";
 }else{
 $asd = mysql_query("SELECT * FROM gallery_kom WHERE id='$_GET[del]' LIMIT 1");
@@ -40,14 +40,14 @@ echo "Ошибка!Доступ закрыт!";
 
 
 //////////////////////////////		Коментарии	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET[kom])){
+if (isset($_GET['kom'])){
 
 
 //-------------------------------------------
-if (!empty($_POST[text])) // если естьтекст записуем сообщение
+if (!empty($_POST['text'])) // если естьтекст записуем сообщение
 {
 
-$msg = $_POST[text];
+$msg = $_POST['text'];
 $msg = htmlspecialchars(stripslashes(trim($msg)));
 $log = htmlspecialchars(stripslashes(trim($log)));
 $currHour=date("H",time());
@@ -57,7 +57,7 @@ $currTime=date("$currHour:i", time());
 // пишем антифлуд
 $req6546 = mysql_query("SELECT * FROM `gallery_kom` WHERE `usr` = '$log' && `id_tm` = '$_GET[kom]' ORDER BY id DESC LIMIT 1");
 $pr = mysql_fetch_array($req6546);
-if($pr[text] == $msg){
+if($pr['text'] == $msg){
 echo'<font color=#9E0000>Антифлуд!</font><br/>';}else{
 
 $ressave = mysql_query("INSERT INTO `gallery_kom` SET
@@ -116,12 +116,12 @@ if($avt>=1)
 
 function smilesmsg($string54545){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string54545=str_replace(":$file2",'<img src="pic/smiles/'.$file.'" alt="" height="30" width="30">',$string54545);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string54545;  }
 
 
@@ -130,18 +130,18 @@ While($tk = mysql_fetch_array($req))
 {
 $us = mysql_query("SELECT * FROM `users` WHERE usr = '$tk[usr]' LIMIT 1");
 $usr = mysql_fetch_array($us);
-if ($usr[dostup]>=4)						{$color = '<font color=lime>'; $color2 = '<font color=#5e995c>';}
-if ($usr[dostup]==2 or $usr[dostup]==3)	{$color = '<font color=#0026FF>'; $color2 = '<font color=#6DC2FF>';}
-if ($usr[dostup]==1) 					{$color = '<font color=#7F6A00>'; $color2 = '<font color=#A09353>';}
-if ($usr[dostup]==0) 					{$color = ''; $color2 = '';}
+if ($usr['dostup']>=4)						{$color = '<font color=lime>'; $color2 = '<font color=#5e995c>';}
+if ($usr['dostup']==2 or $usr['dostup']==3)	{$color = '<font color=#0026FF>'; $color2 = '<font color=#6DC2FF>';}
+if ($usr['dostup']==1) 					{$color = '<font color=#7F6A00>'; $color2 = '<font color=#A09353>';}
+if ($usr['dostup']==0) 					{$color = ''; $color2 = '';}
 
 
-if($udata[dostup]>=2){
+if($udata['dostup']>=2){
 $silka = " <a href=\"gallery.php?kom=$_GET[kom]&amp;del=$tk[id]\"><font color=red><small> [x] </small></font></a>";
 }
 
 
-$text = $tk[text];
+$text = $tk['text'];
 
 $text = smilesmsg($text);
 $text = nl2br($text);
@@ -152,7 +152,7 @@ $color2 $text</font></div><hr/>";
 }
 
 echo "<div class=dot><p>";
-	navig2($page, 'gallery.php?kom='.$_GET[kom].'&amp;', $pages);
+	navig2($page, 'gallery.php?kom='.$_GET['kom'].'&amp;', $pages);
 echo "</p></div>";
 	
 }else{
@@ -358,9 +358,9 @@ echo '<font color=red>Вы успешно загрузили фотографи�
  echo "Ошибка загрузки файла.\n";
  }
 //считываем содержания файла
-$fp = fopen($uploadfile, 'r');
-$contents = fread($fp, filesize ($uploadfile));
-fclose($fp);
+$fp = @fopen($uploadfile, 'r');
+$contents = ($fp && filesize ($uploadfile) > 0) ? fread($fp, filesize ($uploadfile)) : '';
+if ($fp) fclose($fp);
 
 mysql_query("INSERT INTO `gallery` SET `koment` = '".mysql_real_escape_string($_POST['koment'])."', `foto` = '$newFileName', `user` = '$log'");
 
@@ -377,7 +377,7 @@ mysql_query("INSERT INTO `gallery` SET `koment` = '".mysql_real_escape_string($_
  <input type="submit" value="Загрузить">
 </form>
 
-<?
+<?php
 
 break;
 

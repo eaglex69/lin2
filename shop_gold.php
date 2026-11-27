@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'shop';//фикс. места
@@ -16,8 +16,9 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-$tip2=$_GET[tip2];
-$lvlus=$_GET[lvlus];
+$tip2=$_GET['tip2'];
+$lvlus=$_GET['lvlus'];
+$o=isset($_GET['o'])?$_GET['o']:'';
 
 /*if ($udata[dostup]<4){
 
@@ -27,7 +28,7 @@ echo "<hr/><p><font color=red>Приносим свои извенения. Пр
 }*/
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"</div></div> <div class=menu> <font color=#ffffcc>Решил прикупится? GOLD магазин к твоим услугам<br/>Выберай что нужно: </font><br/><br/></div>";
@@ -57,7 +58,7 @@ echo"<a href=\"shop_gold.php?\">Назад</a>";
 break;
 
 case 'b':
-if(empty($_GET[o])){
+if(empty($_GET['o'])){
 echo"<font color=grey> Хах...Защита важная часть!!! </font><br/><br/>";
 
 echo "<div class=inoy>";
@@ -80,7 +81,7 @@ echo"<br/><a href=\"shop_gold.php?\">Назад</a>";
 echo "</div>";
 
 }else{
-if($_GET[o]!=shit && $_GET[o]!=golova && $_GET[o]!=body && $_GET[o]!=poyas && $_GET[o]!=rpoyas && $_GET[o]!=plash && $_GET[o]!=pants && $_GET[o]!=ruki && $_GET[o]!=nogi){
+if($_GET['o']!='shit' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='poyas' && $_GET['o']!='rpoyas' && $_GET['o']!='plash' && $_GET['o']!='pants' && $_GET['o']!='ruki' && $_GET['o']!='nogi'){
 echo'Ошибка!';
 include($path.'inc/down.php');
 exit;
@@ -123,10 +124,10 @@ $avto=mysql_num_rows($req);
 
 While($mag = mysql_fetch_array($req))
 {
-$mag[name] = htmlspecialchars(stripslashes(addslashes($mag[name])));
+$mag['name'] = htmlspecialchars(stripslashes(addslashes($mag['name'])));
 
 echo" <img src=\"shmot/$mag[name].png\" alt=\"pic\"/>
- <a href=\"shop_gold.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag[cena])." <hr/>";
+ <a href=\"shop_gold.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag['cena'])." <hr/>";
 }
 
 echo"<br/><a href=\"shop_gold.php?mod=b\">Назад</a>";
@@ -195,7 +196,7 @@ While($mag = mysql_fetch_array($req))
 
 echo"	<img src=\"shmot/$mag[name].png\" alt=\"pic\"/>
 		<a href=\"shop_gold.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/>
-		Цена: ".number_format($mag[cena])." Gold Bar "; 
+		Цена: ".number_format($mag['cena'])." Gold Bar "; 
 		//[<a href=\"sell_gold.php?act=ask&amp;id=$mag[id]\">купить</a>]<br/>";
 echo "<hr/>";
 }
@@ -211,7 +212,7 @@ include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag[tip]){
+switch($mag['tip']){
 case 'weapon':
 $tip='Оружие';
 break;
@@ -243,7 +244,7 @@ case 'ruki':
 $tip='Рукавицы';
 break;
 }
-switch($mag[klas]){
+switch($mag['klas']){
 case 'not':
 $klas='Все';
 break;
@@ -256,18 +257,18 @@ break;
 }
 
 
-if($mag[nlvl]<20){$st="NG";}
-elseif($mag[nlvl]>=20 and $mag[nlvl]<40){$st="D";}
-elseif($mag[nlvl]>=40 and $mag[nlvl]<52){$st="C";}
-elseif($mag[nlvl]>=52 and $mag[nlvl]<62){$st="B";}
-elseif($mag[nlvl]>=62 and $mag[nlvl]<76){$st="A";}
-elseif($mag[nlvl]>=76 and $mag[nlvl]<91){$st="S";}
-elseif($mag[nlvl]>=91){$st="R";}
+if($mag['nlvl']<20){$st="NG";}
+elseif($mag['nlvl']>=20 and $mag['nlvl']<40){$st="D";}
+elseif($mag['nlvl']>=40 and $mag['nlvl']<52){$st="C";}
+elseif($mag['nlvl']>=52 and $mag['nlvl']<62){$st="B";}
+elseif($mag['nlvl']>=62 and $mag['nlvl']<76){$st="A";}
+elseif($mag['nlvl']>=76 and $mag['nlvl']<91){$st="S";}
+elseif($mag['nlvl']>=91){$st="R";}
 
 
 echo"<b></div></div></div><div class=menu><img src=\"shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b><br/>
 Тип: $tip<br/>
-Цена: ".number_format($mag[cena], 0, ',', "'")." Gold Bar <br/><br/>";
+Цена: ".number_format($mag['cena'], 0, ',', "'")." Gold Bar <br/><br/>";
 
 if ($tip=="Оружие"){
 echo "

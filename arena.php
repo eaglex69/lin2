@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'arena';//фикс. места
@@ -13,11 +13,11 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"<center><img src=\"pic/roz/пвпарена.png\" alt=\"\"></center>";
-if($udata[lvl]<20){
+if($udata['lvl']<20){
 $textl='Битва';
 echo "<b>Арена будет доступна с 20 уровня!</b>";
 echo"<div class=inoy><a href=\"gorod.php?\">Назад</a>";
@@ -43,7 +43,7 @@ $asd = mysql_query("SELECT laikas, usr FROM online WHERE laikas > '$timeou' and 
 $i=1;
 While($visi = mysql_fetch_array($asd))
 {
-if ($usr[hp]<0){echo "<div class=menu> $arena[usr] <font color=grey> убит </font><br/></div>";}else{
+if ($usr['hp']<0){echo "<div class=menu> $arena[usr] <font color=grey> убит </font><br/></div>";}else{
 echo"<div class=inoy><a href=\"okar.php?k=ar&amp;id=$usr[id]\"> $arena[usr] <font color=#FFFFFF>[$usr[hp]/$usr[hpall]]</font></a></div> ";
 }}}}else{echo "<div class=menu>Кроме Вас на Арене никого нет.";}
 

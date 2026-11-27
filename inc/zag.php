@@ -1,4 +1,4 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 
 
@@ -69,10 +69,10 @@ echo'<div class="menu">';
 echo"<b> Вы убиты!</b>";
 echo"<br/> Выберите способ воскрешения.<br/>";
 
-$exp = $udata[exp]*0.005;
-$exp2 = $udata[exp]*0.002;
+$exp = $udata['exp']*0.005;
+$exp2 = $udata['exp']*0.002;
 
-if ($udata[lvl]<=9)	{echo"<br/><a href=\"res.php?mod=11\">Воскреснуть </a> <br/> До 9 уровня Вас воскрешают без потери опыта.";}else{
+if ($udata['lvl']<=9)	{echo"<br/><a href=\"res.php?mod=11\">Воскреснуть </a> <br/> До 9 уровня Вас воскрешают без потери опыта.";}else{
 	echo"<br/><a href=\"res.php?mod=1\">Воскреснуть самому. Утеря ".number_format($exp, 0, ',', ' ')." EXP </a>";
 	echo"<br/><a href=\"res.php?mod=2\">Заплатить целителю 200`000 Аден.  Утеря ".number_format($exp2, 0, ',', ' ')." EXP </a>";}
 
@@ -96,7 +96,7 @@ echo "</div>";
 // запись Смерти юзера
 $reqin = mysql_query("SELECT * FROM `smert` WHERE `usr`='$log' and `life`='no'");		 //
 $magia = mysql_num_rows($reqin);
-if ($udata[hp]<=0 and $magia==0)
+if ($udata['hp']<=0 and $magia==0)
 {
 $res = mysql_query ("INSERT INTO `smert` SET
         `usr` = '$log',
@@ -104,7 +104,7 @@ $res = mysql_query ("INSERT INTO `smert` SET
         `mp` = '$udata[mp]',
         `life` = 'no',
         `kom`='Убил моб'");
-$loses=$udata[loses];
+$loses=$udata['loses'];
 
 $ress = mysql_query ("UPDATE users SET
         loses='$loses',
@@ -134,19 +134,19 @@ $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$log' LIMIT 1");
 $avto=mysql_num_rows($req222);
 if($avto==1){
 $col = mysql_fetch_array($req222);
-echo '<font color="#'.$col[color].'"><b>'.$log.' </b></font>'; 
+echo '<font color="#'.$col['color'].'"><b>'.$log.' </b></font>'; 
 }else{
 echo '<font color="#ffffcc">'.$log.' | </font>';}
-echo '<font color="#ffffcc">'.$udata[lvl].'  ур.  '.$lvlplus.'</font> <font color=#ffffff></font><br/>';
+echo '<font color="#ffffcc">'.$udata['lvl'].'  ур.  '.$lvlplus.'</font> <font color=#ffffff></font><br/>';
 
 
-if ($udata[hp]>=0){
-$hprez=$udata[hp]/$udata[hpall]*100;
-$mprez=$udata[mp]/$udata[mpall]*100;
+if ($udata['hp']>=0){
+$hprez=lin2_div($udata['hp'],$udata['hpall'])*100;
+$mprez=lin2_div($udata['mp'],$udata['mpall'])*100;
 
 if ($hprez>100) {$hprez=100;};
 if ($mprez>100) {$mprez=100;};
-} else {$udata[hp]=0; $hprez=0;}
+} else {$udata['hp']=0; $hprez=0;}
 
 
 
@@ -179,16 +179,16 @@ echo "<br/></div>";
 ///////////////////////////////////////////////////////////
 
 //-------оплатить разблок-----------------
-if (isset($_GET[block_del])){
+if (isset($_GET['block_del'])){
 $req = mysql_query("SELECT * FROM `block` WHERE `usr` = '$log' LIMIT 1");
 $avto = mysql_num_rows($req);
 if ($avto == 1) {
   
   $ban = mysql_fetch_array($req);    
 
-  if ($ban[cena]>0){
+  if ($ban['cena']>0){
   
-$colnew = $udata[almaz]-$ban[cena];
+$colnew = $udata['almaz']-$ban['cena'];
 
 if ($colnew >=0)
 {
@@ -217,7 +217,7 @@ $req = mysql_query("SELECT * FROM `block` WHERE `usr` = '$log' LIMIT 1");
 $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);    
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `block` WHERE `usr` = '$log'");
     }else{
 	echo "<div class=menu>";
@@ -225,17 +225,17 @@ if ($avto == 1) {
     echo"<font color=#ff4040>Ваш персонаж был Заблокирован!</font></b><br/>
 	<font color=#f4d06e>Кем:<b></font><a href=\"search.php?nick=$ban[log]&amp;go=go\"><font color=#ffffcc> $ban[log]</a><br/>
 	<font color=#f4d06e>Причина:</b></font> <font color=#ffffcc>$ban[text]!</font><font color=#f4d06e> <br/>Осталось: ";
-$ban[ban_time]=$ban[ban_time]-time();
-if($ban[ban_time]<60){
+$ban['ban_time']=$ban['ban_time']-time();
+if($ban['ban_time']<60){
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>сек.";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>мин.";
-}else{$ban[ban_time]=round($ban[ban_time]/3600);
+}else{$ban['ban_time']=round($ban['ban_time']/3600);
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>часов";}
 echo "</font></b>"; 
 
- if ($ban[cena]>0){
+ if ($ban['cena']>0){
  echo "<br/><font color=#f4d06e> Цена разбл: - <font color=#ffffcc>$ban[cena] CoL</font>";
  echo'<div class=inoy> <a href="?block_del">&#187; Оплатить</a> </div>';
 }
@@ -253,7 +253,7 @@ $req = mysql_query("SELECT * FROM `block_ip` WHERE `ip` = '$ip' LIMIT 1");
 $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);    
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `block_ip` WHERE `ip` = '$ip'");
     }else{
 	echo "<div class=menu>";
@@ -261,17 +261,17 @@ if ($avto == 1) {
     echo"<font color=#f4d06e>Ваш персонаж был Заблокирован!</font></b><br/>
 	<font color=#f4d06e>Кем:<b></font><a href=\"search.php?nick=$ban[log]&amp;go=go\"><font color=#ffffcc> $ban[log]</a><br/>
 	<font color=#f4d06e>Причина:</b></font> <font color=#ffffcc>$ban[text]!</font> <br/><font color=#f4d06e>Осталось: ";
-$ban[ban_time]=$ban[ban_time]-time();
-if($ban[ban_time]<60){
+$ban['ban_time']=$ban['ban_time']-time();
+if($ban['ban_time']<60){
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>сек.";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>мин.";
-}else{$ban[ban_time]=round($ban[ban_time]/3600);
+}else{$ban['ban_time']=round($ban['ban_time']/3600);
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>часов";}
 echo "</font></b>"; 
 
- if ($ban[cena]>0){
+ if ($ban['cena']>0){
  echo "<br/><font color=#f4d06e> Цена разбл: - <font color=#ffffcc>$ban[cena] CoL</font>";
  echo'<div class=inoy> <a href="?block_del">&#187; Оплатить</a> </div>';
 }
@@ -291,9 +291,9 @@ echo "<hr/><p><font color=#f4d06e>Если вы считаете, что заб�
 $wm = mysql_num_rows(mysql_query("SELECT * FROM `zakaz_col_wm`"));// новые заявки пополнения WebMoney
 if ($wm!==0){$wm1="+$wm";}
 
-if($udata[dostup]>=4){
+if($udata['dostup']>=4){
 
-if($udata[dostup]==5){$gmsilka = '<a href="/gm/"><font color=#ffffcc>GM '.$wm1.'</font></a> 		<font color=#af9878>| ';}
+if($udata['dostup']==5){$gmsilka = '<a href="/gm/"><font color=#ffffcc>GM '.$wm1.'</font></a> 		<font color=#af9878>| ';}
 
 $tk7 = mysql_query("SELECT * FROM `tiket_tm` WHERE news != ''");
 $avt = mysql_num_rows($tk7);
@@ -303,7 +303,7 @@ $avt = mysql_num_rows($tk7);
 if ($avt>=1){																		//
 While($tk = mysql_fetch_array($tk7))												//
 {																					//
-$rez = $tk[news] + $rez;															//
+$rez = $tk['news'] + $rez;															//
 }}																					//
 if ($rez>0){$rezl = "(+$rez)";}														//
 
@@ -321,7 +321,7 @@ echo' '.$gmsilka.'
 echo "</center></div></div>";
 }
 
-if($udata[dostup]==2 or $udata[dostup]==3){
+if($udata['dostup']==2 or $udata['dostup']==3){
 echo "<div class=admin><center>";
 
 echo'	<a href="/mod_panel.php?"><font color=#ffffcc>МД-П</a> <font color=#af9878>| 
@@ -331,8 +331,8 @@ echo'	<a href="/mod_panel.php?"><font color=#ffffcc>МД-П</a> <font color=#af9
 																					//
 echo "</center></div></div>";																//
 }
-if($udata[time]<3600*24*7){
-if($udata[dostup]<1 or $udata[usr]=='Ultimate'){
+if($udata['time']<3600*24*7){
+if($udata['dostup']<1 or $udata['usr']=='Ultimate'){
 $frazy = mysql_fetch_array(mysql_query('SELECT * FROM `text` ORDER BY RAND() LIMIT 1'));
 }}							//
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -341,10 +341,10 @@ $reqac = mysql_query("SELECT * FROM `academy` WHERE `student` = '$log' LIMIT 1")
 $ac = mysql_num_rows($reqac); 
 
 if($ac>0){
-if($udata[lvl]>72){
+if($udata['lvl']>72){
 $reqclan = mysql_query("SELECT * FROM `clan` where `lider`='$udata[clan]'");
 $clan = mysql_fetch_array($reqclan);
-$clanrep=$clan[rep]+1;
+$clanrep=$clan['rep']+1;
 mysql_query("UPDATE clan SET rep = '$clanrep' WHERE lider = '$udata[clan]' LIMIT 1");
 mysql_query("UPDATE users SET clan = '' WHERE usr = '$log' LIMIT 1");
 mysql_query("DELETE FROM academy WHERE student = '$log' LIMIT 1");
@@ -352,7 +352,7 @@ mysql_query("DELETE FROM academy WHERE student = '$log' LIMIT 1");
 }   
 
 
-if($udata[dostup] > 4){
+if($udata['dostup'] > 4){
 $reqac = mysql_query("SELECT * FROM `item` WHERE `time` >1");
 $ac = mysql_num_rows($reqac); 
 if($ac>0){
@@ -363,7 +363,7 @@ mysql_query("DELETE FROM `item` WHERE `time`  >1 ");
 $reqis = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$log' LIMIT 1");
     $prov = mysql_fetch_array($reqis);    
 
-if($prov[place]=="chat" or $prov[place]=="forum_in" or $prov[place]=="tchat" or $prov[place]=="msg"){
+if($prov['place']=="chat" or $prov['place']=="forum_in" or $prov['place']=="tchat" or $prov['place']=="msg"){
 
 
 // если игрок забанен
@@ -372,18 +372,18 @@ $req = mysql_query("SELECT * FROM `ban` WHERE `usr` = '$log' LIMIT 1");
 $avto = mysql_num_rows($req);
 if ($avto == 1) {
     $ban = mysql_fetch_array($req);    
-    if($ban[ban_time]<$t){
+    if($ban['ban_time']<$t){
     mysql_query("DELETE FROM `ban` WHERE `usr` = '$log'");
     }else{
 echo'<div class="foot"><center>';
     echo"<font color=#f4d06e>Ваш персонаж был забанен!</font></b><br/> <font color=#f4d06e>Причина:</font> <font color=#ffffcc>$ban[text]!</font> <br/><font color=#f4d06e>Осталось: ";
-$ban[ban_time]=$ban[ban_time]-time();
-if($ban[ban_time]<60){
+$ban['ban_time']=$ban['ban_time']-time();
+if($ban['ban_time']<60){
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>сек.";
-}elseif($ban[ban_time]>60 and $ban[ban_time]<3600){
-$ban[ban_time]=round($ban[ban_time]/60);
+}elseif($ban['ban_time']>60 and $ban['ban_time']<3600){
+$ban['ban_time']=round($ban['ban_time']/60);
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>мин.";
-}else{$ban[ban_time]=round($ban[ban_time]/3600);
+}else{$ban['ban_time']=round($ban['ban_time']/3600);
 echo "<font color=#ffffcc>$ban[ban_time] <font color=#f4d06e>часов";}
 echo "</b>"; 
 echo "<br/><br/>Вам закрыт доступ в Почту, Чат и Форум.<br/><br/>";
@@ -445,24 +445,24 @@ $pita345 = mysql_query("SELECT id,hp,hpall,lvl,name,lasteda FROM `pit` WHERE `us
 $avtopit = mysql_num_rows($pita345);     
 $adres = $_SERVER['SCRIPT_NAME'];
 if($avtopit==1 and $adres!="/pit.php"  and $adres!="/pitomec.php"){ $pit = mysql_fetch_array($pita345);
-if ($pit[hp]>=0){
-$hprezpit=$pit[hp]/$pit[hpall]*100;
+if ($pit['hp']>=0){
+$hprezpit=lin2_div($pit['hp'],$pit['hpall'])*100;
 
 if ($hprezpit>100) {$hprezpit=100;};
-} else {$pit[hp]<=0; $hprezpit=0;}
+} else {$pit['hp']<=0; $hprezpit=0;}
 
 		echo "<div class=\"paty\"><div style=margin-left:7px;><b> Питомец  с <a href=\"/pit.php?mod=mypit\">$pit[name]</a> - $pit[lvl] ур.</b><br/>";
 
-echo '<span style="top:9px;left:2%;color:#FF6633;"> <b>HP:</b>    '.$pit[hp].' / '.$pit[hpall].'</span>&nbsp;&nbsp;';
+echo '<span style="top:9px;left:2%;color:#FF6633;"> <b>HP:</b>    '.$pit['hp'].' / '.$pit['hpall'].'</span>&nbsp;&nbsp;';
 echo '<span style=color:orange;>';
-		$pit[lasteda]=$pit[lasteda]-time();
-if($pit[lasteda]<60){
+		$pit['lasteda']=$pit['lasteda']-time();
+if($pit['lasteda']<60){
 echo "[$pit[lasteda] сек.]<br/>";
-}elseif($pit[lasteda]>60 and $pit[lasteda]<3600){
-$pit[lasteda]=round($pit[lasteda]/60);
+}elseif($pit['lasteda']>60 and $pit['lasteda']<3600){
+$pit['lasteda']=round($pit['lasteda']/60);
 echo "[$pit[lasteda] мин.]<br/>";
 }else{
-$pit[lasteda]=round($pit[lasteda]/3600);
+$pit['lasteda']=round($pit['lasteda']/3600);
 echo "[$pit[lasteda] ч.]<br/>";
 }
 echo '</span>';
@@ -488,7 +488,7 @@ echo"<a href=\"/fish.php\"><span style=color:#f4d06e;>&#187 Вернуться �
 //-------------------------------------
 $adres = $_SERVER['SCRIPT_NAME'];
 if($adres!="/pers.php"){
-  if($udata[skill]>0){echo"<div><div class=\"info\"><div class=silka><a href=\"/pers.php?\"><font color=#ffffcc>&#187 Активные навыки </font><font color=#ff4040>+".$udata[skill]."</font></a></b></div></div>";}
+  if($udata['skill']>0){echo"<div><div class=\"info\"><div class=silka><a href=\"/pers.php?\"><font color=#ffffcc>&#187 Активные навыки </font><font color=#ff4040>+".$udata['skill']."</font></a></b></div></div>";}
 }
   //-------------------------------------
 ///////////////////////////////////////////////////////////////////////////////
@@ -558,9 +558,9 @@ echo " <a href=\"paty.php?&pt=kill\">Отказатся</a></b></p></div>";
 		$pgl = mysql_fetch_array($pgl);
 		$u = mysql_query("SELECT * FROM `users` WHERE `usr` = '$pgl[usr2]'");
 		$usr = mysql_fetch_array($u);
-if ($usr[hp]>=0){
-$php=$usr[hp]/$usr[hpall]*100;
-$pmp=$usr[mp]/$usr[mpall]*100;
+if ($usr['hp']>=0){
+$php=lin2_div($usr['hp'],$usr['hpall'])*100;
+$pmp=lin2_div($usr['mp'],$usr['mpall'])*100;
 
 if ($hprez>100) {$hprez=100;};
 if ($mprez>100) {$mprez=100;};
@@ -571,11 +571,11 @@ if ($mprez>100) {$mprez=100;};
 if ($avt2>=1){
 
 		echo "<div class=\"paty\"></b></font> <font color=#ffffcc>Пати с <a href=\"search.php?nick=$usr[usr]&amp;go=go\"><font color=#f4d06e>$usr[usr]</a> - <font color=#f4d06e>$usr[lvl] ур.</b><br/>";
-echo '</center>	<span style="top:9px;left:2%;color:#ff4040;"> HP:</b>    '.$usr[hp].' / '.$usr[hpall].'</span><div style="border:1px solid #990000;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#990000;height:10px;width:'.$php.'%;"></div></div>';
-echo '			<span style="top:9px;left:2%;color:skyblue;"> MP:</b>    '.$usr[mp].' / '.$usr[mpall].'</span><div style="border:1px solid #3333FF;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#3333FF;height:10px;width:'.$pmp.'%;"></div></div>';
+echo '</center>	<span style="top:9px;left:2%;color:#ff4040;"> HP:</b>    '.$usr['hp'].' / '.$usr['hpall'].'</span><div style="border:1px solid #990000;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#990000;height:10px;width:'.$php.'%;"></div></div>';
+echo '			<span style="top:9px;left:2%;color:skyblue;"> MP:</b>    '.$usr['mp'].' / '.$usr['mpall'].'</span><div style="border:1px solid #3333FF;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#3333FF;height:10px;width:'.$pmp.'%;"></div></div>';
 		echo "<div class=\"silka\"> <a href=\"paty.php?&pt=kill\">Покинуть пати</a></b></div></div>";
 		}else { 
-		if ($pgl[act2]=="kill"){$sm="<font color=#ff4040> Игрок отказался от участия в пати.</font>";}else{$sm="Игроку выслано приглашение.";}
+		if ($pgl['act2']=="kill"){$sm="<font color=#ff4040> Игрок отказался от участия в пати.</font>";}else{$sm="Игроку выслано приглашение.";}
 echo "<div class=\"paty\"><font color=#f4d06e></b></font> <font color=#ffffcc>Пати с <a href=\"search.php?nick=$usr[usr]&amp;go=go\"><font color=#f4d06e>$usr[usr]</a> - $usr[lvl] ур.</b><br/>";
 echo " $sm";
 		echo "<div class=\"silka\"> <a href=\"paty.php?&pt=kill\">Покинуть пати</a></b></div></div>";
@@ -591,7 +591,7 @@ echo " $sm";
 	if ($avto2>=1){
 		$usr = mysql_fetch_array($paty2);
 	
-	if ($usr[usr]=='***'){
+	if ($usr['usr']=='***'){
 echo "<div class=\"paty\">Вам предлогали пати! </b><br/>";
 echo "<font color=#ff4040>Игрок отказался от учасия.</font> <br/>";
 echo " <div class=silka><a href=\"paty.php?&pt=kill\">Отказатся так же</a></b></div></div>";
@@ -612,9 +612,9 @@ echo " <a href=\"paty.php?&pt=kill\"><font color=#ffffcc>Отказатся</a><
 		$p = mysql_fetch_array($p);
 		$u = mysql_query("SELECT * FROM `users` WHERE `usr` = '$p[usr]'");
 		$usr = mysql_fetch_array($u);
-if ($usr[hp]>=0){
-$php=$usr[hp]/$usr[hpall]*100;
-$pmp=$usr[mp]/$usr[mpall]*100;
+if ($usr['hp']>=0){
+$php=lin2_div($usr['hp'],$usr['hpall'])*100;
+$pmp=lin2_div($usr['mp'],$usr['mpall'])*100;
 
 if ($hprez>100) {$hprez=100;};
 if ($mprez>100) {$mprez=100;};
@@ -625,11 +625,11 @@ if ($mprez>100) {$mprez=100;};
 if ($avt2>=1){
 
 		echo "<div class=\"paty\"></b></font><font color=#ffffcc> Пати с <a href=\"search.php?nick=$usr[usr]&amp;go=go\"><font color=#f4d06e>$usr[usr]</a> - <font color=#f4d06e>$usr[lvl] ур.</b><br/>";
-echo '</center>	<span style="top:9px;left:2%;color:#ff4040;"> HP:</b>    '.$usr[hp].' / '.$usr[hpall].'</span><div style="border:1px solid #990000;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#990000;height:10px;width:'.$php.'%;"></div></div>';
-echo '			<span style="top:9px;left:2%;color:skyblue;"> MP:</b>    '.$usr[mp].' / '.$usr[mpall].'</span><div style="border:1px solid #3333FF;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#3333FF;height:10px;width:'.$pmp.'%;"></div></div>';
+echo '</center>	<span style="top:9px;left:2%;color:#ff4040;"> HP:</b>    '.$usr['hp'].' / '.$usr['hpall'].'</span><div style="border:1px solid #990000;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#990000;height:10px;width:'.$php.'%;"></div></div>';
+echo '			<span style="top:9px;left:2%;color:skyblue;"> MP:</b>    '.$usr['mp'].' / '.$usr['mpall'].'</span><div style="border:1px solid #3333FF;font-size: 9px;background:1px #282828;height:10px;width:120px;"><div style="background-color:#3333FF;height:10px;width:'.$pmp.'%;"></div></div>';
 		echo "<div class=\"silka\"> <a href=\"paty.php?&pt=kill\">Покинуть пати</a></b></div></div>";
 		}else { 
-		if ($p[act]=="kill"){$sm="<font color=#ff4040> Игрок отказался от участия в пати.</font>";}else{echo "Игроку выслано приглашение.";}
+		if ($p['act']=="kill"){$sm="<font color=#ff4040> Игрок отказался от участия в пати.</font>";}else{echo "Игроку выслано приглашение.";}
 echo "<div class=\"paty\"></font> <font color=#ffffcc>Пати с <a href=\"search.php?nick=$usr[usr]&amp;go=go\"><font color=#f4d06e>$usr[usr]</a> - $usr[lvl] ур.</b><br/>";
 echo " $sm";
 		echo "<div class=\"silka\"> <b><a href=\"paty.php?&pt=kill\">Покинуть пати</a></b></div></div>";
@@ -651,31 +651,31 @@ if($avto>=1){
 While($aur = mysql_fetch_array($req))
 {
 
-if ($aur[tip]=='bafkrit'){$tip="Критов";}
-if ($aur[tip]=='bafat'){$tip="Атаки";}
-if ($aur[tip]=='bafzash'){$tip="Защиты";}
-if ($aur[tip]=='bafzat'){$tip="Защиты и Атаки";}
+if ($aur['tip']=='bafkrit'){$tip="Критов";}
+if ($aur['tip']=='bafat'){$tip="Атаки";}
+if ($aur['tip']=='bafzash'){$tip="Защиты";}
+if ($aur['tip']=='bafzat'){$tip="Защиты и Атаки";}
 
-if ($aur[tip]=='5kad'){$tip="  <img src=\"pic/baff.png\" >	  ";}
-if ($aur[tip]=='40kad'){$tip=" <img src=\"pic/baff.png\" > ";}
-if ($aur[tip]=='300'){$tip=" <img src=\"pic/baff.png\" > ";}
-if ($aur[tip]=='4001'){$tip=" <img src=\"pic/baff.png\" > ";}
-if ($aur[tip]=='4002'){$tip=" <img src=\"pic/baff.png\" > ";}
-if ($aur[tip]=='4003'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='5kad'){$tip="  <img src=\"pic/baff.png\" >	  ";}
+if ($aur['tip']=='40kad'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='300'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='4001'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='4002'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='4003'){$tip=" <img src=\"pic/baff.png\" > ";}
 
-if ($aur[tip]=='200kad'){$tip=" <img src=\"pic/baff.png\" > ";}
-if ($aur[tip]=='200'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='200kad'){$tip=" <img src=\"pic/baff.png\" > ";}
+if ($aur['tip']=='200'){$tip=" <img src=\"pic/baff.png\" > ";}
 
 
 echo'<div class="info">';
 echo"  $tip  </b>";
 
-$aur[time]=$aur[time]-time();
-if($aur[time]<60){
-if ($aur[time]<=0){$aur[time]=0;}
+$aur['time']=$aur['time']-time();
+if($aur['time']<60){
+if ($aur['time']<=0){$aur['time']=0;}
 echo "  $aur[time] сек.";
 }else{
-$aur[time]=round($aur[time]/60);
+$aur['time']=round($aur['time']/60);
 echo "  $aur[time] мин.";
 }
 echo' </div>';

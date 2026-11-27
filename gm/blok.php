@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='Ред. Блок персонажа';
@@ -14,14 +14,14 @@ include($path.'inc/zag.php');
 ///////////////
 
 
-if ($udata[dostup] < 3){
+if ($udata['dostup'] < 3){
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
 mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в гм панель $udata[usr]' ");
 include($path.'inc/down.php');
 exit;}
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -42,7 +42,7 @@ $data = str_replace("December","Декабря",$data);
 
 //---ПИШЕМ РЕЗУЛЬТАТ-----
 
-if (isset($_GET[new_bl])){
+if (isset($_GET['new_bl'])){
 
 mysql_query ("UPDATE block SET text='$_POST[text]',cena='$_POST[cena]' WHERE usr='$_POST[usr]' LIMIT 1"); // пишем данные игрока с новой суммой
 
@@ -63,15 +63,15 @@ echo "
 //------------------------------------
 
 //  -------- приравниваем ------------------------------------------------------------------------------
-if(!empty($_POST[usr]) and !empty($_POST[b]))
+if(!empty($_POST['usr']) and !empty($_POST['b']))
 {
-  $_GET[usr] = $_POST[usr]; $_GET[b] = $_POST[b]; 
+  $_GET['usr'] = $_POST['usr']; $_GET['b'] = $_POST['b']; 
 }
 //------------------------------------------------------------------------------------------------------------
 
 
 //-----------------------открываем данные о персонаже---------------------
-if(empty($_GET[usr]) and empty($_GET[b])){
+if(empty($_GET['usr']) and empty($_GET['b'])){
 
 echo '<form action="?" method="post">';
 

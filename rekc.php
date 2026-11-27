@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'rekc';//фикс. места
@@ -19,9 +19,9 @@ $timeout = $date - $taim;
 ////////////////
 
 //---------------------
-$nick=$_GET[nick];
-if (!empty($_POST[nick])) {$nick=$_POST[nick];}
-$id=$_GET[id];
+$nick=$_GET['nick'];
+if (!empty($_POST['nick'])) {$nick=$_POST['nick'];}
+$id=$_GET['id'];
 //---------------------
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -43,16 +43,16 @@ $data = str_replace("December","Декабря",$data);
 
 echo "</div> <div class = fon>";
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 
 
 /////////////////////////////////////////////////////////////////
-if (isset($_GET[who])){
+if (isset($_GET['who'])){
 
-if (empty($_GET[who])){$_GET[who] = $log;}
-if (empty($nick)){$nick = $_GET[who];}
+if (empty($_GET['who'])){$_GET['who'] = $log;}
+if (empty($nick)){$nick = $_GET['who'];}
 
 
 
@@ -92,7 +92,7 @@ echo "</p>";
 
 
 
-if (empty($_GET[who])) {echo"<br/><div class=silka><a href=\"/?\">Главная</a>";}else{
+if (empty($_GET['who'])) {echo"<br/><div class=silka><a href=\"/?\">Главная</a>";}else{
  echo"<br/><div class=silka><a href=\"search.php?nick=$_GET[who]&go=go\">Вернутся к $_GET[who]</a>";}
 
 include($path.'inc/down.php');
@@ -128,7 +128,7 @@ include($path.'inc/down.php');exit;
 
 
 
-if (isset($_GET[go])){
+if (isset($_GET['go'])){
 
 
 if($log == $nick){
@@ -151,14 +151,14 @@ include($path.'inc/down.php');exit;
 }
 
 
-if ($usdata[almaz]< 15){
+if ($usdata['almaz']< 15){
 echo'<font color=#ff4040>Не хватает Coin of Luck!</font>';
 if (empty($nick)) {echo"<br/><div class=silka><a href=\"/?\">Главная</a>";}else{
 echo"<br/><div class=silka><a href=\"search.php?nick=$nick&go=go\">Вернутся к $nick</a>";}
 include($path.'inc/down.php');exit;
 }
 
-$almaznew = $usdata[almaz] - 15;
+$almaznew = $usdata['almaz'] - 15;
 mysql_query ("UPDATE users SET almaz='$almaznew'  WHERE usr='$log' LIMIT 1"); // пишем данные игрока с новой суммой
 
 // создаём в таблице запись

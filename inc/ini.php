@@ -1,4 +1,4 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 ////////////////	AntiDdoss	//////////////////
 include $_SERVER['DOCUMENT_ROOT'].'/inc/antiddos.php';

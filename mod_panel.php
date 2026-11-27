@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'mod_panel';//фикс. места
@@ -14,7 +14,7 @@ include($path.'inc/zag.php');
 
 
 
-if($udata[dostup]<2){
+if($udata['dostup']<2){
 echo'Доступ закрыт!';
 mysql_query("INSERT INTO `db1464828399`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в модер панель $udata[usr]' ");
@@ -22,7 +22,7 @@ include($path.'inc/down.php');
 exit;
 }
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 echo"<hr/><a href=\"mod_panel.php?mod=rules\"><font color=red>Правила для МД</font></a><br/>";
@@ -39,7 +39,7 @@ break;
 ///////////////////////////////////////////////////////////
 case 'moder_event':
 echo 'Эвенты от модеров!<br><br>';
-if(empty($_POST[name])){
+if(empty($_POST['name'])){
 echo '<form action="mod_panel.php?mod=moder_event" method="post">';
 echo"Название:<br/>
 <input class='input' type=\"text\" size=\"20\" name=\"name\"/><br/>";
@@ -51,8 +51,8 @@ mysql_query("INSERT INTO `moder_event` SET
         `title` = '$_POST[name]',
         `text` = '$_POST[text]',
         `nick` = '$log',`time`='".date("d.m.y")."'");
-echo'Заголовок: <b>'.$_POST[name].'!</b><br/>';
-echo'Текст: <b>'.$_POST[text].'!</b><br/>';
+echo'Заголовок: <b>'.$_POST['name'].'!</b><br/>';
+echo'Текст: <b>'.$_POST['text'].'!</b><br/>';
 echo"<a href=\"adm_panel.php?\">Назад</a>";
 }
 break;
@@ -81,7 +81,7 @@ break;
 ///////////////////////////////////////////////////////////
 
 case '1':
-if(empty($_POST[nick])){
+if(empty($_POST['nick'])){
 echo '<form action="mod_panel.php?mod=1" method="post">';
 echo"Логин:<br/>
 <input class='input' type=\"text\" size=\"10\" value=\"$_GET[usr]\" name=\"nick\"/><br/>";
@@ -115,11 +115,11 @@ $req = mysql_query("SELECT * FROM `$_POST[tip]` where `usr`='$_POST[nick]'");
 $avto=mysql_num_rows($req);
 if($avto==1){echo"Игрок уже в бане(блоке)!";include($path.'inc/down.php');exit;}
 
-if($_POST[times]==sec){$_POST[time]=$_POST[time];}
-if($_POST[times]==min){$_POST[time]=$_POST[time]*60;}
-if($_POST[times]==cha){$_POST[time]=$_POST[time]*3600;}
+if($_POST['times']=='sec'){$_POST['time']=$_POST['time'];}
+if($_POST['times']=='min'){$_POST['time']=$_POST['time']*60;}
+if($_POST['times']=='cha'){$_POST['time']=$_POST['time']*3600;}
 
-$time_ban=time()+$_POST[time];
+$time_ban=time()+$_POST['time'];
 
 mysql_query("INSERT INTO
         `$_POST[tip]` SET
@@ -128,7 +128,7 @@ mysql_query("INSERT INTO
         `text` = '$_POST[text]',
         `ban_time` = '$time_ban'");
 
-echo'Игрок '.$_POST[nick].' забанен(заблочен)!<br/>';
+echo'Игрок '.$_POST['nick'].' забанен(заблочен)!<br/>';
 }
 echo"<a href=\"mod_panel.php?\">Назад</a>";
 break;
@@ -149,7 +149,7 @@ echo"<b>Нет забаненых!</b><br/>";
 echo"<a href=\"mod_panel.php?\">Назад</a>";
 break;
 case '3':
-if(empty($_GET[id])){
+if(empty($_GET['id'])){
 echo"Ошибка невыбран игрок!";
 include($path.'inc/down.php');
 exit;

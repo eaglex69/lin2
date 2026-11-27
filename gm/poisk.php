@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,8 +19,8 @@ $taim = 150;
 $date = time();
 $timeout = $date - $taim;
 ////////////////
-if ($udata[dostup]>1){
-switch($_GET[p]){
+if ($udata['dostup']>1){
+switch($_GET['p']){
 default:
 echo "<form action=\"?&amp;p=poisk\" method=\"post\"><small>Ввдите ник игрока:</small><br/>";
 echo "<input name=\"nick\" type=\"text\" maxlength=\"10\" value=\"$nick\" title=\"nick\"/><br/>";
@@ -29,7 +29,7 @@ echo '<input type="submit" value="OK" /></form>';
 break;
 case 'poisk':
 
-$zah = mysql_real_escape_string($_POST[nick]);
+$zah = mysql_real_escape_string($_POST['nick']);
 
 $usra = mysql_query("SELECT * FROM `users` WHERE `usr`='$zah' ");
 $usr = mysql_fetch_array($usra);
@@ -38,13 +38,13 @@ echo"<div class=dot>IP юзверя $zah = <a href=\"?&amp;p=poisk_ip&ip=$usr[ip
 
 break;
 
-case 'poisk_ip';
+case 'poisk_ip':
 
 $nick=$_GET['nick'];
 
 echo"<div class=dot>Персонажи у которых схожие IP с игроком $nick :</div>";
 
-$ip = mysql_real_escape_string($_GET[ip]);
+$ip = mysql_real_escape_string($_GET['ip']);
  $pr_q=mysql_query("SELECT * FROM users WHERE `ip`='$ip'");
  while($prss=mysql_fetch_array($pr_q))
  echo "<div class=inoy><a href=\"../search.php?&amp;nick=".$prss['usr']."&go=go\">".$prss['usr']." </a></div>";

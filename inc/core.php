@@ -31,8 +31,8 @@ $times = date("H:i:s");
 $date = date("d.m.Y");
 
 
-$rekonline=explode('|',$rek[online]);
-$reknewusr=explode('|',$rek[new_reg]);
+$rekonline=explode('|',$rek['online']);
+$reknewusr=explode('|',$rek['new_reg']);
  
  
  //---рекорд онлайна
@@ -97,7 +97,7 @@ return $sectoday;
 
 
 
-function display_pagin($my_page, $total, $script, $display){
+static function display_pagin($my_page, $total, $script, $display = 10){
     if(empty($display)){
     $display = 10;
     }

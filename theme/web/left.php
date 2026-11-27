@@ -1,4 +1,4 @@
-<?if ($user_id=='1'){?>
+<?php if ($user_id=='1'){?>
 
 
 <div id="main">  
@@ -25,4 +25,4 @@
 
   </ul>  
   </div>  
-<?}?>
+<?php }?>

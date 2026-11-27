@@ -1,16 +1,16 @@
-<?
+<?php
 echo "</table></table></div></div></div></div><span style=text-align:center;>";
 ///////////////////////////////////////////////////////////
 
 
 //----------низ ссылка обратная-----------
-if(!empty($udata[site])){
-$u=explode('.',$udata[site]);
+if(!empty($udata['site'])){
+$u=explode('.',$udata['site']);
 include($path.'site/'.$u[0].'.php');
 }else{
 if(isset($_SESSION['site'])){
 //echo"<hr/><a href='$site'>Главная</a><br/>";
-echo '<p> <a href="http://'.$site.'"> Главная '.$site.'</a> </p>'; // 
+echo '<p> <a href="http://'.$_SESSION['site'].'"> Главная '.$_SESSION['site'].'</a> </p>'; // 
 }}
 //----------------------------------------
 
@@ -34,7 +34,7 @@ echo'<center><span style=color:#af9878;> '.$times.'  | '.$date.'</center>';
 $Y_god = date("Y"); 
 
 echo '</span><div align="center"><span style=color:#af9878;font-size:10px;> <br/> 
-	© '.$_SERVER[HTTP_HOST].', '.$Y_god.'  <br/><br/>  </span>';
+	© '.$_SERVER['HTTP_HOST'].', '.$Y_god.'  <br/><br/>  </span>';
 
 //    info_compress();
 

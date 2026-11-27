@@ -1,4 +1,4 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ $clan['lvl']=$clan['lvl']+1;
 $clan['point']=$clan['point']+($clan['lvl']*2);
 $mysql->query("UPDATE clan SET 
 lvl = '".$clan['lvl']."',
-point='".$clan[point]."' WHERE lider = '".$udata['clan']."' LIMIT 1");
+point='".$clan['point']."' WHERE lider = '".$udata['clan']."' LIMIT 1");
 }
 
 ?>

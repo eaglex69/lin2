@@ -1,5 +1,7 @@
-<?
+<?php
 session_start();
+// PHP 8: mysql_*() functions on top of mysqli
+include_once dirname(__FILE__) . '/inc/mysql_compat.php';
 // Подключаемся к БД
 $dbhost="localhost";
 $dbname="l2warmobi_server";
@@ -13,7 +15,6 @@ mysql_query("set character_set_results='utf8'");
 mysql_query("set collation_connection='utf8'");
 // Делаем проверку на существование акаунта
 $password = md5($password);
-i
 $g=mysql_query("SELECT * FROM `account` WHERE `account`='$account' AND `password`='$password' LIMIT 1");
 if(mysql_num_rows($g)==1){
 

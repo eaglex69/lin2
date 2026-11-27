@@ -12,24 +12,24 @@ include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
-if($udata[dostup]<2){
+if($udata['dostup']<2){
 echo "<font color=red><p>Доступ закрыт</p></font>";
 include($path.'inc/down.php');exit;
 }
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 /*
 function smiles($string){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string=str_replace(":$file2",'<img src="pic/smiles/'.$file.'" alt="">',$string);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string;  }
 */
 /////////////
@@ -49,16 +49,16 @@ echo //"	<input type=\"text\" name=\"zin\" maxlength=\"5000\"/>
 <input type=\"submit\" value=\"Написать\" class=\"ibutton\"></div>";
 ///Функция отправки
 //начало подщёт страниц
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 ///конец подщётов
 $viso = mysql_num_rows(mysql_query("SELECT komentaras FROM adm_chat"));
 $puslap = floor($viso/10);
@@ -79,27 +79,27 @@ $ud = mysql_fetch_array($reqs);
 
 //картинка клана /////////////////////////////
 $pic = "";
-if(!empty($ud[clan])){
+if(!empty($ud['clan'])){
 $req6546566 = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ud[clan]' LIMIT 1");
 $wh = mysql_fetch_array($req6546566);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"cl\"/>";}}
 ////////////////////////////////////////////////
 
-if($udata[dostup]>=4){
+if($udata['dostup']>=4){
 $silka = " <a href=\"adm_chat.php?mod=del_post&amp;p=$dsa[id]\"><font color=red>x</font></a>";
 }
 
 
-if ($ud[dostup]>=4)
+if ($ud['dostup']>=4)
 {
 echo "
 <hr/><b>[$time] $pic <a href=\"search.php?nick=$nickas&amp;go=go\"><font color=lime>$nickas</font></a>
 <a href=\"adm_chat.php?nick=$nickas&amp;mod=write\"> [отв] $silka</a>
 :<br/></b><b><font color=#893700> $koment </font></b>";
 }else{
-if ($ud[dostup]==2 or $ud[dostup]==3)
+if ($ud['dostup']==2 or $ud['dostup']==3)
 {
 echo "
 <hr/><b>[$time] $pic <a href=\"search.php?nick=$nickas&amp;go=go\"><font color=#0026FF>$nickas</font></a>
@@ -130,22 +130,22 @@ echo "
 echo'<br/>';
 }
 echo "<hr/></div>";
-if($udata[dostup] >= 3)
+if($udata['dostup'] >= 3)
 {
 echo "<br/><div class=inoy><a href=\"adm_chat.php?mod=och\">Удалить все сообщения</a></div>";
 }
 echo '<div style="border-bottom		:#666 solid  1px; padding		: 1% 1% 1% 1%; width:120px;">';
 
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"adm_chat.php?page=$back\">Назад</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "Назад";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"adm_chat.php?page=$next\">Далее</a>";}
 else
 {echo "Далее";}
@@ -153,9 +153,9 @@ echo "</div>";
 break;
 
 case 'del_post':
-if($udata[dostup] >= 4)
+if($udata['dostup'] >= 4)
 {
-if(empty($_GET[p])){
+if(empty($_GET['p'])){
 echo"Не выбран пост!<br/>";
 }else{
 $asd = mysql_query("SELECT * FROM adm_chat WHERE id='$_GET[p]' LIMIT 1");
@@ -177,9 +177,9 @@ case 'write':
 
 echo"<b>Сообщение</b><br/>";
 echo "<form action=\"adm_chat.php?mod=writes\" method=\"POST\">";
-if (isset($_GET[nick]))
+if (isset($_GET['nick']))
 {
-$_GET[nick] = htmlspecialchars($_GET[nick]);
+$_GET['nick'] = htmlspecialchars($_GET['nick']);
 //echo "<input type=\"text\" name=\"zin\" maxlength=\"250\" value=\"$_GET[nick], \" size=\"20\"/><br/>";
 echo "<textarea name=\"zin\" rows=\"3\" maxlength=\"5000\">$_GET[nick], </textarea><br/>";
 
@@ -201,7 +201,7 @@ $msg=$_POST['zin'];
 // пишем защиту от повтора сообщений
 $pov = mysql_fetch_array(mysql_query("SELECT * FROM adm_chat WHERE nick = '$log' ORDER BY id DESC LIMIT 1"));
 
-if ($pov[komentaras]==$msg){
+if ($pov['komentaras']==$msg){
 echo "<b>Спам. Запрещенно писать одинаковые сообщения! </b>";
 					echo"<br/><br/><a href=\"adm_chat.php?\">Назад</a>";
 include($path.'inc/down.php');
@@ -232,12 +232,12 @@ $rand = rand(1000,9999);
 /*
 function smiles($string){
 $dir = opendir ("pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $string=str_replace(":$file2",'<img src="pic/smiles/'.$file.'" alt="">',$string);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $string;  }
 */
 /////////////
@@ -251,16 +251,16 @@ echo //"<input type=\"text\" name=\"zin\" maxlength=\"5000\"/>
 		"	<textarea name=\"zin\" rows=\"3\" maxlength=\"5000\"></textarea><br/>
 <input type=\"submit\" value=\"Написать\" class=\"ibutton\"></div>";
 
-if ($_GET[page] == "" || $_GET[page] < 0 || $_GET[page] == "0") 
+if (!is_numeric($_GET['page']) || $_GET['page'] < 0 || $_GET['page'] == "0") 
 {
-$_GET[page] = 0;
+$_GET['page'] = 0;
 }
-$next = $_GET[page] + 1;
-$back = $_GET[page] - 1;
-$num = $_GET[page] * 10;
-if($_GET[page] == "0")
+$next = $_GET['page'] + 1;
+$back = $_GET['page'] - 1;
+$num = $_GET['page'] * 10;
+if($_GET['page'] == "0")
 {$i = 1;}
-else{$i = ($_GET[page]*10)+1;}
+else{$i = ($_GET['page']*10)+1;}
 $viso = mysql_num_rows(mysql_query("SELECT komentaras FROM adm_chat"));
 $puslap = floor($viso/10);
 $times = date("H:i");
@@ -279,28 +279,28 @@ $ud = mysql_fetch_array($reqs);
 
 //картинка клана /////////////////////////////
 $pic = "";
-if(!empty($ud[clan])){
+if(!empty($ud['clan'])){
 $req6546566 = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$ud[clan]' LIMIT 1");
 $wh = mysql_fetch_array($req6546566);
 
-if(!empty($wh[emblema])){
+if(!empty($wh['emblema'])){
 $pic = "<img src=\"pic/clan/$wh[emblema]\" alt=\"cl\"/>";}}
 ////////////////////////////////////////////////
 
 
-if($udata[dostup]>=4){
+if($udata['dostup']>=4){
 $silka = " <a href=\"adm_chat.php?mod=del_post&amp;p=$dsa[id]\"><font color=red>x</font></a>";
 }
 
 
-if ($ud[dostup]>=4)
+if ($ud['dostup']>=4)
 {
 echo "
 <hr/><b>[$time] $pic <a href=\"search.php?nick=$nickas&amp;go=go\"><font color=lime>$nickas</font></a>
 <a href=\"adm_chat.php?nick=$nickas&amp;mod=write\"> [отв] $silka</a>
 :<br/></b><b><font color=#893700> $koment </font></b>";
 }else{
-if ($ud[dostup]==2 or $ud[dostup]==3)
+if ($ud['dostup']==2 or $ud['dostup']==3)
 {
 echo "
 <hr/><b>[$time] $pic <a href=\"search.php?nick=$nickas&amp;go=go\"><font color=#0026FF>$nickas</font></a>
@@ -331,22 +331,22 @@ echo "
 echo'<br/>';
 }
 echo "<hr/></div>";
-if($udata[dostup] >= 4)
+if($udata['dostup'] >= 4)
 {
 echo "<br/><div class=inoy><a href=\"adm_chat.php?mod=och\">Удалить все сообщения</a></div>";
 }
 echo '<div style="border-bottom		:#666 solid  1px; padding		: 1% 1% 1% 1%; width:120px;">';
 
-if ($_GET[page] > 0)
+if ($_GET['page'] > 0)
 {
 echo "<a href=\"adm_chat.php?page=$back\">Назад</a>";
 }
-elseif ($_GET[page] == 0)
+elseif ($_GET['page'] == 0)
 {
 echo "Назад";
 }
 echo" | ";
-if($_GET[page] < $puslap || $_GET[page] == "" || $_GET[page] == 0)
+if($_GET['page'] < $puslap || $_GET['page'] == "" || $_GET['page'] == 0)
 {echo "<a href=\"adm_chat.php?page=$next\">Далее</a>";}
 else
 {echo "Далее";}
@@ -376,7 +376,7 @@ break;
 
 case 'och':
 
-if($udata[dostup] >= 4)
+if($udata['dostup'] >= 4)
 {
 mysql_query("DELETE FROM adm_chat");
 echo "Все сообщения удалены!";

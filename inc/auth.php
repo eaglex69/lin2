@@ -1,4 +1,4 @@
-<?
+<?php
 defined('PROTECTOR') or die('Error: restricted access');
 
 
@@ -33,7 +33,7 @@ $account  = mysql_fetch_assoc(mysql_query("SELECT * FROM `account` WHERE `nick` 
     if($active){ //≈сли выбран персонаж то загружаем его данные
     $udata = mysql_fetch_assoc(mysql_query("SELECT * FROM `users` WHERE `id` = '$active'"));
     
-    $in_battle = mysql_num_rows(mysql_query("SELECT * FROM tmp WHERE usr = '$log' LIMIT 1"));
+    $in_battle = mysql_num_rows(mysql_query("SELECT * FROM tmp WHERE usr = '$udata[usr]' LIMIT 1"));
 	
 	$_SESSION['log'] = $udata['usr'];
     $_SESSION['klas'] = $udata['klas'];
@@ -75,16 +75,16 @@ $account  = mysql_fetch_assoc(mysql_query("SELECT * FROM `account` WHERE `nick` 
         $auth = 0; //ёзер не авторизирован
     }
 //------    
-    if(isset($_GET[site])){
-    $_SESSION['site']=$_GET[site];
+    if(isset($_GET['site'])){
+    $_SESSION['site']=$_GET['site'];
     }
 //------
-	    if(isset($_GET[ref])){
-    $_SESSION['ref']=$_GET[ref];
+	    if(isset($_GET['ref'])){
+    $_SESSION['ref']=$_GET['ref'];
     }
 //------
-	    if(isset($_GET[themes])){
-    $_SESSION['themes']=$_GET[themes];
+	    if(isset($_GET['themes'])){
+    $_SESSION['themes']=$_GET['themes'];
     }
 //------
 

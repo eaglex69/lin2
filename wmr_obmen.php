@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $textl='GM-Panel WebMoney';
@@ -16,7 +16,7 @@ include($path.'inc/zag.php');
 
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 default:
 //-
 $data = date("d F Yг. в H:i", strtotime("+20 seconds"));
@@ -36,14 +36,14 @@ $data = str_replace("December","Декабря",$data);
 
 
 // --- --- 		Обменять WMR 		 --- --- //
-if (isset($_GET[yes])){
+if (isset($_GET['yes'])){
 
 $usr = mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `usr`='$log' Limit 1"));
 
 
-$_POST[col] = floor($_POST[col]);
+$_POST['col'] = floor((float)$_POST['col']);
 
-if ($_POST[col]<=0 or is_numeric($_POST[col])==FALSE){
+if ((float)$_POST['col']<=0 or is_numeric($_POST['col'])==FALSE){
 echo "<p><font color=red><b>Ошибка! Вводите цыфры больше ноля !!! </b></font></p>";
 echo "<div class=silka><a href=\"wmr_obmen.php\">Назад</a></div>";
 include($path.'inc/down.php');EXIT;
@@ -51,18 +51,18 @@ include($path.'inc/down.php');EXIT;
 
 
 
-$wmr2 = $_POST[col]/10*1*100; // сколько забераем ВМР
+$wmr2 = $_POST['col']/10*1*100; // сколько забераем ВМР
 
 
 
-$wmr = $usr[wmr] - $wmr2; // выщитуем
+$wmr = $usr['wmr'] - $wmr2; // выщитуем
 
 if ($wmr<0){echo "<p><font color=red><b>Ошибка! Мало WMR !!! </b></font></p>";
 echo "<div class=silka><a href=\"wmr_obmen.php\">Назад</a></div>";
 include($path.'inc/down.php');EXIT;
 }
 
-$almaznew = $usr[almaz] + $_POST[col]; // плюсуем колы
+$almaznew = $usr['almaz'] + $_POST['col']; // плюсуем колы
 
 mysql_query ("UPDATE users SET almaz='$almaznew', wmr='$wmr'  WHERE usr='$log' LIMIT 1"); // пишем данные игрока с новой суммой
 /* 
@@ -96,14 +96,14 @@ $usr = mysql_fetch_array(mysql_query("SELECT * FROM `users` WHERE `usr`='$log' L
 
 
 
-$usr[wmr] = $usr[wmr] / 100;
-echo "<p><font color=#CC6633><b>У Вас ".number_format($usr[wmr], 2, ',', "`")." WMR ! <br/> </b>";
+$usr['wmr'] = $usr['wmr'] / 100;
+echo "<p><font color=#CC6633><b>У Вас ".number_format($usr['wmr'], 2, ',', "`")." WMR ! <br/> </b>";
 ////<a href=\"/wm/\"> » WMR за WebMoney</a></font></p>";
 
 echo "<p><font color=green><b>Курс обмена: <br/> * 1000 Coin of Luck = 100 WMR</b></font></p>";
 
 
-$col = $usr[wmr]*10;
+$col = $usr['wmr']*10;
 $col = floor($col);
 
 echo "<form action=\"wmr_obmen.php?yes\" method=\"POST\">";

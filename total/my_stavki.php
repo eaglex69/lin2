@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'Тотализатор';
@@ -32,7 +32,7 @@ echo"Ставка была сделана : [<b>".$arr['date']."</b>&nbsp;|&nbsp
 
 echo"Ваша ставка : <b>$arr[kom1]</b> | <b>$arr[kom2]</b><br>";
 echo"Выигрышная ставка : <b>$arr[win1]</b> | <b>$arr[win2]</b> <br>";
-if($arr[kom1] == $arr[win1] && $arr[kom2] == $arr[win2])
+if($arr['kom1'] == $arr['win1'] && $arr['kom2'] == $arr['win2'])
 {
 echo"<b>Ваша ставка сыграла!! <font color='lime'>:-)</font></b><br>";
 }else{

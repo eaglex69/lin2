@@ -32,12 +32,12 @@ if(isset($topic['id'])){
 //start
 function smiles($msg){
 $dir = opendir ("../pic/smiles"); 
-while ($file = readdir ($dir)) {
-if (ereg (".gif$", "$file")){
+while ($file = lin2_readdir ($dir)) {
+if (preg_match('/\.gif$/', $file)){
 $file2=str_replace(".gif","",$file);
 $msg=str_replace(":$file2",'<img src="../pic/smiles/'.$file.'" alt="" height="30" width="30">',$msg);
 }}
-closedir ($dir);
+lin2_closedir ($dir);
 return $msg;  }
 
 
@@ -78,22 +78,22 @@ $asd = mysql_num_rows(mysql_query("SELECT laikas, usr FROM online WHERE laikas >
 
 $reqs = mysql_query("SELECT * FROM `users` WHERE `usr` = '$msg[login]' Limit 1");
 $ud = mysql_fetch_array($reqs);
-if ($ud[dostup]==5)
+if ($ud['dostup']==5)
 {
 $color1='<font color=lime>';
 $color2='<font color=#ffffcc>';
 }
-if ($ud[dostup]==4)
+if ($ud['dostup']==4)
 {
 $color1='<font color=lime>';
 $color2='<font color=#ffffcc>';
 }
-if ($ud[dostup]==2 or $ud[dostup]==3)
+if ($ud['dostup']==2 or $ud['dostup']==3)
 {
 $color1='<font color=#547ef4>';
 $color2='<font color=#ffffcc>';
 }
-if ($ud[dostup]<2)
+if ($ud['dostup']<2)
 {
 $color1='';
 $color2='<font color=#ffffcc>';

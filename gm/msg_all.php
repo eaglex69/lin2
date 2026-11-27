@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'gm_panel';//фикс. места
@@ -19,10 +19,10 @@ $date = time();
 $timeout = $date - $taim;
 ////////////////
 
-if ($udata[dostup]>4){
+if ($udata['dostup']>4){
 $time = date("H:i d.m.y");
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 default:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ if (!empty($smsgo)){echo "$smsgo <hr/>";}
 
 echo "<p><font color=orabge>Рассылка сообщений</font></p><hr>";
    
-if(empty($_POST[text])){
+if(empty($_POST['text'])){
 
 echo '<form action="?" method="post">';
 echo"Введите текст сообщения:<br/><small><font color=grey>(Поддержка html тегов)</font></small><br/>

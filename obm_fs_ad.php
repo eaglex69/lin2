@@ -1,4 +1,4 @@
-<?
+<?php
 define('PROTECTOR', 1);
 
 $headmod = 'obm_fs_ad';//фикс. места
@@ -14,14 +14,14 @@ include($path.'inc/head.php');
 include($path.'inc/zag.php');
 
 
-switch($_GET[mod]){
+switch($_GET['mod']){
 
 
 default:
 $res = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' && `lat_name` = 'FestivalAdena'"); //проверка есть ли адена если да то открываем таблицу
 $av = mysql_num_rows($res);
 $fa = mysql_fetch_array($res);
-$av = $fa[kol];
+$av = $fa['kol'];
 if (empty($av)){$av = 0;}
 if ($av==0){
 // если нет фестиваль аден то пишем что пусто
@@ -59,12 +59,12 @@ echo "<div class=silka><a href=\"gorod.php\">В город</a></div>";
 break;
 
 
-case "yes";
+case "yes":
 // пишем защиты
 
-$_POST[col] = round($_POST[col]);
+$_POST['col'] = round((float)$_POST['col']);
 
-if ($_POST[col]<=0 or is_numeric($_POST[col])==FALSE){
+if ((float)$_POST['col']<=0 or is_numeric($_POST['col'])==FALSE){
 echo "<p><font color=#ff4040><b>Ошибка! Вводите цыфры больше ноля !!! </b></font></p>";
 echo "<div class=silka><a href=\"obm_fs_ad.php\">Назад</a></div>";
 include($path.'inc/down.php');EXIT;
@@ -73,10 +73,10 @@ include($path.'inc/down.php');EXIT;
 $res = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' && `lat_name` = 'FestivalAdena'"); //проверка есть ли адена если да то открываем таблицу
 $av=mysql_num_rows($res);
 $fa = mysql_fetch_array($res);
-$av = $fa[kol];
+$av = $fa['kol'];
 
-$col = $_POST[col];
-$fad = $_POST[col] * 200;
+$col = $_POST['col'];
+$fad = $_POST['col'] * 200;
 $nav = $av - $fad;
 
 if ($nav < 0){$navs = round($nav); $u=explode('-',$navs); 
@@ -99,7 +99,7 @@ mysql_query("UPDATE `res` SET `kol` = '$nav' WHERE `usr`='$log' and `lat_name`='
 $reqi = mysql_query("SELECT * FROM `users` WHERE `usr`='$log' LIMIT 1");
 $udata = mysql_fetch_array($reqi);
 
-$almaz = $udata[almaz] + $col * 10; // щитаем колы
+$almaz = $udata['almaz'] + $col * 10; // щитаем колы
 
 mysql_query("UPDATE `users` SET `almaz` = '$almaz' WHERE `usr`='$log' LIMIT 1");
 
