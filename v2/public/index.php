@@ -68,6 +68,25 @@ set_exception_handler(static function (Throwable $e) use ($debug): void {
 });
 }
 
+// --- заголовки безопасности на все ответы (в т.ч. API)
+if (!headers_sent()) {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: same-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+    // Клиент использует только собственные script/style, без инлайновых обработчиков.
+    header(
+        "Content-Security-Policy: default-src 'self'; "
+        . "script-src 'self'; style-src 'self' 'unsafe-inline'; "
+        . "img-src 'self' data:; connect-src 'self'; "
+        . "frame-ancestors 'self'; base-uri 'none'; form-action 'self'; object-src 'none'"
+    );
+    if ((($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')) {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+}
+
 // --- БД и схема (миграция идемпотентна)
 Database::boot();
 Migrator::migrate();

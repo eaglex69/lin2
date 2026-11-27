@@ -87,7 +87,23 @@ final class GameService
             throw new \InvalidArgumentException('Монстр ещё не возродился.');
         }
 
+        // SECURITY: проверяем доступ к зоне. Клиент ограничивает зоны только
+        // визуально — без этой проверки с 1 уровня можно бить дракона 20 ур.
+        $zone = (string) $mob['zone'];
+        $minLevel = self::ZONES[$zone]['min_level'] ?? 1;
+        if ((int) $char['level'] < $minLevel) {
+            throw new \InvalidArgumentException("Зона откроется на {$minLevel} уровне.");
+        }
+
         $bt = Database::table('battles');
+        // не даём держать десятки параллельных боёв (спам запросами)
+        $activeCnt = (int) Database::value(
+            "SELECT COUNT(*) FROM {$bt} WHERE char_id = ? AND state = 'active'",
+            [$charId]
+        );
+        if ($activeCnt >= 3) {
+            throw new \InvalidArgumentException('Слишком много активных боёв. Завершите текущие.');
+        }
         // незавершённый бой на того же моба переиспользуем
         $active = Database::one(
             "SELECT * FROM {$bt} WHERE char_id = ? AND mob_id = ? AND state = 'active' ORDER BY id DESC LIMIT 1",

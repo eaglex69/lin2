@@ -129,6 +129,14 @@ CREATE TABLE IF NOT EXISTS sessions (
     last_used    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Счётчик неудачных попыток входа: защита от подбора пароля.
+CREATE TABLE IF NOT EXISTS login_attempts (
+    nick           TEXT PRIMARY KEY,
+    cnt            INTEGER NOT NULL DEFAULT 0,
+    first_ts       INTEGER NOT NULL,
+    blocked_until  TEXT NULL
+);
+
 CREATE TABLE IF NOT EXISTS online (
     char_id      INTEGER PRIMARY KEY REFERENCES characters (id) ON DELETE CASCADE,
     last_ts      INTEGER NOT NULL

@@ -20,7 +20,12 @@ final class ChatService
             $channel = 'global';
         }
 
-        $text = trim(preg_replace('/\s+/u', ' ', strip_tags($text)) ?? '');
+        // strip_tags + удаление «висящих» угловых скобок и управляющих символов:
+        // defence in depth к экранированию на клиенте (esc()).
+        $text = strip_tags($text);
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $text) ?? '';
+        $text = str_replace(['<', '>'], '', $text);
+        $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
         if ($text === '') {
             throw new \InvalidArgumentException('Сообщение пустое.');
         }

@@ -172,15 +172,28 @@ final class Migrator
         if ((int) Database::value('SELECT COUNT(*) FROM ' . Database::table('accounts')) > 0) {
             return;
         }
-        $demo = self::createAccount('demo', 'demo', 'demo@miniage.local', 'admin');
+        $demoPass = Config::get('SEED_DEMO_PASS', 'demo');
+        $demo = self::createAccount('demo', $demoPass, 'demo@miniage.local', 'admin');
         $charId = self::createCharacter($demo, 'Demo', 'human', 'fighter', 'm');
         Database::update('accounts', ['active_char' => $charId], 'id = ?', [$demo]);
         self::giveStarterKit($charId);
 
-        $admin = self::createAccount('admin', 'admin', 'admin@miniage.local', 'admin');
+        // Пароль администратора: из .env либо случайный (печатается в лог один раз).
+        // Никогда не оставляем admin/admin в проде.
+        $adminPass = Config::get('SEED_ADMIN_PASS');
+        $generated = false;
+        if ($adminPass === '') {
+            $adminPass = bin2hex(random_bytes(9));
+            $generated = true;
+        }
+        $admin = self::createAccount('admin', $adminPass, 'admin@miniage.local', 'admin');
         $adminChar = self::createCharacter($admin, 'Admin', 'elf', 'mage', 'm');
         Database::update('accounts', ['active_char' => $adminChar], 'id = ?', [$admin]);
         self::giveStarterKit($adminChar);
+
+        if ($generated && Config::get('APP_ENV') !== 'production') {
+            error_log('[miniage] admin создан со случайным паролем: ' . $adminPass);
+        }
     }
 
     public static function createAccount(string $nick, string $pass, string $email = '', string $role = 'player'): int

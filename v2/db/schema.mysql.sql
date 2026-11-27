@@ -156,6 +156,16 @@ CREATE TABLE IF NOT EXISTS sessions (
     KEY idx_sessions_account (account_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Счётчик неудачных попыток входа: защита от подбора пароля.
+CREATE TABLE IF NOT EXISTS login_attempts (
+    nick           VARCHAR(64) NOT NULL,
+    cnt            SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    first_ts       INT UNSIGNED NOT NULL,
+    blocked_until  DATETIME NULL,
+    PRIMARY KEY (nick),
+    KEY idx_login_attempts_blocked (blocked_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS online (
     char_id      INT UNSIGNED NOT NULL,
     last_ts      INT UNSIGNED NOT NULL,

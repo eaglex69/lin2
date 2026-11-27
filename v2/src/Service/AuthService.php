@@ -22,8 +22,19 @@ final class AuthService
             throw new \InvalidArgumentException('Логин: 3–16 символов, латиница, цифры, _ и -.');
         }
         $passLen = function_exists('mb_strlen') ? mb_strlen($pass, 'UTF-8') : strlen($pass);
-        if ($passLen < 4) {
-            throw new \InvalidArgumentException('Пароль минимум 4 символа.');
+        if ($passLen < 8) {
+            throw new \InvalidArgumentException('Пароль минимум 8 символов.');
+        }
+        if ($passLen > 200) {
+            throw new \InvalidArgumentException('Пароль слишком длинный (максимум 200 символов).');
+        }
+        // не даём регистрировать очевидно слабые пароли
+        if (preg_match('/^(?:pass|password|1234567|qwerty|letmein|admin|demo|1111)/i', $pass)) {
+            throw new \InvalidArgumentException('Пароль слишком простой.');
+        }
+        // email, если указан, обязан быть корректным и не слишком длинным
+        if ($email !== '' && (strlen($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL))) {
+            throw new \InvalidArgumentException('Некорректный email.');
         }
         $t = Database::table('accounts');
         if (Database::one("SELECT id FROM {$t} WHERE nick = ?", [$nick]) !== null) {
@@ -44,13 +55,34 @@ final class AuthService
         });
     }
 
+    /** Порог и окно блокировки подбора пароля. */
+    private const LOGIN_MAX_ATTEMPTS = 5;
+    private const LOGIN_WINDOW_SEC = 300;
+    private const LOGIN_BLOCK_SEC = 600;
+
     public function login(string $nick, string $pass): array
     {
         $t = Database::table('accounts');
-        $acc = Database::one("SELECT * FROM {$t} WHERE nick = ?", [trim($nick)]);
-        if ($acc === null || !password_verify($pass, (string) $acc['pass_hash'])) {
+        $nick = trim($nick);
+
+        // Пустой пароль/логин не пускаем даже при наличии хеша в БД,
+        // и ограничиваем длину: bcrypt молча обрезает на 72 байтах, а
+        // огромный ввод зря жжёт CPU при проверке.
+        if ($nick === '' || $pass === '' || strlen($nick) > 64 || strlen($pass) > 200) {
+            $this->recordFailedLogin($nick === '' ? '-' : $nick);
             throw new \InvalidArgumentException('Неверный логин или пароль.');
         }
+
+        $this->assertNotLockedOut($nick);
+
+        $acc = Database::one("SELECT * FROM {$t} WHERE nick = ?", [$nick]);
+        if ($acc === null || !password_verify($pass, (string) $acc['pass_hash'])) {
+            $this->recordFailedLogin($nick);
+            // одинаковый ответ и одинаковое время для существующего/несуществующего логина
+            throw new \InvalidArgumentException('Неверный логин или пароль.');
+        }
+
+        $this->clearFailedLogins($nick);
 
         // обновляем хеш при смене алгоритма PHP
         if (password_needs_rehash((string) $acc['pass_hash'], PASSWORD_DEFAULT)) {
@@ -70,6 +102,69 @@ final class AuthService
         Session::set('_csrf', bin2hex(random_bytes(24)));
 
         return ['account_id' => (int) $acc['id'], 'nick' => (string) $acc['nick'], 'role' => (string) $acc['role']];
+    }
+
+    /** @throws \InvalidArgumentException если попытки исчерпаны */
+    private function assertNotLockedOut(string $nick): void
+    {
+        $row = Database::one(
+            'SELECT cnt, blocked_until FROM ' . Database::table('login_attempts') . ' WHERE nick = ?',
+            [strtolower($nick)]
+        );
+        if ($row === null) {
+            return;
+        }
+        $until = $row['blocked_until'] === null ? 0 : strtotime((string) $row['blocked_until']);
+        if ($until > time()) {
+            $wait = (int) ceil(($until - time()) / 60);
+            throw new \InvalidArgumentException("Слишком много попыток. Повторите через {$wait} мин.");
+        }
+    }
+
+    private function recordFailedLogin(string $nick): void
+    {
+        $t = Database::table('login_attempts');
+        $key = strtolower($nick);
+        $now = time();
+
+        $row = Database::one("SELECT * FROM {$t} WHERE nick = ?", [$key]);
+        if ($row === null) {
+            Database::insert('login_attempts', [
+                'nick' => $key,
+                'cnt' => 1,
+                'first_ts' => $now,
+                'blocked_until' => null,
+            ]);
+            return;
+        }
+
+        $first = (int) $row['first_ts'];
+        $cnt = (int) $row['cnt'];
+        // окно истекло — начинаем счёт заново
+        if ($now - $first > self::LOGIN_WINDOW_SEC) {
+            $cnt = 0;
+            $first = $now;
+        }
+        $cnt++;
+
+        $blockedUntil = null;
+        if ($cnt >= self::LOGIN_MAX_ATTEMPTS) {
+            $blockedUntil = date('Y-m-d H:i:s', $now + self::LOGIN_BLOCK_SEC);
+        }
+
+        Database::update('login_attempts', [
+            'cnt' => $cnt,
+            'first_ts' => $first,
+            'blocked_until' => $blockedUntil,
+        ], 'nick = ?', [$key]);
+    }
+
+    private function clearFailedLogins(string $nick): void
+    {
+        Database::exec(
+            'DELETE FROM ' . Database::table('login_attempts') . ' WHERE nick = ?',
+            [strtolower($nick)]
+        );
     }
 
     public function logout(): void

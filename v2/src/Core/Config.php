@@ -41,6 +41,9 @@ final class Config
             'SESSION_NAME'    => 'miniage_sid',
             'SESSION_TTL'     => '86400',
             'SEED_DEMO'       => '1',
+            // пароль демо-аккаунта; в проде обязательно переопределить через .env
+            'SEED_DEMO_PASS'  => 'demo',
+            'SEED_ADMIN_PASS' => '',
             'TIMEZONE'        => 'Europe/Moscow',
         ];
 
