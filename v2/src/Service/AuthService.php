@@ -181,12 +181,59 @@ final class AuthService
         return ['account_id' => (int) $acc['id'], 'nick' => (string) $acc['nick'], 'role' => (string) $acc['role']];
     }
 
-    /** Ник для сравнения: без учёта регистра и краевых пробелов. */
+    /**
+     * Ник для сравнения: без учёта регистра и краевых пробелов.
+     *
+     * БАГ: без mbstring (а в этой сборке php-wasm его нет) strtolower()
+     * не трогает кириллицу вообще — 'Демо' и 'демо' считались РАЗНЫМИ
+     * никами. Проверено: strtolower('Демо') === 'Демо'. Последствия:
+     * 1) можно было завести «Демо» рядом с «демо» в превью (на MySQL
+     *    utf8mb4_unicode_ci такой ник отклонил бы — поведение расходилось);
+     * 2) лимит попыток входа считался по разным ключам, и перебор пароля
+     *    с «Демо»/«ДЕМО»/«демо» обходил счётчик.
+     * Своя таблица соответствий не требует ни mbstring, ни intl.
+     */
     private static function normalizeNick(string $nick): string
     {
-        return function_exists('mb_strtolower')
-            ? mb_strtolower(trim($nick), 'UTF-8')
-            : strtolower(trim($nick));
+        $trimmed = trim($nick);
+        if (function_exists('mb_strtolower')) {
+            return mb_strtolower($trimmed, 'UTF-8');
+        }
+        static $cyr = null;
+        if ($cyr === null) {
+            $upper = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
+            $lower = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+            $cyr = [];
+            for ($i = 0; $i < 33; $i++) {
+                $cyr[substr($upper, $i * 2, 2)] = substr($lower, $i * 2, 2);
+            }
+        }
+        return strtr(strtolower($trimmed), $cyr);
+    }
+
+    /**
+     * Ключ для счётчика попыток.
+     *
+     * БАГ: ключ не ограничивался по длине. Вход с ником в 5000 байт создавал
+     * строку в login_attempts ровно такого размера (проверено), и таблицу
+     * можно было раздуть перебором — каждая неудачная попытка с новым ником
+     * добавляла строку. На MySQL колонка nick — VARCHAR(64): длинный ключ
+     * давал бы ошибку усечения, и ЛЮБОЙ вход с длинным ником падал бы с 500
+     * вместо честного «неверный логин или пароль».
+     *
+     * Реальные ники не длиннее 16 символов (см. валидацию регистрации),
+     * поэтому длинный ключ всё равно ни с чем не совпадёт — режем и
+     * кодируем хвост, чтобы разные длинные ники не сливались в один ключ.
+     */
+    private static function attemptKey(string $nick): string
+    {
+        $key = self::normalizeNick($nick);
+        // 64 байта — предел колонки; много байт на символ только у UTF-8,
+        // поэтому 48 символов гарантированно укладываются
+        if (strlen($key) <= 48) {
+            return $key;
+        }
+        return substr($key, 0, 40) . '#' . substr(sha1($key), 0, 7);
     }
 
     /** @throws \InvalidArgumentException если попытки исчерпаны */
@@ -194,7 +241,7 @@ final class AuthService
     {
         $row = Database::one(
             'SELECT cnt, blocked_until FROM ' . Database::table('login_attempts') . ' WHERE nick = ?',
-            [strtolower($nick)]
+            [self::attemptKey($nick)]
         );
         if ($row === null) {
             return;
@@ -242,7 +289,7 @@ final class AuthService
     private function recordFailedLogin(string $nick): void
     {
         $t = Database::table('login_attempts');
-        $key = strtolower($nick);
+        $key = self::attemptKey($nick);
         $now = time();
 
         $row = Database::one("SELECT * FROM {$t} WHERE nick = ?", [$key]);
@@ -281,7 +328,7 @@ final class AuthService
     {
         Database::exec(
             'DELETE FROM ' . Database::table('login_attempts') . ' WHERE nick = ?',
-            [strtolower($nick)]
+            [self::attemptKey($nick)]
         );
     }
 

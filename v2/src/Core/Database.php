@@ -163,12 +163,27 @@ final class Database
         return self::$driver === 'mysql' ? "`{$ident}`" : '"' . $ident . '"';
     }
 
-    /** Транзакция с поддержкой вложенности (savepoint). */
+    /**
+     * Транзакция с поддержкой вложенности (savepoint).
+     *
+     * БАГ (гонка при старте боя): на SQLite обычный BEGIN открывает
+     * DEFERRED-транзакцию — блокировка записи берётся только на первом
+     * INSERT/UPDATE. Два параллельных запроса успевают оба прочитать
+     * «моб свободен» и только потом один из них получает SQLITE_BUSY —
+     * либо, при неудачном тайминге, оба создают бой. BEGIN IMMEDIATE
+     * захватывает блокировку записи сразу, поэтому проверка «моб занят»
+     * и INSERT боя становятся атомарными относительно другого процесса.
+     */
     public static function transaction(callable $fn): mixed
     {
         $pdo = self::pdo();
-        if (self::$txLevel === 0) {
-            $pdo->beginTransaction();
+        $root = self::$txLevel === 0;
+        if ($root) {
+            if (self::$driver === 'sqlite') {
+                $pdo->exec('BEGIN IMMEDIATE');
+            } else {
+                $pdo->beginTransaction();
+            }
         } else {
             $pdo->exec('SAVEPOINT sp' . self::$txLevel);
         }
@@ -177,7 +192,13 @@ final class Database
             $result = $fn();
             self::$txLevel--;
             if (self::$txLevel === 0) {
-                $pdo->commit();
+                // для SQLite COMMIT через exec: PDO::commit() не знает, что
+                // транзакция открыта вручную оператором BEGIN
+                if (self::$driver === 'sqlite') {
+                    $pdo->exec('COMMIT');
+                } else {
+                    $pdo->commit();
+                }
             } else {
                 $pdo->exec('RELEASE SAVEPOINT sp' . self::$txLevel);
             }
@@ -185,7 +206,16 @@ final class Database
         } catch (\Throwable $e) {
             self::$txLevel--;
             if (self::$txLevel === 0) {
-                $pdo->rollBack();
+                if (self::$driver === 'sqlite') {
+                    // ROLLBACK при ошибке самого ROLLBACK не должен подменять
+                    // исходное исключение
+                    try {
+                        $pdo->exec('ROLLBACK');
+                    } catch (\Throwable) {
+                    }
+                } else {
+                    $pdo->rollBack();
+                }
             } else {
                 $pdo->exec('ROLLBACK TO SAVEPOINT sp' . self::$txLevel);
             }

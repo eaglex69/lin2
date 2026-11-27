@@ -591,3 +591,39 @@ $ownFall = $ownAuth->character();
 $dbg('T44 чужой active_char: ' . ($ownFall === null ? 'отказ -> OK' : 'БАГ: получил ' . $ownFall['name']));
 $ownSel = $ownAuth->selectCharacter($ownB, $ownAChar);
 $dbg('T44 selectCharacter чужого: ' . ($ownSel === null ? 'отказ -> OK' : 'БАГ'));
+
+// --- ТЕСТ 45: длинный ник не раздувает login_attempts (и не ломает MySQL)
+Database::exec('DELETE FROM login_attempts');
+for ($i = 0; $i < 20; $i++) {
+    try { (new AuthService())->login(str_repeat('z', 800) . $i, 'x'); } catch (Throwable $e) {}
+}
+$laStat = Database::one('SELECT COUNT(*) c, COALESCE(MAX(LENGTH(nick)),0) mx FROM login_attempts');
+$dbg('T45 длинные ники: строк ' . $laStat['c'] . ', макс. ключ ' . $laStat['mx'] . ' байт -> '
+    . ($laStat['mx'] <= 48 && $laStat['c'] <= 20 ? 'OK (умещается в VARCHAR(64))' : 'БАГ'));
+
+// --- ТЕСТ 46: регистр ника не обходит лимит попыток
+Database::exec('DELETE FROM login_attempts');
+(new AuthService())->register('CaseGuy', 'Str0ngPass!1', '', 'human', 'fighter', 'm');
+foreach (['CaseGuy', 'CASEGUY', 'caseguy', 'CaSeGuY'] as $variant) {
+    try { (new AuthService())->login($variant, 'bad'); } catch (Throwable $e) {}
+}
+$laKeys = (int) Database::value('SELECT COUNT(*) FROM login_attempts');
+$laCnt = (int) Database::value('SELECT MAX(cnt) FROM login_attempts');
+$dbg('T46 регистры ника: ключей ' . $laKeys . ', счётчик ' . $laCnt . ' -> '
+    . ($laKeys === 1 && $laCnt === 4 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 47: транзакции атомарны и откатываются
+$txA = Migrator::createAccount('txtest', 'Str0ngPass!1');
+$txC = Migrator::createCharacter($txA, 'txtest', 'human', 'fighter', 'm');
+Database::update('characters', ['adena' => 777], 'id = ?', [$txC]);
+try {
+    Database::transaction(function () use ($txC) {
+        Database::update('characters', ['adena' => 999999], 'id = ?', [$txC]);
+        throw new RuntimeException('сбой');
+    });
+} catch (Throwable $e) {}
+$txAfter = (int) Database::value('SELECT adena FROM characters WHERE id = ?', [$txC]);
+$dbg('T47 откат транзакции: адена ' . $txAfter . ' -> ' . ($txAfter === 777 ? 'OK' : 'БАГ'));
+$txNested = Database::transaction(fn () => Database::transaction(fn () => 'inner'));
+$dbg('T47 вложенная транзакция: ' . var_export($txNested, true) . ' -> '
+    . ($txNested === 'inner' ? 'OK' : 'БАГ'));
