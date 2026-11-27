@@ -11,6 +11,9 @@ use App\Core\Database;
  */
 final class ShopService
 {
+    /** Максимум предметов в одной ячейке инвентаря. */
+    public const MAX_STACK = 99;
+
     /** @return array<int,array<string,mixed>> */
     public function catalog(?string $kind = null): array
     {
@@ -57,7 +60,24 @@ final class ShopService
             $inv = Database::table('inventory');
             $row = Database::one("SELECT * FROM {$inv} WHERE char_id = ? AND item_id = ? AND equipped = 0", [$charId, $item['id']]);
             if ($row !== null && $item['stackable']) {
-                Database::update('inventory', ['qty' => (int) $row['qty'] + $qty], 'id = ?', [(int) $row['id']]);
+                // БАГ: qty обрезалась до 99 на одну покупку, но стак рос без
+                // учёта уже лежащего: 99 + 99 = 198 зелий в одной ячейке.
+                // Лимит должен действовать на весь стак, а не на одну покупку.
+                $have = (int) $row['qty'];
+                $space = self::MAX_STACK - $have;
+                if ($space <= 0) {
+                    throw new \InvalidArgumentException('В сумке уже максимум таких предметов (' . self::MAX_STACK . ').');
+                }
+                if ($qty > $space) {
+                    // продаём ровно столько, сколько помещается, и берём деньги
+                    // только за них — иначе игрок платил за то, что не получил
+                    $qty = $space;
+                    $total = $item['price'] * $qty;
+                    if ($char['adena'] < $total) {
+                        throw new \InvalidArgumentException('Недостаточно адены: нужно ' . number_format($total, 0, '', ' ') . '.');
+                    }
+                }
+                Database::update('inventory', ['qty' => $have + $qty], 'id = ?', [(int) $row['id']]);
             } else {
                 Database::insert('inventory', ['char_id' => $charId, 'item_id' => $item['id'], 'qty' => $qty, 'equipped' => 0]);
             }

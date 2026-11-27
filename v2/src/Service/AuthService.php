@@ -310,8 +310,16 @@ final class AuthService
                 return null;
             }
         }
+        // БАГ: персонаж искался по одному id из сессии, без проверки владельца.
+        // Если сессия указывала на чужой char_id (переиспользованный id после
+        // удаления записи, подмена значения), игрок получал ЧУЖОГО персонажа —
+        // и дальше играл под ним: бои, инвентарь, адена. Проверено: аккаунт B
+        // с char_id персонажа A успешно «вошёл» за HeroA.
+        $accId = (int) ($this->account()['id'] ?? 0);
         $t = Database::table('characters');
-        $char = Database::one("SELECT * FROM {$t} WHERE id = ?", [(int) $charId]);
+        $char = $accId === 0
+            ? null
+            : Database::one("SELECT * FROM {$t} WHERE id = ? AND account_id = ?", [(int) $charId, $accId]);
         return $char === null ? null : $this->decorate($char);
     }
 

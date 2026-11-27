@@ -30,6 +30,9 @@ final class GameService
      */
     private const BATTLE_IDLE_SEC = 1800;
 
+    /** Сколько последних строк боя отдавать клиенту и хранить в БД. */
+    private const BATTLE_LOG_KEEP = 60;
+
     public const ZONES = [
         'Giran' => ['label' => 'Окрестности Гирана', 'min_level' => 1, 'color' => '#2e4a2e'],
         'DeathPass' => ['label' => 'Перевал Смерти', 'min_level' => 5, 'color' => '#3a2f2a'],
@@ -371,6 +374,14 @@ final class GameService
                 }
             }
 
+            // БАГ: лог рос без ограничения — 85 ходов давали 170 строк и 9.5 КБ,
+            // и ВЕСЬ лог уходил клиенту в каждом ответе на удар (квадратичный
+            // рост трафика). Храним только хвост: прочитанное выше игрок уже
+            // видел, а окно лога всё равно показывает последние строки.
+            if (count($log) > self::BATTLE_LOG_KEEP) {
+                $log = array_slice($log, -self::BATTLE_LOG_KEEP);
+            }
+
             $battleUpdate = [
                 'mob_hp' => $mobHp,
                 // turn уже увеличен условным UPDATE выше — здесь не трогаем
@@ -411,6 +422,9 @@ final class GameService
             throw new \InvalidArgumentException('Бой уже завершён.');
         }
         $log = json_decode((string) $battle['log_json'], true) ?: [];
+        if (count($log) > self::BATTLE_LOG_KEEP) {
+            $log = array_slice($log, -self::BATTLE_LOG_KEEP);
+        }
         $log[] = ['t' => 'system', 'turn' => (int) $battle['turn'], 'text' => 'Вы отступили из боя.'];
         Database::update('battles', [
             'state' => 'fled',
@@ -467,6 +481,10 @@ final class GameService
     {
         $mob = Database::one('SELECT * FROM ' . Database::table('mobs') . ' WHERE id = ?', [(int) $battle['mob_id']]);
         $log = json_decode((string) $battle['log_json'], true) ?: [];
+        // страховка для старых боёв, записанных до ограничения
+        if (count($log) > self::BATTLE_LOG_KEEP) {
+            $log = array_slice($log, -self::BATTLE_LOG_KEEP);
+        }
         return [
             'id' => (int) $battle['id'],
             'state' => (string) $battle['state'],

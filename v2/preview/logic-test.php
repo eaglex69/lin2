@@ -21,7 +21,7 @@ file_put_contents('/config.json', json_encode([
 ]));
 @unlink('/tmp/test.sqlite');
 
-use App\Core\Config, App\Core\Database, App\Core\Migrator;
+use App\Core\Config, App\Core\Database, App\Core\Migrator, App\Core\Session;
 use App\Service\GameService, App\Service\ShopService;
 use App\Service\AuthService;
 use App\Service\ChatService;
@@ -522,3 +522,72 @@ $all = $chatT->list('all', 0);
 $channels = array_map(fn ($m) => $m['channel'], $all);
 $dbg('T41 all: каналы=' . implode(',', $channels) . ' -> '
     . (!in_array('system', $channels, true) && in_array('global', $channels, true) ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 42: стак не превышает лимит при докупке
+$stAcc = Migrator::createAccount('stacklim', 'Str0ngPass!1');
+$stCid = Migrator::createCharacter($stAcc, 'stacklim', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($stCid);
+Database::update('characters', ['adena' => 60000000], 'id = ?', [$stCid]);
+$stShop = new ShopService();
+$stQty = (int) Database::value('SELECT qty FROM inventory WHERE char_id = ? AND item_id = (SELECT id FROM items WHERE code = ?)', [$stCid, 'hp_potion']);
+$stShop->buy($stCid, 'hp_potion', 60);
+$stAfter = (int) Database::value('SELECT qty FROM inventory WHERE char_id = ? AND item_id = (SELECT id FROM items WHERE code = ?)', [$stCid, 'hp_potion']);
+$dbg('T42 покупка 60 при ' . $stQty . ': стало ' . $stAfter . ' -> '
+    . ($stAfter === $stQty + 60 ? 'OK' : 'БАГ'));
+$stFill = $stShop->buy($stCid, 'hp_potion', 99);
+$stFinal = (int) Database::value('SELECT qty FROM inventory WHERE char_id = ? AND item_id = (SELECT id FROM items WHERE code = ?)', [$stCid, 'hp_potion']);
+$stCells = (int) Database::value('SELECT COUNT(*) FROM inventory WHERE char_id = ? AND item_id = (SELECT id FROM items WHERE code = ?)', [$stCid, 'hp_potion']);
+$dbg('T42 докупка 99 в стак: стало ' . $stFinal . ', выдано ' . $stFill['qty']
+    . ', оплачено ' . $stFill['paid'] . ' -> '
+    . ($stFinal === 99 && $stFill['paid'] === $stFill['qty'] * 450 && $stCells === 1 ? 'OK' : 'БАГ'));
+$stRejected = false;
+try { $stShop->buy($stCid, 'hp_potion', 1); } catch (Throwable $e) { $stRejected = str_contains($e->getMessage(), 'максимум'); }
+$dbg('T42 покупка в полный стак: ' . ($stRejected ? 'отказ -> OK' : 'БАГ: принята'));
+
+// --- ТЕСТ 43: лог боя не растёт безгранично
+$lgAcc = Migrator::createAccount('logcap', 'Str0ngPass!1');
+$lgCid = Migrator::createCharacter($lgAcc, 'logcap', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($lgCid);
+Database::update('characters', ['level' => 12, 'hp' => 200000, 'hp_max' => 200000, 'p_atk' => 1, 'p_def' => 5000], 'id = ?', [$lgCid]);
+$lgMob = Database::one('SELECT id FROM mobs WHERE level <= 12 ORDER BY level DESC LIMIT 1');
+$lgBattle = $game->startBattle($lgCid, (int) $lgMob['id']);
+$lgMax = 0;
+$lgMaxBytes = 0;
+$lgTurns = 0;
+$lgState = null;
+for ($i = 0; $i < 6000; $i++) {
+    $lgState = $game->attack($lgCid, (int) $lgBattle['id']);
+    $lgTurns++;
+    $lgMax = max($lgMax, count($lgState['log']));
+    $lgMaxBytes = max($lgMaxBytes, strlen(json_encode($lgState, JSON_UNESCAPED_UNICODE)));
+    if (in_array($lgState['state'], ['won', 'lost'], true)) {
+        break;
+    }
+}
+$lgDb = json_decode((string) Database::value('SELECT log_json FROM battles WHERE id = ?', [(int) $lgBattle['id']]), true) ?: [];
+$dbg('T43 ' . $lgTurns . ' ходов: макс. лог в ответе ' . $lgMax . ' строк, '
+    . round($lgMaxBytes / 1024, 1) . ' КБ, в БД ' . count($lgDb) . ' -> '
+    . ($lgMax <= 60 && $lgMaxBytes < 8000 && count($lgDb) <= 60 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 44: персонаж проверяется на владельца (реальный вызов AuthService)
+$ownA = Migrator::createAccount('owna', 'Str0ngPass!1');
+$ownAChar = Migrator::createCharacter($ownA, 'OwnerA', 'human', 'fighter', 'm');
+$ownB = Migrator::createAccount('ownb', 'Str0ngPass!1');
+$ownBChar = Migrator::createCharacter($ownB, 'OwnerB', 'human', 'fighter', 'm');
+$ownAuth = new AuthService();
+// аккаунт B пытается играть персонажем A
+Session::set('account_id', $ownB);
+Session::set('char_id', $ownAChar);
+$ownGot = $ownAuth->character();
+$dbg('T44 чужой char_id в сессии: ' . ($ownGot === null ? 'отказ -> OK' : 'БАГ: получил ' . $ownGot['name']));
+// свой персонаж по-прежнему доступен
+Session::set('char_id', $ownBChar);
+$ownMine = $ownAuth->character();
+$dbg('T44 свой char_id: ' . ($ownMine !== null && $ownMine['name'] === 'OwnerB' ? 'OK' : 'БАГ: отказ своему'));
+// active_char без char_id в сессии — тоже с проверкой владельца
+Database::update('accounts', ['active_char' => $ownBChar], 'id = ?', [$ownA]);
+Session::set('char_id', null);
+$ownFall = $ownAuth->character();
+$dbg('T44 чужой active_char: ' . ($ownFall === null ? 'отказ -> OK' : 'БАГ: получил ' . $ownFall['name']));
+$ownSel = $ownAuth->selectCharacter($ownB, $ownAChar);
+$dbg('T44 selectCharacter чужого: ' . ($ownSel === null ? 'отказ -> OK' : 'БАГ'));
