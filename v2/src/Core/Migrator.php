@@ -110,6 +110,8 @@ final class Migrator
             }
         };
 
+        self::syncEquipStats();
+
         if (!$has(trim($bt, '"`'), 'won_at')) {
             Database::pdo()->exec(
                 $driver === 'mysql'
@@ -119,6 +121,45 @@ final class Migrator
             // у старых записей лучшая догадка о времени победы — updated_at
             Database::pdo()->exec("UPDATE {$bt} SET won_at = updated_at WHERE state = 'won' AND won_at IS NULL");
             error_log('[miniage] миграция: добавлена колонка battles.won_at');
+        }
+    }
+
+    /**
+     * Догоняющая миграция: персонажи, созданные до исправления бага 64, носили
+     * экипировку, бонусы которой не входили в hp_max/p_atk/p_def (стартовый
+     * набор выдавался «мимо» пересчёта). Приводим их характеристики к
+     * экипировке — иначе фикс действовал бы только на новых персонажей.
+     *
+     * Выполняется один раз на базу: маркер в служебной таблице, чтобы не
+     * делать SELECT по всему инвентарю на каждый запрос.
+     */
+    private static function syncEquipStats(): void
+    {
+        try {
+            $marker = 'sync_equip_stats_v1';
+            $mt = Database::table('meta');
+            $done = Database::value('SELECT `value` FROM ' . $mt . ' WHERE `key` = ?', [$marker]);
+            if ($done === '1') {
+                return;
+            }
+        } catch (\Throwable) {
+            // таблицы meta нет (старая база) — не мешаем миграции
+            return;
+        }
+        try {
+            $shop = new \App\Service\ShopService();
+            $rows = Database::all(
+                'SELECT DISTINCT i.char_id FROM ' . Database::table('inventory') . ' i WHERE i.equipped = 1'
+            );
+            foreach ($rows as $r) {
+                $shop->recalcStats((int) $r['char_id']);
+            }
+            Database::exec(
+                'INSERT INTO ' . Database::table('meta') . ' (`key`, `value`) VALUES (?, ?)',
+                [$marker, '1']
+            );
+        } catch (\Throwable $e) {
+            error_log('[miniage] syncEquipStats: ' . $e->getMessage());
         }
     }
 
@@ -290,7 +331,11 @@ final class Migrator
             return;
         }
         $demoPass = Config::get('SEED_DEMO_PASS', 'demo');
-        $demo = self::createAccount('demo', $demoPass, 'demo@miniage.local', 'admin');
+        // БАГ: демо-аккаунт создавался с ролью admin, а его пароль по умолчанию
+        // — «demo» (его же подставляет форма входа). При SEED_DEMO=1 (значение
+        // по умолчанию!) на любом развёртывании любой желающий входил
+        // администратором. Демо — витрина, прав ей не нужно: роль player.
+        $demo = self::createAccount('demo', $demoPass, 'demo@miniage.local', 'player');
         $charId = self::createCharacter($demo, 'Demo', 'human', 'fighter', 'm');
         Database::update('accounts', ['active_char' => $charId], 'id = ?', [$demo]);
         self::giveStarterKit($charId);
@@ -360,21 +405,18 @@ final class Migrator
         ]);
     }
 
+    /**
+     * Стартовый набор. Делегирует ShopService::starterKit(), который после
+     * выдачи пересчитывает характеристики.
+     *
+     * БАГ: раньше предметы вставлялись здесь с equipped = 1, а статы оставались
+     * базовыми — надетый меч (+8 атаки) и доспех (+14 защиты, +20 HP) не
+     * учитывались, пока игрок вручную не снимал/надевал их. Проверено вживую:
+     * p_atk=26 вместо 34, hp_max=120 вместо 140.
+     */
     public static function giveStarterKit(int $charId): void
     {
-        $sword = Database::one('SELECT id FROM ' . Database::table('items') . ' WHERE code = ?', ['wooden_sword']);
-        $vest = Database::one('SELECT id FROM ' . Database::table('items') . ' WHERE code = ?', ['leather_vest']);
-        $potions = Database::one('SELECT id FROM ' . Database::table('items') . ' WHERE code = ?', ['hp_potion']);
-
-        if ($sword) {
-            Database::insert('inventory', ['char_id' => $charId, 'item_id' => (int) $sword['id'], 'qty' => 1, 'equipped' => 1]);
-        }
-        if ($vest) {
-            Database::insert('inventory', ['char_id' => $charId, 'item_id' => (int) $vest['id'], 'qty' => 1, 'equipped' => 1]);
-        }
-        if ($potions) {
-            Database::insert('inventory', ['char_id' => $charId, 'item_id' => (int) $potions['id'], 'qty' => 5]);
-        }
+        (new \App\Service\ShopService())->starterKit($charId);
     }
 
     private static function seedChat(): void

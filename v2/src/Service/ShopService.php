@@ -221,6 +221,57 @@ final class ShopService
     }
 
     /** @return array<int,array<string,mixed>> */
+    /**
+     * Стартовый набор новичка: меч и доспех сразу надеты, плюс пять зелий.
+     *
+     * БАГ: Migrator::giveStarterKit() вставлял предметы напрямую в inventory
+     * с equipped = 1, а характеристики персонажа оставались базовыми — они
+     * создаются в createCharacter() без учёта экипировки. В итоге новичок
+     * носил «Деревянный меч» (+8 к атаке) и «Кожаный доспех» (+14 защиты,
+     * +6 мдеф, +20 HP), но дрался базовыми статами. Проверено вживую:
+     * hp_max=120 вместо 140, p_atk=26 вместо 34, p_def=14 вместо 28.
+     * Бонусы появлялись только после снятия/надевания предмета вручную.
+     *
+     * Здесь стартовый набор выдаётся и СРАЗУ пересчитываются характеристики,
+     * поэтому «надето» и «учтено в статах» всегда согласованы.
+     */
+    public function starterKit(int $charId): void
+    {
+        $t = Database::table('items');
+        foreach (['wooden_sword', 'leather_vest'] as $code) {
+            $item = Database::one("SELECT id FROM {$t} WHERE code = ?", [$code]);
+            if ($item === null) {
+                continue;
+            }
+            Database::insert('inventory', [
+                'char_id' => $charId, 'item_id' => (int) $item['id'], 'qty' => 1, 'equipped' => 1,
+            ]);
+        }
+        $potions = Database::one("SELECT id FROM {$t} WHERE code = ?", ['hp_potion']);
+        if ($potions !== null) {
+            Database::insert('inventory', [
+                'char_id' => $charId, 'item_id' => (int) $potions['id'], 'qty' => 5, 'equipped' => 0,
+            ]);
+        }
+        // пересчитываем статы ПОСЛЕ выдачи: иначе экипировка «висит» на персонаже,
+        // но её бонусы не входят в hp_max/p_atk/p_def (баг 64).
+        $this->recalcStats($charId);
+        // вызывается только для freshly created персонажа — начинаем с полным HP/MP,
+        // прибавка от доспеха (+20 HP) тоже должна быть сразу заполнена
+        $caps = Database::one(
+            'SELECT hp_max, mp_max FROM ' . Database::table('characters') . ' WHERE id = ?',
+            [$charId]
+        );
+        if ($caps !== null) {
+            Database::update(
+                'characters',
+                ['hp' => (int) $caps['hp_max'], 'mp' => (int) $caps['mp_max']],
+                'id = ?',
+                [$charId]
+            );
+        }
+    }
+
     public function inventory(int $charId): array
     {
         $sql = "SELECT i.id AS inv_id, i.qty, i.equipped, it.*
@@ -270,7 +321,17 @@ final class ShopService
                 Database::exec("DELETE FROM {$invT} WHERE id = ?", [(int) $row['id']]);
             }
 
-            return ['hp' => $hp, 'mp' => $mp, 'char' => $game->requireChar($charId)];
+            // БАГ: здесь возвращался СЫРОЙ ряд characters. Клиент делает
+            // updateHud(data.char) и берёт exp_percent/hp_percent, которых в
+            // сыром ряду нет — в HUD появлялось «EXP undefined%». Плюс наружу
+            // уходили last_seen/created_at, а контракт поля char был другим,
+            // чем у остальных ручек. Отдаём то же представление, что и все.
+            return [
+                'hp' => $hp,
+                'mp' => $mp,
+                // то же представление персонажа, что у остальных ручек
+                'char' => \App\Service\AuthService::present($game->requireChar($charId)),
+            ];
         });
     }
 

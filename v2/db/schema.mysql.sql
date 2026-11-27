@@ -150,6 +150,13 @@ CREATE TABLE IF NOT EXISTS news (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Служебные маркеры одноразовых миграций данных (см. Migrator::syncEquipStats)
+CREATE TABLE IF NOT EXISTS meta (
+    `key`   VARCHAR(64)  NOT NULL,
+    `value` VARCHAR(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS sessions (
     id           CHAR(64) NOT NULL,
     account_id   INT UNSIGNED NULL,

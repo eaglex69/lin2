@@ -390,6 +390,18 @@ final class AuthService
         return array_map(fn (array $r) => $this->decorate($r), $rows);
     }
 
+    /**
+     * Общее представление персонажа для JSON API.
+     *
+     * Так же, как decorate(), но не требует объекта: их нужно отдавать и из
+     * ShopService::useItem, где создавать AuthService ради одного вызова
+     * незачем.
+     */
+    public static function present(array $c): array
+    {
+        return (new self())->decorate($c);
+    }
+
     /** Приводим типы и добавляем производные поля для JSON API. */
     public function decorate(array $c): array
     {

@@ -125,6 +125,12 @@ CREATE TABLE IF NOT EXISTS news (
     created_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Служебные маркеры одноразовых миграций данных (см. Migrator::syncEquipStats)
+CREATE TABLE IF NOT EXISTS meta (
+    "key"   TEXT PRIMARY KEY,
+    "value" TEXT NOT NULL DEFAULT ''
+);
+
 CREATE TABLE IF NOT EXISTS sessions (
     id           TEXT PRIMARY KEY,
     account_id   INTEGER NULL,

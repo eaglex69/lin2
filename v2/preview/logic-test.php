@@ -325,8 +325,10 @@ $miss = (int) $hres['char']['hp_max'] - 20;
 $expect = max(1, (int) ceil(($miss + ((int) $hres['char']['mp_max'] - 10)) * 0.5));
 $dbg('T22 лечение живого: cost=' . $hres['cost'] . ' (ожидалось ' . $expect . ') -> '
     . ($hres['cost'] === $expect ? 'OK' : 'БАГ'));
+// adena хранится как double (см. баг про 32-битный int), поэтому сравниваем
+// численно, а не строгим === с int — иначе тест «падает» на верной сумме
 $dbg('T22 адена списана: ' . $hres['char']['adena'] . ' (ожидалось ' . (5000 - $expect) . ') -> '
-    . ($hres['char']['adena'] === 5000 - $expect ? 'OK' : 'БАГ'));
+    . (abs((float) $hres['char']['adena'] - (5000 - $expect)) < 0.5 ? 'OK' : 'БАГ'));
 Database::update('characters', ['hp' => 20, 'mp' => 10, 'adena' => 5], 'id = ?', [$hcid]);
 $poor = false;
 try { $game->heal($hcid); } catch (Throwable $e) { $poor = str_contains($e->getMessage(), 'Не хватает адены'); }
@@ -503,11 +505,16 @@ $bigChar = $game->requireChar($bigCid);
 $dbg('T39 requireChar 9e9: ' . var_export($bigChar['adena'], true) . ' -> '
     . ($bigChar['adena'] == 9000000000 ? 'OK' : 'БАГ: обрезано до ' . (int) $bigChar['adena']));
 $bigShop = new ShopService();
+// в стартовом наборе уже 5 зелий, поэтому в стак (99) помещается 94, а не 99:
+// ожидаемую сумму считаем от фактически выданного количества, иначе тест
+// «падал» на корректном поведении лимита стака (баг 42)
+$bigHave = (int) Database::value('SELECT qty FROM inventory WHERE char_id = ? AND item_id = (SELECT id FROM items WHERE code = ?)', [$bigCid, 'hp_potion']);
 $bigBuy = $bigShop->buy($bigCid, 'hp_potion', 99);
-$dbg('T39 после покупки: ' . var_export($bigBuy['adena'], true) . ' -> '
-    . ($bigBuy['adena'] == 9000000000 - 44550 ? 'OK' : 'БАГ'));
+$bigExpected = 9000000000 - 450 * $bigBuy['qty'];
+$dbg('T39 после покупки: ' . var_export($bigBuy['adena'], true) . ' (выдано ' . $bigBuy['qty'] . ' из ' . $bigHave . ') -> '
+    . ($bigBuy['adena'] == $bigExpected && $bigHave + $bigBuy['qty'] === 99 ? 'OK' : 'БАГ'));
 $bigJson = json_encode(['adena' => $bigBuy['adena']]);
-$dbg('T39 JSON: ' . $bigJson . ' -> ' . (str_contains($bigJson, '8999955450') ? 'OK' : 'БАГ'));
+$dbg('T39 JSON: ' . $bigJson . ' -> ' . (str_contains($bigJson, (string) $bigExpected) ? 'OK' : 'БАГ'));
 
 // --- ТЕСТ 40: мёртвый персонаж не ходит
 $deadAcc = Migrator::createAccount('deadwalker', 'Str0ngPass!1');
@@ -731,3 +738,50 @@ $dbg('T53 награда -5000: exp=' . var_export($ngAfter['exp'], true) . ', �
 $hstsSrc = (string) file_get_contents('/tmp/v2/public/index.php');
 $hstsGuarded = str_contains($hstsSrc, 'isTrustedProxy') && !preg_match('/X_FORWARDED_PROTO.*=== .https.\s*\)\s*\{\s*header\(.Strict/', $hstsSrc);
 $dbg('T54 HSTS за доверенным прокси: ' . ($hstsGuarded ? 'OK (проверка есть)' : 'БАГ (заголовок без проверки)'));
+
+// --- ТЕСТ 55: стартовый набор учитывается в характеристиках (баг 64)
+// Предметы выдаются надетым, но раньше статы оставались базовыми: меч +8 атаки
+// и доспех +14 защиты/+20 HP не входили в расчёт, пока их не снимут/наденут.
+$ekAcc = Migrator::createAccount('equipkit', 'Str0ngPass!1');
+$ekCid = Migrator::createCharacter($ekAcc, 'equipkit', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($ekCid);
+$ekC = Database::one('SELECT hp, hp_max, mp, mp_max, p_atk, p_def, m_def FROM characters WHERE id = ?', [$ekCid]);
+// база воина 1 ур.: hp 120, mp 60, p_atk 26, p_def 14, m_def 8
+// набор: меч +8 p_atk, доспех +14 p_def/+6 m_def/+20 hp
+$ekOk = (int) $ekC['hp_max'] === 140 && (int) $ekC['p_atk'] === 34
+    && (int) $ekC['p_def'] === 28 && (int) $ekC['m_def'] === 14
+    && (int) $ekC['hp'] === 140 && (int) $ekC['mp'] === 60;
+$dbg('T55 статы с экипировкой: hp=' . $ekC['hp'] . '/' . $ekC['hp_max']
+    . ', p_atk=' . $ekC['p_atk'] . ', p_def=' . $ekC['p_def'] . ', m_def=' . $ekC['m_def']
+    . ' -> ' . ($ekOk ? 'OK' : 'БАГ (экипировка не учтена)'));
+
+// --- ТЕСТ 56: useItem отдаёт то же представление персонажа (баг 65)
+$uiChar = Database::one('SELECT * FROM characters WHERE id = ?', [$ekCid]);
+$uiShop = new ShopService();
+$uiInv = Database::one('SELECT id FROM inventory WHERE char_id = ? AND item_id = (SELECT id FROM items WHERE code = ?)', [$ekCid, 'hp_potion']);
+Database::update('characters', ['hp' => 10, 'mp' => 5], 'id = ?', [$ekCid]);
+$uiRes = $uiShop->useItem($ekCid, (int) $uiInv['id']);
+$uiCharOut = $uiRes['char'] ?? [];
+$uiOk = isset($uiCharOut['exp_percent'], $uiCharOut['exp_cur'], $uiCharOut['hp_percent'],
+    $uiCharOut['mp_percent'], $uiCharOut['race_label'], $uiCharOut['class_label']);
+// сверяем с эталоном: useItem обязан совпадать с тем, что отдают остальные ручки
+$uiRef = (new AuthService())->decorate(Database::one('SELECT * FROM characters WHERE id = ?', [$ekCid]));
+$uiClean = array_keys($uiCharOut) === array_keys($uiRef);
+$dbg('T56 useItem.char: exp_percent=' . var_export($uiCharOut['exp_percent'] ?? null, true)
+    . ', hp_percent=' . var_export($uiCharOut['hp_percent'] ?? null, true)
+    . ', набор полей как у decorate=' . var_export($uiClean, true)
+    . ' -> ' . ($uiOk && $uiClean ? 'OK' : 'БАГ (сырой ряд вместо decorate)'));
+
+// --- ТЕСТ 57: демо-аккаунт не администратор (баг 67)
+$demoRole = (string) Database::value('SELECT role FROM accounts WHERE nick = ?', ['demo']);
+$dbg('T57 роль demo: ' . $demoRole . ' -> ' . ($demoRole === 'player' ? 'OK' : 'БАГ (демо с правами)'));
+
+// --- ТЕСТ 58: Request::ip() не верит X-Forwarded-For (баг 68)
+$_SERVER['REMOTE_ADDR'] = '203.0.113.9';
+$_SERVER['HTTP_X_FORWARDED_FOR'] = '1.2.3.4';
+$_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+$ipReq = new \App\Core\Request('GET', '/', [], [], [], [], '', $_SERVER);
+$ipGot = $ipReq->ip();
+unset($_SERVER['HTTP_X_FORWARDED_FOR']);
+$dbg('T58 Request::ip() при XFF=1.2.3.4: ' . $ipGot . ' -> '
+    . ($ipGot === '203.0.113.9' ? 'OK' : 'БАГ (подмена IP)'));

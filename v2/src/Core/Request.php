@@ -202,13 +202,18 @@ final class Request
         return false;
     }
 
+    /**
+     * IP клиента для журналов и лимитов.
+     *
+     * БАГ: этот метод всё ещё читал X-Forwarded-For БЕЗ всякой проверки —
+     * ровно та дыра, которую закрыли в currentIp() (баг 58). Сейчас он нигде
+     * не вызывается, но первый же вызов вернул бы подставленный адрес, и
+     * лимиты «по IP» снова обходились бы сменой заголовка. Делегируем
+     * проверенной логике.
+     */
     public function ip(): string
     {
-        $fwd = $this->header('X-Forwarded-For');
-        if ($fwd !== '') {
-            return trim(explode(',', $fwd)[0]);
-        }
-        return (string) ($this->server['REMOTE_ADDR'] ?? '127.0.0.1');
+        return self::currentIp();
     }
 
     public function userAgent(): string
