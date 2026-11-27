@@ -1,0 +1,16 @@
+{
+  "name": "miniage-node",
+  "version": "1.0.0",
+  "description": "Miniage (L2War) WAP MMORPG — перевод с PHP на Node.js. Оригинальные URL (*.php) сохранены.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "generate": "node tools/generate.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}
