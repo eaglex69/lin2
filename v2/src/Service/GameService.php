@@ -51,6 +51,9 @@ final class GameService
             $y = 110 + mt_rand(0, 430);
             mt_srand();
             $alive = $this->isMobAlive($charId, $mobId);
+            // моб занят чужим активным боем: показать как «мёртв», чтобы клиент
+            // не предлагал напасть и не получал отказ уже после клика
+            $busy = $alive && $this->isMobBusy($mobId, $charId);
             $out[] = [
                 'id' => $mobId,
                 'code' => $m['code'],
@@ -64,11 +67,12 @@ final class GameService
                 'boss' => (bool) $m['is_boss'],
                 'x' => $x,
                 'y' => $y,
-                'alive' => $alive,
+                'alive' => $alive && !$busy,
+                'busy' => $busy,
                 // БАГ: здесь был фиктивный расчёт по остатку от деления time()
                 // на respawn_sec — таймер не совпадал с фактическим респавном
                 // и всегда показывал произвольное число. Берём настоящее время.
-                'respawn_in' => $alive ? 0 : $this->respawnIn($mobId),
+                'respawn_in' => ($alive && !$busy) ? 0 : $this->respawnIn($mobId),
             ];
         }
         return $out;
@@ -148,10 +152,41 @@ final class GameService
         return Database::driver() === 'mysql' ? ' FOR UPDATE' : '';
     }
 
+    /**
+     * Занят ли моб чужим активным боем.
+     *
+     * БАГ: активный бой другого игрока не учитывался вовсе. Двое начинали
+     * бой с ОДНИМ мобом и оба получали победу и награду — проверено: у A
+     * wins=1 и у B wins=1 за одного слизня. Свои бои не считаются: игрок
+     * должен иметь возможность вернуться в незавершённый бой.
+     */
+    private function isMobBusy(int $mobId, int $charId): bool
+    {
+        // учитываем только «свежие» бои: брошенный (нет хода дольше
+        // BATTLE_IDLE_SEC) не должен держать моба вечно, даже если чужой
+        // клиент ещё не вызывал closeStaleBattles
+        $busy = Database::value(
+            'SELECT COUNT(*) FROM ' . Database::table('battles')
+            . " WHERE mob_id = ? AND state = 'active' AND char_id <> ?"
+            . ' AND updated_at >= ?',
+            [$mobId, $charId, date('Y-m-d H:i:s', time() - self::BATTLE_IDLE_SEC)]
+        );
+        return (int) $busy > 0;
+    }
+
     /** Секунды до возрождения монстра (0 — уже жив). */
     public function respawnIn(int $mobId): int
     {
         $t = Database::table('battles');
+        // идёт чужой свежий бой — моб занят, таймер возрождения ещё не пошёл
+        $busy = Database::value(
+            "SELECT COUNT(*) FROM {$t} WHERE mob_id = ? AND state = 'active' AND updated_at >= ?",
+            [$mobId, date('Y-m-d H:i:s', time() - self::BATTLE_IDLE_SEC)]
+        );
+        if ((int) $busy > 0) {
+            $mob = Database::one('SELECT respawn_sec FROM ' . Database::table('mobs') . ' WHERE id = ?', [$mobId]);
+            return max(1, (int) ($mob['respawn_sec'] ?? 20));
+        }
         $row = Database::one(
             "SELECT won_at FROM {$t} WHERE mob_id = ? AND state = 'won' AND won_at IS NOT NULL
              ORDER BY won_at DESC, id DESC LIMIT 1",
@@ -214,16 +249,28 @@ final class GameService
             return $this->battleState($active);
         }
 
-        $id = Database::insert('battles', [
-            'char_id' => $charId,
-            'mob_id' => $mobId,
-            'mob_hp' => (int) $mob['hp'],
-            'turn' => 1,
-            'log_json' => json_encode([], JSON_UNESCAPED_UNICODE),
-            'state' => 'active',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        // Захват моба: повторная проверка «моб свободен» и вставка боя в
+        // ОДНОЙ транзакции. Без этого между isMobAlive() выше и INSERT на
+        // MySQL успевал вклиниться второй игрок — один моб доставался двоим,
+        // и оба получали победу с наградой.
+        $id = Database::transaction(function () use ($charId, $mobId, $mob) {
+            if (!$this->isMobAlive($charId, $mobId)) {
+                throw new \InvalidArgumentException('Монстр ещё не возродился.');
+            }
+            if ($this->isMobBusy($mobId, $charId)) {
+                throw new \InvalidArgumentException('Монстра уже атакует другой игрок.');
+            }
+            return Database::insert('battles', [
+                'char_id' => $charId,
+                'mob_id' => $mobId,
+                'mob_hp' => (int) $mob['hp'],
+                'turn' => 1,
+                'log_json' => json_encode([], JSON_UNESCAPED_UNICODE),
+                'state' => 'active',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        });
 
         return $this->battleState(Database::one("SELECT * FROM {$bt} WHERE id = ?", [$id]));
     }

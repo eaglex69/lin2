@@ -319,7 +319,9 @@ export class WorldCanvas {
     ctx.fillText(`${m.name} [${m.level}]`, x, m.y - 26);
     if (!alive) {
       ctx.fillStyle = '#9a9a9a';
-      ctx.fillText(`респавн ~${m.respawn_in}s`, x, m.y - 12);
+      // «занят» и «ждёт респавна» — разные вещи: подпись должна объяснять,
+      // почему моб недоступен, иначе игрок думает, что таймер врёт
+      ctx.fillText(m.busy ? 'бьётся с другим игроком' : `респавн ~${m.respawn_in}s`, x, m.y - 12);
     }
     ctx.restore();
   }

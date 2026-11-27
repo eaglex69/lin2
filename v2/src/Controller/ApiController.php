@@ -36,6 +36,9 @@ final class ApiController
         $char = $this->auth->character();
         if ($char !== null) {
             $this->game->touchOnline((int) $char['id']);
+            // брошенные бои закрываем и здесь: игрок может вообще не начинать
+            // новый бой, а лимит в 3 активных держался бы вечно
+            $this->game->closeStaleBattles((int) $char['id']);
         }
 
         return Response::ok([

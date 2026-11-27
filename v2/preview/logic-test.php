@@ -437,3 +437,53 @@ $ok33 = false;
 try { $auth2->register('tailtest2', $lp, '', 'human', 'fighter', 'm'); $ok33 = true; }
 catch (Throwable $e) { $ok33 = false; }
 $dbg('T33 регистрация ровно 72 байт: ' . ($ok33 ? 'OK' : 'БАГ: отказ'));
+
+// --- ТЕСТ 34: двое не могут бить одного моба (дублирование награды)
+$dupA = Migrator::createAccount('dupA', 'Str0ngPass!1');
+$dupB = Migrator::createAccount('dupB', 'Str0ngPass!1');
+$cidA = Migrator::createCharacter($dupA, 'dupA', 'human', 'fighter', 'm');
+$cidB = Migrator::createCharacter($dupB, 'dupB', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($cidA);
+Migrator::giveStarterKit($cidB);
+Database::exec('DELETE FROM battles');
+$gameT = new GameService();
+$bA = $gameT->startBattle($cidA, 1);
+$blockedB = false;
+try { $gameT->startBattle($cidB, 1); }
+catch (Throwable $e) { $blockedB = str_contains($e->getMessage(), 'другой игрок'); }
+$dbg('T34 второй игрок на того же моба: ' . ($blockedB ? 'отказ -> OK' : 'БАГ: начал бой'));
+
+// --- ТЕСТ 35: свой бой переиспользуется, а не блокируется
+$again = $gameT->startBattle($cidA, 1);
+$dbg('T35 свой незавершённый бой переиспользован: id=' . $again['id'] . ' -> '
+    . ((int) $again['id'] === (int) $bA['id'] ? 'OK' : 'БАГ: создан новый/отказ'));
+$dbg('T35 активных боёв у A: ' . Database::value("SELECT COUNT(*) FROM battles WHERE char_id = ? AND state = 'active'", [$cidA])
+    . ' -> ' . ((int) Database::value("SELECT COUNT(*) FROM battles WHERE char_id = ? AND state = 'active'", [$cidA]) === 1 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 36: зона показывает занятость и не отдаёт занятого моба живым
+Database::update('characters', ['level' => 5], 'id = ?', [$cidB]);
+$zB = $gameT->mobsInZone('Giran', $cidB);
+$mob1B = null;
+foreach ($zB as $m) { if ((int) $m['id'] === 1) { $mob1B = $m; break; } }
+$dbg('T36 для B моб1: alive=' . var_export($mob1B['alive'], true) . ' busy=' . var_export($mob1B['busy'], true)
+    . ' -> ' . ($mob1B['alive'] === false && $mob1B['busy'] === true ? 'OK' : 'БАГ'));
+$zA = $gameT->mobsInZone('Giran', $cidA);
+$mob1A = null;
+foreach ($zA as $m) { if ((int) $m['id'] === 1) { $mob1A = $m; break; } }
+$dbg('T36 для A (свой бой) моб1: alive=' . var_export($mob1A['alive'], true) . ' busy=' . var_export($mob1A['busy'], true)
+    . ' -> ' . ($mob1A['alive'] === true && $mob1A['busy'] === false ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 37: после flee моб свободен для другого
+$gameT->flee($cidA, (int) $bA['id']);
+$freeAfterFlee = true;
+try { $gameT->startBattle($cidB, 1); } catch (Throwable $e) { $freeAfterFlee = false; }
+$dbg('T37 после flee моб свободен для B: ' . ($freeAfterFlee ? 'OK' : 'БАГ: остался занят'));
+
+// --- ТЕСТ 38: брошенный бой не держит моба вечно
+Database::exec('DELETE FROM battles');
+$stale = $gameT->startBattle($cidA, 2);
+Database::exec('UPDATE battles SET updated_at = ? WHERE id = ?',
+    [date('Y-m-d H:i:s', time() - 4000), (int) $stale['id']]);
+$freeStale = true;
+try { $gameT->startBattle($cidB, 2); } catch (Throwable $e) { $freeStale = false; }
+$dbg('T38 брошенный бой не держит моба: ' . ($freeStale ? 'OK' : 'БАГ: моб занят вечно'));
