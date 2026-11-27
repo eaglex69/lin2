@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS characters (
     p_def        INT UNSIGNED NOT NULL DEFAULT 10,
     m_def        INT UNSIGNED NOT NULL DEFAULT 8,
     crit         TINYINT UNSIGNED NOT NULL DEFAULT 10,  -- %
-    adena        BIGINT UNSIGNED NOT NULL DEFAULT 30000000,
+    adena        BIGINT UNSIGNED NOT NULL DEFAULT 500,
     x            SMALLINT NOT NULL DEFAULT 0,           -- координаты на Canvas-карте
     y            SMALLINT NOT NULL DEFAULT 0,
     city         VARCHAR(48) NOT NULL DEFAULT 'Giran',
@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS battles (
     turn         INT UNSIGNED NOT NULL DEFAULT 1,
     log_json     MEDIUMTEXT NOT NULL,
     state        ENUM('active','won','lost','fled') NOT NULL DEFAULT 'active',
+    won_at       DATETIME NULL,
     created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

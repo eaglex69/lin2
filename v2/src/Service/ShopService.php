@@ -188,7 +188,9 @@ final class ShopService
 
         Database::update('characters', [
             'hp_max' => $hpMax,
-            'hp' => min((int) $char['hp'] > 0 ? (int) $char['hp'] : $hpMax, $hpMax),
+            // ВАЖНО: мёртвого (hp <= 0) нельзя «лечить» пересчётом статов.
+            // Раньше смена экипировки воскрешала персонажа с полным HP.
+            'hp' => min(max(0, (int) $char['hp']), $hpMax),
             'mp_max' => $mpMax,
             'mp' => min((int) $char['mp'], $mpMax),
             'p_atk' => $pAtk,
@@ -230,8 +232,16 @@ final class ShopService
             }
             $game = new GameService();
             $char = $game->requireChar($charId);
-            $hp = min($char['hp_max'], $char['hp'] + $item['hp_bonus']);
-            $mp = min($char['mp_max'], $char['mp'] + $item['mp_bonus']);
+            // Мёртвого зельем не поднять: воскрешение — только heal за 500 адены.
+            if ((int) $char['hp'] <= 0) {
+                throw new \InvalidArgumentException('Персонаж мёртв — нужна реанимация в городе (500 адены).');
+            }
+            $hp = min($char['hp_max'], $char['hp'] + (int) $item['hp_bonus']);
+            $mp = min($char['mp_max'], $char['mp'] + (int) $item['mp_bonus']);
+            // Зелье не должно сгорать впустую: если HP и MP уже полные — отказ.
+            if ($hp === $char['hp'] && $mp === $char['mp']) {
+                throw new \InvalidArgumentException('Здоровье и мана уже полные — зелье не нужно.');
+            }
             Database::update('characters', ['hp' => $hp, 'mp' => $mp], 'id = ?', [$charId]);
 
             if ((int) $row['qty'] > 1) {

@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS characters (
     p_def        INTEGER NOT NULL DEFAULT 10,
     m_def        INTEGER NOT NULL DEFAULT 8,
     crit         INTEGER NOT NULL DEFAULT 10,
-    adena        INTEGER NOT NULL DEFAULT 30000000,
+    adena        INTEGER NOT NULL DEFAULT 500,
     x            INTEGER NOT NULL DEFAULT 0,
     y            INTEGER NOT NULL DEFAULT 0,
     city         TEXT NOT NULL DEFAULT 'Giran',
@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS battles (
     turn         INTEGER NOT NULL DEFAULT 1,
     log_json     TEXT NOT NULL,
     state        TEXT NOT NULL DEFAULT 'active',
+    won_at       TEXT NULL,
     created_at   TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );

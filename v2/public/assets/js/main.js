@@ -506,16 +506,21 @@ setInterval(async () => {
   } catch { /* тихо */ }
 }, 3000);
 
-// ---- восстановление HP/MP (сервер считает при запросах; здесь просто HUD)
-setInterval(() => {
-  if (!state.char || state.char.hp <= 0) return;
-  const pct = state.char.hp / state.char.hp_max;
-  if (pct < 1) {
-    state.char.hp = Math.min(state.char.hp_max, state.char.hp + Math.max(1, Math.round(state.char.hp_max * 0.002)));
-    state.char.mp = Math.min(state.char.mp_max, state.char.mp + Math.max(1, Math.round(state.char.mp_max * 0.002)));
-    updateHud(state.char);
-  }
-}, 5000);
+// ---- восстановление HP/MP
+// Источник истины — сервер (GameService::applyRegen): он начисляет реген по
+// времени последнего визита. Клиент только подтягивает актуальные цифры,
+// иначе HUD показывал одно, а бой считал по другим значениям.
+setInterval(async () => {
+  if (!state.char || state.char.hp <= 0 || state.busy || state.battle) return;
+  if (state.char.hp >= state.char.hp_max && state.char.mp >= state.char.mp_max) return;
+  try {
+    const data = await api.bootstrap();
+    if (data.character) {
+      state.char = data.character;
+      updateHud(state.char);
+    }
+  } catch { /* тихо: сеть может моргнуть */ }
+}, 10000);
 
 // ------------------------------------------------------------------- события
 function bindAuth() {

@@ -58,16 +58,20 @@ final class GameService
     private function isMobAlive(int $charId, int $mobId): bool
     {
         $t = Database::table('battles');
+        // ВАЖНО: updated_at меняется при любом изменении строки, в том числе
+        // при отступлении (flee) после победы. Тогда респавн обнулялся и можно
+        // было убивать одного моба бесконечно. Храним время победы отдельно.
         $row = Database::one(
-            "SELECT state, updated_at FROM {$t} WHERE char_id = ? AND mob_id = ? AND state = 'won' ORDER BY id DESC LIMIT 1",
+            "SELECT state, updated_at, won_at FROM {$t} WHERE char_id = ? AND mob_id = ? AND state = 'won' ORDER BY id DESC LIMIT 1",
             [$charId, $mobId]
         );
         if ($row === null) {
             return true;
         }
+        $wonAt = (string) ($row['won_at'] ?? '') !== '' ? (string) $row['won_at'] : (string) $row['updated_at'];
         $mob = Database::one('SELECT respawn_sec FROM ' . Database::table('mobs') . ' WHERE id = ?', [$mobId]);
         $respawn = (int) ($mob['respawn_sec'] ?? 20);
-        return (time() - strtotime((string) $row['updated_at'])) >= $respawn;
+        return (time() - strtotime($wonAt)) >= $respawn;
     }
 
     /**
@@ -185,16 +189,23 @@ final class GameService
                     $state = 'lost';
                     Database::update('characters', ['losses' => (int) $char['losses'] + 1], 'id = ?', [(int) $char['id']]);
                     $log[] = ['t' => 'system', 'turn' => $turn, 'text' => 'Вы погибли. Нужна реанимация в городе.'];
+                    // бой обрываем, чтобы клиент не продолжал присылать удары
+                    $log[] = ['t' => 'system', 'turn' => $turn, 'text' => 'Бой завершён.'];
                 }
             }
 
-            Database::update('battles', [
+            $battleUpdate = [
                 'mob_hp' => $mobHp,
                 'turn' => $turn + 1,
                 'log_json' => json_encode($log, JSON_UNESCAPED_UNICODE),
                 'state' => $state,
                 'updated_at' => date('Y-m-d H:i:s'),
-            ], 'id = ?', [(int) $battle['id']]);
+            ];
+            if ($state === 'won') {
+                // фиксируем момент победы: от него считается респавн
+                $battleUpdate['won_at'] = date('Y-m-d H:i:s');
+            }
+            Database::update('battles', $battleUpdate, 'id = ?', [(int) $battle['id']]);
 
             $this->touchOnline($charId);
 
@@ -215,6 +226,11 @@ final class GameService
         $battle = Database::one("SELECT * FROM {$bt} WHERE id = ? AND char_id = ?", [$battleId, $charId]);
         if ($battle === null) {
             throw new \InvalidArgumentException('Бой не найден.');
+        }
+        // Отступать можно только из идущего боя. Иначе выигранный бой
+        // превращался в «fled» и ломал подсчёт респавна/статистику.
+        if ($battle['state'] !== 'active') {
+            throw new \InvalidArgumentException('Бой уже завершён.');
         }
         $log = json_decode((string) $battle['log_json'], true) ?: [];
         $log[] = ['t' => 'system', 'turn' => (int) $battle['turn'], 'text' => 'Вы отступили из боя.'];
@@ -246,21 +262,24 @@ final class GameService
             'wins' => (int) $char['wins'] + 1,
         ];
 
-        if ($levelup) {
-            // рост характеристик: как legacy checkLevel()
-            $hpMax = (int) $char['hp_max'] + 12 + $level * 2;
-            $mpMax = (int) $char['mp_max'] + 6 + $level;
-            $update['hp_max'] = $hpMax;
-            $update['hp'] = $hpMax;
-            $update['mp_max'] = $mpMax;
-            $update['mp'] = $mpMax;
-            $update['p_atk'] = (int) $char['p_atk'] + 2;
-            $update['m_atk'] = (int) $char['m_atk'] + 2;
-            $update['p_def'] = (int) $char['p_def'] + 1;
-            $update['m_def'] = (int) $char['m_def'] + 1;
-        }
-
         Database::update('characters', $update, 'id = ?', [(int) $char['id']]);
+
+        if ($levelup) {
+            // Рост характеристик пересчитываем целиком (база за уровень +
+            // бонусы экипировки). Раньше прибавка шла к hp_max, который уже
+            // включал бонус предметов, и при следующей смене экипировки
+            // накопленный прирост «съедался».
+            (new ShopService())->recalcStats((int) $char['id']);
+            $refreshed = Database::one(
+                'SELECT hp_max, mp_max FROM ' . Database::table('characters') . ' WHERE id = ?',
+                [(int) $char['id']]
+            );
+            // после уровня — полное восстановление
+            Database::update('characters', [
+                'hp' => (int) ($refreshed['hp_max'] ?? 0),
+                'mp' => (int) ($refreshed['mp_max'] ?? 0),
+            ], 'id = ?', [(int) $char['id']]);
+        }
 
         return ['exp' => (int) $mob['exp_reward'], 'adena' => (int) $mob['adena_reward'], 'levelup' => $levelup, 'level' => $level];
     }
@@ -297,14 +316,20 @@ final class GameService
     public function heal(int $charId): array
     {
         $char = $this->requireChar($charId);
+        $dead = (int) $char['hp'] <= 0;
         $cost = 0;
-        if ((int) $char['hp'] >= (int) $char['hp_max'] && (int) $char['mp'] >= (int) $char['mp_max']) {
+
+        // Проверять «полностью здоров» нужно только для живых: у мёртвого
+        // hp = 0 < hp_max, и старая проверка ошибочно считала его здоровым.
+        if (!$dead && (int) $char['hp'] >= (int) $char['hp_max'] && (int) $char['mp'] >= (int) $char['mp_max']) {
             throw new \InvalidArgumentException('Персонаж уже полностью здоров.');
         }
-        if ((int) $char['hp'] <= 0) {
+        if ($dead) {
             $cost = 500;
             if ((int) $char['adena'] < $cost) {
-                throw new \InvalidArgumentException('Не хватает адены на реанимацию (500).');
+                throw new \InvalidArgumentException(
+                    'Не хватает адены на реанимацию (нужно 500). Продайте предмет из инвентаря.'
+                );
             }
         }
         Database::update('characters', [
@@ -350,9 +375,60 @@ final class GameService
         if ($char === null) {
             throw new \InvalidArgumentException('Персонаж не найден.');
         }
+        $char = $this->applyRegen($char);
         foreach (['id', 'level', 'exp', 'hp', 'hp_max', 'mp', 'mp_max', 'p_atk', 'm_atk', 'p_def', 'm_def', 'crit', 'adena', 'wins', 'losses', 'x', 'y'] as $k) {
             $char[$k] = (int) $char[$k];
         }
+        return $char;
+    }
+
+    /**
+     * Пассивная регенерация HP/MP по времени.
+     *
+     * Клиент рисовал «восстановление» сам, но сервер о нём не знал: HUD
+     * показывал одно, бой считал другое. Теперь источник истины — сервер.
+     * Скорость: 0.2% от максимума в секунду, не чаще одного пересчёта в 3 с.
+     */
+    private function applyRegen(array $char): array
+    {
+        // мёртвых не регенерируем: воскрешение только через heal
+        if ((int) $char['hp'] <= 0) {
+            return $char;
+        }
+        $hpMax = (int) $char['hp_max'];
+        $mpMax = (int) $char['mp_max'];
+        if ((int) $char['hp'] >= $hpMax && (int) $char['mp'] >= $mpMax) {
+            return $char;
+        }
+
+        $last = (string) ($char['last_seen'] ?? '');
+        $since = $last === '' ? 0 : time() - strtotime($last);
+        // слишком давно не заходил — не начисляем «офлайн-реген» пачкой
+        if ($since < 3) {
+            return $char;
+        }
+        $seconds = min($since, 60);   // не больше минуты за один раз
+
+        $hp = (int) $char['hp'];
+        $mp = (int) $char['mp'];
+        if ($hp < $hpMax) {
+            $hp = min($hpMax, $hp + max(1, (int) round($hpMax * 0.002 * $seconds)));
+        }
+        if ($mp < $mpMax) {
+            $mp = min($mpMax, $mp + max(1, (int) round($mpMax * 0.002 * $seconds)));
+        }
+        if ($hp === (int) $char['hp'] && $mp === (int) $char['mp']) {
+            return $char;
+        }
+
+        Database::update('characters', [
+            'hp' => $hp,
+            'mp' => $mp,
+            'last_seen' => date('Y-m-d H:i:s'),
+        ], 'id = ?', [(int) $char['id']]);
+
+        $char['hp'] = $hp;
+        $char['mp'] = $mp;
         return $char;
     }
 

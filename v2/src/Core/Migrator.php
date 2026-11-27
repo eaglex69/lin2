@@ -23,7 +23,53 @@ final class Migrator
             Database::pdo()->exec($stmt);
         }
 
+        self::upgrade();
         self::seed();
+    }
+
+    /**
+     * Догоняющие миграции для уже существующих баз.
+     *
+     * CREATE TABLE IF NOT EXISTS не добавляет новые колонки в старые таблицы,
+     * поэтому здесь аккуратно доводим схему до актуальной.
+     */
+    private static function upgrade(): void
+    {
+        $bt = Database::table('battles');
+        $driver = Database::driver();
+
+        $has = static function (string $table, string $column) use ($driver): bool {
+            try {
+                if ($driver === 'mysql') {
+                    $row = Database::one(
+                        'SELECT COUNT(*) AS c FROM information_schema.COLUMNS
+                         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
+                        [trim($table, '`'), $column]
+                    );
+                    return (int) ($row['c'] ?? 0) > 0;
+                }
+                $rows = Database::all('PRAGMA table_info(' . $table . ')');
+                foreach ($rows as $r) {
+                    if (($r['name'] ?? '') === $column) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (\Throwable) {
+                return false;
+            }
+        };
+
+        if (!$has(trim($bt, '"`'), 'won_at')) {
+            Database::pdo()->exec(
+                $driver === 'mysql'
+                    ? "ALTER TABLE {$bt} ADD COLUMN won_at DATETIME NULL AFTER state"
+                    : "ALTER TABLE {$bt} ADD COLUMN won_at TEXT NULL"
+            );
+            // у старых записей лучшая догадка о времени победы — updated_at
+            Database::pdo()->exec("UPDATE {$bt} SET won_at = updated_at WHERE state = 'won' AND won_at IS NULL");
+            error_log('[miniage] миграция: добавлена колонка battles.won_at');
+        }
     }
 
     /** Разбивает SQL-дамп на отдельные выражения (без процедур и триггеров). */
@@ -177,6 +223,9 @@ final class Migrator
         $charId = self::createCharacter($demo, 'Demo', 'human', 'fighter', 'm');
         Database::update('accounts', ['active_char' => $charId], 'id = ?', [$demo]);
         self::giveStarterKit($charId);
+        // Демо-персонаж — витрина: даём стартовый капитал, чтобы можно было
+        // сразу посмотреть магазин. Обычные новички начинают с 500 адены.
+        Database::update('characters', ['adena' => 30000000], 'id = ?', [$charId]);
 
         // Пароль администратора: из .env либо случайный (печатается в лог один раз).
         // Никогда не оставляем admin/admin в проде.

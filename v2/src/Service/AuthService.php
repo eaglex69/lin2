@@ -21,6 +21,17 @@ final class AuthService
         if (!preg_match('/^[A-Za-z0-9_-]{3,16}$/u', $nick)) {
             throw new \InvalidArgumentException('Логин: 3–16 символов, латиница, цифры, _ и -.');
         }
+        // Раса/класс/пол обязаны быть из белого списка: раньше принималось
+        // что угодно (например class=godmode или HTML в поле race).
+        if (!isset(self::RACES[$race])) {
+            throw new \InvalidArgumentException('Неизвестная раса.');
+        }
+        if (!isset(self::CLASSES[$class])) {
+            throw new \InvalidArgumentException('Неизвестный класс.');
+        }
+        if (!in_array($gender, ['m', 'f'], true)) {
+            $gender = 'm';
+        }
         $passLen = function_exists('mb_strlen') ? mb_strlen($pass, 'UTF-8') : strlen($pass);
         if ($passLen < 8) {
             throw new \InvalidArgumentException('Пароль минимум 8 символов.');
