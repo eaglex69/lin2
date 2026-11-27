@@ -50,7 +50,14 @@ export class ApiError extends Error {
   }
 }
 
-async function request(method, url, body) {
+/**
+ * БАГ: при истёкшей сессии (серверный gc, долгая пауза, смена sid) каждый POST
+ * отвечал 419 «CSRF-токен недействителен», а клиент лишь показывал тост и
+ * повторял запрос с тем же протухшим токеном. Игра залипала намертво до
+ * ручного F5. Теперь на 419 один раз перезапрашиваем bootstrap (он выдаёт
+ * свежий токен и sid) и повторяем исходный запрос.
+ */
+async function request(method, url, body, retried = false) {
   const headers = { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
   const sid = currentSid();
   if (sid) headers['X-Miniage-Session'] = sid;
@@ -77,6 +84,16 @@ async function request(method, url, body) {
   try { data = text ? JSON.parse(text) : {}; } catch { data = { ok: false, error: text.slice(0, 200) }; }
 
   if (data && data.csrf) csrf = data.csrf;
+
+  // Протухший CSRF: один повтор после перезагрузки токена.
+  if (res.status === 419 && !retried && !url.startsWith('/api/bootstrap')) {
+    try {
+      const fresh = await request('GET', '/api/bootstrap');
+      if (fresh && fresh.csrf) csrf = fresh.csrf;
+      return await request(method, url, body, true);
+    } catch { /* не смогли — падаем в обычную обработку ниже */ }
+  }
+
   if (!res.ok || (data && data.ok === false)) {
     throw new ApiError((data && data.error) || `HTTP ${res.status}`, (data && data.code) || 'http', res.status);
   }

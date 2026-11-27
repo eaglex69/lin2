@@ -428,8 +428,14 @@ export class WorldCanvas {
   }
 
   _drawHero(ctx, hero) {
-    const x = this.view.w / 2;
-    const y = this.view.h - 96;
+    // БАГ: герой рисовался в фиксированной точке (центр нижнего края), а его
+    // координаты с сервера игнорировались — из-за этого движение по карте
+    // было бессмысленным: сохранялось, но ни на что не влияло. Берём x/y
+    // персонажа (они совпадают с системой координат мобов) и мягко
+    // подстраиваемся под размер окна.
+    const hasPos = Number.isFinite(hero.x) && Number.isFinite(hero.y);
+    const x = hasPos ? Math.max(24, Math.min(this.view.w - 24, hero.x)) : this.view.w / 2;
+    const y = hasPos ? Math.max(40, Math.min(this.view.h - 40, hero.y)) : this.view.h - 96;
     const bob = Math.sin(this.t * 3) * 2;
 
     // мягкий свет вокруг героя

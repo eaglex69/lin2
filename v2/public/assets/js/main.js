@@ -193,6 +193,31 @@ async function loadZone(zoneKey) {
 }
 
 // --------------------------------------------------------------------- бой
+/**
+ * Клик по карте: сохраняем позицию героя на сервере и рисуем его там же.
+ * Не блокирует UI: движение — не критичная операция, ошибку показываем
+ * тостом и позицию не двигаем (чтобы клиент не разошёлся с сервером).
+ */
+async function moveHero(p) {
+  if (!state.char || state.busy) return;
+  if (!state.char.hp || state.char.hp <= 0) {
+    toast('Персонаж мёртв — сначала реанимация в городе.', 'warn');
+    return;
+  }
+  const x = Math.round(p.x);
+  const y = Math.round(p.y);
+  // сразу рисуем — отклик не должен ждать сети
+  world.setHero({ ...state.char, x, y });
+  try {
+    const res = await api.move(x, y, state.char.city || 'Giran');
+    state.char = { ...state.char, x: res.x, y: res.y };
+    world.setHero(state.char);
+  } catch (e) {
+    world.setHero(state.char);
+    toast(errText(e), 'error');
+  }
+}
+
 async function startBattle(mob) {
   if (state.busy) return;
   state.busy = true;
@@ -641,6 +666,11 @@ function init() {
   const canvas = document.getElementById('game-canvas');
   world = new WorldCanvas(canvas);
   world.onMobClick = (mob) => startBattle(mob);
+  // БАГ: движение не работало вовсе. Клик по свободному месту карты не делал
+  // ничего: canvas отдаёт onTileClick, но его никто не назначал, а api.move
+  // не вызывался ни из одного места клиента. Серверный /api/move при этом
+  // исправно сохранял координаты — просто их никто не присылал.
+  world.onTileClick = (p) => moveHero(p);
   panel = new Panel();
 
   bindAuth();
