@@ -293,7 +293,7 @@ $req = mysql_query("SELECT * FROM `soulshots` WHERE `usr` = '$log'");
 $res=mysql_num_rows($req);
 $rs = mysql_fetch_array($req);
 if($res==0){
-mysql_query("INSERT INTO `l2warmobi`.`soulshots` (`id` ,`usr` ,`kol` )
+mysql_query("INSERT INTO `soulshots` (`id` ,`usr` ,`kol` )
 VALUES (NULL , '$log', '100');");
 $nk=$rs['kol']+$co;
 echo "<p><font color=blue>Вы купили $co Shots. У Вас теперь $nk Shots.</font></p>";

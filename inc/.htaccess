@@ -1,0 +1,9 @@
+# Файлы каталога inc/ подключаются из PHP и по HTTP не запрашиваются.
+# Прямой доступ закрыт (в первую очередь к config.php с паролем от базы данных).
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

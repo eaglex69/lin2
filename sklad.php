@@ -70,7 +70,7 @@ mysql_query("INSERT INTO
 mysql_query("DELETE FROM `item` WHERE usr='$log' and `image`='not' and `id`='$_GET[id]'");
 $time = date("H:i d.m.y");
 $text="[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> Положил $item[name] на склад";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'put', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'put', '$text')");
         
 echo"Вещь $item[name] положена на склад!<br/>";
 
@@ -123,7 +123,7 @@ mysql_query("INSERT INTO
         mysql_query("DELETE FROM `sklad` WHERE usr='$log' and `id`='$_GET[id]'");
 $time = date("H:i d.m.y");
 $text="[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> Забрал $item[name] на склад";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'take', '$text')");        
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'take', '$text')");        
 echo"Вещь $item[name] забрана со склада!<br/>";
 
 }else{
@@ -236,7 +236,7 @@ mysql_query("INSERT INTO
         mysql_query("INSERT INTO `msg_r` SET `user_from` = '$log', `user_to` = '$_POST[komu]', `time` = '$time', `read` = 1, `mail_msg` = 'Пользователь  $log прислал Вам $item[name]'");
 $time = date("H:i d.m.y");
 $text="[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> передал <b>$item[name]<b> игроку <a href=\"/search.php?nick=$_POST[komu]&amp;go=go\">$_POST[komu]</a>";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'giveitem', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'giveitem', '$text')");
 
 
 
@@ -299,7 +299,7 @@ mysql_query("INSERT INTO
         mysql_query("DELETE FROM `pit_item` WHERE usr='$log' and `image`='not' and `id`='$_GET[id]'");
 $time = date("H:i d.m.y");
 $text="[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> передал вещь для питомцев <b>$mag[name]</b>  игроку <a href=\"/search.php?nick=$_POST[komu]&amp;go=go\">$_POST[komu]</a>";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'givepit', '$text')");    
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'givepit', '$text')");    
 echo"Вещь $mag[name] передана!<br/>";
 }else{
 echo"<b>Нет такой вещи</b><br/>";
@@ -412,7 +412,7 @@ mysql_query("UPDATE `res` SET `kol` = '$item[kol]' WHERE `usr` = '$_POST[komu]' 
 }
 $time = date("H:i d.m.y");
 $text="[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> передал ресурс <b>$res[name]</b> в количестве <b>$nkol штук</b> игроку <a href=\"/search.php?nick=$_POST[komu]&amp;go=go\">$_POST[komu]</a>";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'giveres', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'giveres', '$text')");
 
        
 echo"$res[name]($nkol штук) передан $_POST[komu]!<br/>";

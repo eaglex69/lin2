@@ -65,15 +65,14 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 // entries that do not include inc/path.php (avt.php, blog.php, enter.php, news.php ...) have no $path
 if (!isset($path)) $path = '';
 
-$db_host = "localhost";
-$db_user = "db1466666825";
-$db_table = "db1466666825";
-$db_pass = "12345";
-// PHP 8 port: connection settings can be overridden from the server environment (SetEnv / env[...] in php-fpm)
-if (getenv('LIN2_DB_HOST') !== false) $db_host = getenv('LIN2_DB_HOST');
-if (getenv('LIN2_DB_USER') !== false) $db_user = getenv('LIN2_DB_USER');
-if (getenv('LIN2_DB_NAME') !== false) $db_table = getenv('LIN2_DB_NAME');
-if (getenv('LIN2_DB_PASS') !== false) $db_pass = getenv('LIN2_DB_PASS');
+// Параметры подключения к базе: inc/config.php (его создаёт install.php) и/или переменные окружения LIN2_DB_*
+// (см. inc/dbconfig.php). Пока ничего не задано, вместо игры выводится страница «игра не установлена».
+include_once dirname(__FILE__).'/dbconfig.php';
+$lin2_db = lin2_require_config();
+$db_host = $lin2_db['host'];
+$db_user = $lin2_db['user'];
+$db_table = $lin2_db['name'];
+$db_pass = $lin2_db['pass'];
 $connect = @ mysql_connect($db_host, $db_user, $db_pass) or die('Проводятся технические работы. Зайдите через день с ув.Саша');
 @ mysql_select_db($db_table) or die('Нет соединения с БД.');
 @ mysql_query("SET NAMES 'utf8'", $connect);

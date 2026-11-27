@@ -14,7 +14,7 @@ include($path.'inc/zag.php');
 
 if($udata['dostup']<4){
 echo'Доступ закрыт!';
-mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
+mysql_query("INSERT INTO `block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в адм панель $udata[usr]' ");
 include($path.'inc/down.php');
 exit;
@@ -314,7 +314,7 @@ mysql_query("DELETE FROM `ya_zamujem` WHERE `muj` = '$_POST[nick]'");
 mysql_query("DELETE FROM `ya_zamujem` WHERE `usr` = '$_POST[nick]'");
 mysql_query("DELETE FROM `zamuj` WHERE `clan` = '$_POST[nick]'");
 mysql_query("DELETE FROM `zamuj` WHERE `usr` ='$_POST[nick]'");
-mysql_query("INSERT INTO `l2warmobi`.`block_ip` (`id`, `usr`, `log`, `ban_time`, `text`, `ip`) VALUES (NULL, '$_POST[nick]', '$log', '99999999', 'удаление юзера', '$user[ip]')");
+mysql_query("INSERT INTO `block_ip` (`id`, `usr`, `log`, `ban_time`, `text`, `ip`) VALUES (NULL, '$_POST[nick]', '$log', '99999999', 'удаление юзера', '$user[ip]')");
 echo'Пользователь '.$_POST['nick'].' удален';
 }
 break;
@@ -325,7 +325,7 @@ $data = mysql_query("SELECT * FROM `users` where `usr`='$_POST[nick]'");
 $datas= mysql_fetch_array($data);
 if($datas['dostup']>$udata['dostup'])  {echo'Запрещено редактировать старших по званию';include($path.'inc/down.php');exit;}
 if($datas['usr']=='Ultimate' and $udata['usr']!='Ultimate'){echo'Запрещено редактировать Ultimate';
-mysql_query("INSERT INTO `miniage.ru`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Облом)))', '')");
+mysql_query("INSERT INTO `block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'Ultimate', '4985139097', 'Облом)))', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'Ultimate', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался Вас отредактировать $udata[usr]' ");
 include($path.'inc/down.php');
 exit;}

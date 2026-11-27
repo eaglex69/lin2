@@ -731,7 +731,7 @@ $reqshot = mysql_query("SELECT * FROM `soulshots` WHERE `usr` = '$log' and `nlvl
 $shot=mysql_fetch_array($reqshot);
 if($shot['kol']>0){
 if($shot['kol'] > 1){mysql_query("UPDATE `soulshots` SET `kol` = `kol`-1 WHERE `usr` = '$log' and `status` = '0' ");}else
-{mysql_query(" DELETE FROM `miniage`.`soulshots` WHERE `soulshots`.`id` = $shot[id] ");}
+{mysql_query(" DELETE FROM `soulshots` WHERE `soulshots`.`id` = $shot[id] ");}
 
 
 

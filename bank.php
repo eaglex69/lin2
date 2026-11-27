@@ -205,7 +205,7 @@ $text = "[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> перед
 $timelog = date("H:i");
 $datelog = date("d.m.y");
 
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text`)VALUES (NULL , 'kol', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text`)VALUES (NULL , 'kol', '$text')");
 
 
 mysql_query("UPDATE `users` SET `almaz` = '$ubank[almaz]' WHERE `usr` = '$_POST[komu]'");
@@ -276,7 +276,7 @@ $timelog = date("H:i");
 $datelog = date("d.m.y");
 
 
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'money', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'money', '$text')");
 
 
 echo"<p><b><font color=grey>Вы перевели $_POST[gold] Аден игроку $_POST[komu]!</b></p>";

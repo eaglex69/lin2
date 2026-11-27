@@ -33,7 +33,7 @@ if (isset($_GET['yes'])){
 
 $time = date("H:i d.m.y");
 $text = " [$time] Игрок <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> выкинул вещь <b>$item[name]</b> ";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'offvesh', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'offvesh', '$text')");
 
 mysql_query("DELETE FROM `item` WHERE usr='$log' and `image`='not' and `id`='$_GET[off]'");
     echo"<div class=msg><p><span style=color:#f4d06e;>Вещь <b>$item[name]</b> выкинута!</p></span></div>";
@@ -60,7 +60,7 @@ echo "<a href=\"inventar.php?mod=res&tip=res&page=$page\"><span style=color:#ff4
 if (isset($_GET['yes'])){
 $time = date("H:i d.m.y");
 $text = " [$time] Игрок <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> выкинул ресурс <b>$res[name]</b> ";
-mysql_query("INSERT INTO `db1464828399`.`logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'offres', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text` )VALUES (NULL , 'offres', '$text')");
 
 mysql_query("DELETE FROM `res` WHERE usr='$log' and `id`='$_GET[ofr]'");
 

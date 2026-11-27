@@ -5,10 +5,12 @@ include $_SERVER['DOCUMENT_ROOT'].'/inc/antiddos.php';
 //////////////////////////////////////////////////
 include $_SERVER['DOCUMENT_ROOT'].'/inc/gzips.php';
 session_start();
-$db_host = "localhost";
-$db_user = "db1466666825";
-$db_table = "db1466666825";
-$db_pass = "12345";
+include_once dirname(__FILE__).'/dbconfig.php';
+$lin2_db = lin2_require_config();
+$db_host = $lin2_db['host'];
+$db_user = $lin2_db['user'];
+$db_table = $lin2_db['name'];
+$db_pass = $lin2_db['pass'];
 $connect = @ mysql_pconnect($db_host, $db_user, $db_pass) or die('Нет подключения к серверу.');
 @ mysql_select_db($db_table) or die('Нет соединения с БД.');
 @ mysql_query("SET NAMES 'utf8'", $connect);

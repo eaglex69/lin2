@@ -705,7 +705,7 @@ echo'Вы уже находитесь в клане!';
 include"inc/down.php";exit;
 }
 
-if($udata['lvl']<72){mysql_query("INSERT INTO `miniage`.`academy` (`id`, `clan`, `student`) VALUES (NULL, '$inv[clan]', '$log')");}
+if($udata['lvl']<72){mysql_query("INSERT INTO `academy` (`id`, `clan`, `student`) VALUES (NULL, '$inv[clan]', '$log')");}
 mysql_query("DELETE FROM `invite` WHERE usr='$log' and `id`='$_GET[id]'");
 mysql_query("UPDATE `users` SET `clan`='$inv[clan]' WHERE `usr` = '$log'");
 

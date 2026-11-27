@@ -3,10 +3,12 @@ session_start();
 // PHP 8: mysql_*() functions on top of mysqli
 include_once dirname(__FILE__) . '/inc/mysql_compat.php';
 // Подключаемся к БД
-$dbhost="localhost";
-$dbname="l2warmobi_server";
-$dbuser="l2warmobi_server";
-$dbpass="200990";
+include_once dirname(__FILE__) . '/inc/dbconfig.php';
+$lin2_db = lin2_require_config();
+$dbhost = $lin2_db['host'];
+$dbname = $lin2_db['name'];
+$dbuser = $lin2_db['user'];
+$dbpass = $lin2_db['pass'];
 $lin=mysql_connect($dbhost,$dbuser,$dbpass) or die("Не могу подключиться к серверу БД");
 mysql_select_db($dbname,$lin) or die("Не могу подключиться к БД");
 mysql_query("SET NAMES utf8");

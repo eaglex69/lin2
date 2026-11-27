@@ -97,7 +97,7 @@ mysql_query("UPDATE `users` SET
 
 mysql_query("DELETE FROM `item` WHERE `usr` = '$log' and `tip`='weapon' and `image`='yes'");
 $text = "[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> Сломал $it[name]. ";
-mysql_query("INSERT INTO `l2warmobi`.`logi` (`id` ,`tip` ,`text`)VALUES (NULL , 'slomal', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text`)VALUES (NULL , 'slomal', '$text')");
 $msg="Оружие не выдержало очередного заряда магии из свитка!<br/><b>Оружие $it[name] сломано!</b><br/>";
 }
 //////////////
@@ -199,7 +199,7 @@ mysql_query("UPDATE `users` SET
 mysql_query("DELETE FROM `item` WHERE `usr` = '$log' and `tip`='$_GET[tip]' and `image`='yes'");
 
 $text = "[$time] <a href=\"/search.php?nick=$log&amp;go=go\">$log</a> Сломал $it[name]. ";
-mysql_query("INSERT INTO `l2warmobi`.`logi` (`id` ,`tip` ,`text`)VALUES (NULL , 'slomal', '$text')");
+mysql_query("INSERT INTO `logi` (`id` ,`tip` ,`text`)VALUES (NULL , 'slomal', '$text')");
 
 $msg="<p>Вещь не выдержала очередного заряда магии из свитка!<br/><b>Вещь $it[name] сломана!</b></p><br/>";
 }

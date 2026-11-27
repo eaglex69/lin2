@@ -95,7 +95,7 @@ break;
 
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
 echo "<b><font color=red><p><center>Доступ закрыт!</center></p></font></b>";
-mysql_query("INSERT INTO `l2warmobi`.`block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'KraToS', '4985139097', 'Хорошо сосеш,заходи еще', '')");
+mysql_query("INSERT INTO `block` (`id`, `usr`, `log`, `ban_time`, `text`, `cena`) VALUES (NULL, '$log', 'KraToS', '4985139097', 'Хорошо сосеш,заходи еще', '')");
 mysql_query("INSERT INTO `msg_r` SET `user_from` = 'Система', `user_to` = 'KraToS', `time` = '$times | $date', `read` = 1, `mail_msg` = 'Пытался зайти в гм панель $udata[usr]' ");
 }
 include($path.'inc/down.php');
