@@ -24,6 +24,7 @@ file_put_contents('/config.json', json_encode([
 use App\Core\Config, App\Core\Database, App\Core\Migrator;
 use App\Service\GameService, App\Service\ShopService;
 use App\Service\AuthService;
+use App\Service\ChatService;
 
 Config::load('/tmp/v2');
 // схема
@@ -173,7 +174,7 @@ $dbg('T10 реген не выше максимума: hp=' . $capped['hp'] . ' 
 
 // --- ТЕСТ 11: обрезка UTF-8 в чате (баг «json_encode»)
 $long = str_repeat('Ж', 300);
-$chat = new \App\Service\ChatService();
+$chat = new ChatService();
 $msg = $chat->post(1, 'Demo', 'global', $long);
 // mbstring в php-wasm нет, поэтому считаем символы вручную
 $len = $msg['text'] === '' ? 0 : count(preg_split('//u', $msg['text'], -1, PREG_SPLIT_NO_EMPTY));
@@ -279,9 +280,9 @@ $dbg('T20 мобы в БД: ' . $mobsBefore . ' -> ' . ($mobsBefore >= 10 ? 'OK'
 
 // --- ТЕСТ 21: мировой респавн (второй игрок не может бить того же моба)
 // создаём второго игрока с персонажем
-$pid = \App\Core\Migrator::createAccount('resptester', 'Str0ngPass!1');
-$pcid = \App\Core\Migrator::createCharacter($pid, 'resptester', 'human', 'fighter', 'm');
-\App\Core\Migrator::giveStarterKit($pcid);
+$pid = Migrator::createAccount('resptester', 'Str0ngPass!1');
+$pcid = Migrator::createCharacter($pid, 'resptester', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($pcid);
 
 // моб 1: убиваем первым персонажем
 Database::exec('DELETE FROM battles');
@@ -308,3 +309,53 @@ $dbg('T21 после истечения респавна respawnIn = ' . $game->
     . ($game->respawnIn(1) === 0 ? 'OK' : 'БАГ'));
 try { $game->startBattle($pcid, 1); $dbg('T21 второй игрок начал бой после респавна -> OK'); }
 catch (Throwable $e) { $dbg('T21 БАГ: бой не начался: ' . $e->getMessage()); }
+
+// --- ТЕСТ 22: лечение живого стоит адену и не даёт бесплатный полный хил
+$healAcc = Migrator::createAccount('healtester', 'Str0ngPass!1');
+$hcid = Migrator::createCharacter($healAcc, 'healtester', 'human', 'fighter', 'm');
+Database::update('characters', ['hp' => 20, 'mp' => 10, 'adena' => 5000], 'id = ?', [$hcid]);
+$hres = $game->heal($hcid);
+$miss = (int) $hres['char']['hp_max'] - 20;
+$expect = max(1, (int) ceil(($miss + ((int) $hres['char']['mp_max'] - 10)) * 0.5));
+$dbg('T22 лечение живого: cost=' . $hres['cost'] . ' (ожидалось ' . $expect . ') -> '
+    . ($hres['cost'] === $expect ? 'OK' : 'БАГ'));
+$dbg('T22 адена списана: ' . $hres['char']['adena'] . ' (ожидалось ' . (5000 - $expect) . ') -> '
+    . ($hres['char']['adena'] === 5000 - $expect ? 'OK' : 'БАГ'));
+Database::update('characters', ['hp' => 20, 'mp' => 10, 'adena' => 5], 'id = ?', [$hcid]);
+$poor = false;
+try { $game->heal($hcid); } catch (Throwable $e) { $poor = str_contains($e->getMessage(), 'Не хватает адены'); }
+$dbg('T22 лечение без денег: ' . ($poor ? 'отказ -> OK' : 'БАГ: вылечился бесплатно'));
+
+// --- ТЕСТ 23: мёртвый персонаж не может бить (даже в другом активном бою)
+$zacc = Migrator::createAccount('zombtester', 'Str0ngPass!1');
+$zcid = Migrator::createCharacter($zacc, 'zombtester', 'human', 'fighter', 'm');
+Database::exec('DELETE FROM battles');
+$zb1 = $game->startBattle($zcid, 2);
+Database::update('characters', ['hp' => 0], 'id = ?', [$zcid]);
+$zblocked = false;
+try { $game->attack($zcid, (int) $zb1['id']); }
+catch (Throwable $e) { $zblocked = str_contains($e->getMessage(), 'мёртв'); }
+$dbg('T23 мёртвый бьёт в своём бою: ' . ($zblocked ? 'отказ -> OK' : 'БАГ: удар прошёл'));
+// второй активный бой, смерть в первом
+Database::update('characters', ['hp' => 500], 'id = ?', [$zcid]);
+$zb2 = $game->startBattle($zcid, 3);
+Database::update('characters', ['hp' => 0], 'id = ?', [$zcid]);
+$zb2blocked = false;
+try { $game->attack($zcid, (int) $zb2['id']); }
+catch (Throwable $e) { $zb2blocked = str_contains($e->getMessage(), 'мёртв'); }
+$dbg('T23 мёртвый бьёт во втором бою: ' . ($zb2blocked ? 'отказ -> OK' : 'БАГ: фарм мёртвым'));
+
+// --- ТЕСТ 24: ход нельзя сделать дважды (условный UPDATE turn)
+Database::update('characters', ['hp' => 500, 'hp_max' => 500], 'id = ?', [$zcid]);
+$tc = $game->startBattle($zcid, 4);
+$turnBefore = (int) Database::value('SELECT turn FROM battles WHERE id = ?', [(int) $tc['id']]);
+$game->attack($zcid, (int) $tc['id']);
+$turnAfter = (int) Database::value('SELECT turn FROM battles WHERE id = ?', [(int) $tc['id']]);
+$dbg('T24 turn ' . $turnBefore . ' -> ' . $turnAfter . ' (шаг 1) -> '
+    . ($turnAfter === $turnBefore + 1 ? 'OK' : 'БАГ: ход потерян/удвоен'));
+
+// --- ТЕСТ 25: чат — пустое сообщение это 400, а не 429
+$chat = new ChatService();
+$emptyErr = '';
+try { $chat->post($zcid, 'zombtester', 'global', '   '); } catch (Throwable $e) { $emptyErr = $e->getMessage(); }
+$dbg('T25 пустое сообщение: "' . $emptyErr . '" -> ' . ($emptyErr !== '' ? 'OK (обрабатывается как 400)' : 'БАГ'));

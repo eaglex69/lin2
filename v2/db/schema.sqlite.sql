@@ -104,6 +104,8 @@ CREATE TABLE IF NOT EXISTS battles (
     updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_battles_char_state ON battles (char_id, state);
+-- мировой респавн ищет последнюю победу над мобом любого игрока
+CREATE INDEX IF NOT EXISTS idx_battles_mob_won ON battles (mob_id, state, won_at);
 
 CREATE TABLE IF NOT EXISTS chat_messages (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,

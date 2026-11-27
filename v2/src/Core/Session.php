@@ -120,13 +120,25 @@ final class Session
     {
         $t = Database::table('sessions');
         $exists = Database::one("SELECT id FROM {$t} WHERE id = ?", [self::$sid]);
-        if ($exists === null) {
+        if ($exists !== null) {
+            return;
+        }
+        try {
             Database::insert('sessions', [
                 'id' => self::$sid,
                 'account_id' => null,
                 'data_json' => '{}',
                 'last_used' => date('Y-m-d H:i:s'),
             ]);
+        } catch (\PDOException $e) {
+            // Гонка на MySQL: два параллельных запроса с одним новым sid
+            // (первая загрузка страницы + bootstrap) оба не нашли строку и оба
+            // попытались вставить — второй падал на UNIQUE и запрос отдавал 500.
+            // Если строка уже создана конкурентом — это нормально.
+            $again = Database::one("SELECT id FROM {$t} WHERE id = ?", [self::$sid]);
+            if ($again === null) {
+                throw $e;
+            }
         }
     }
 

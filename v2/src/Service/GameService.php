@@ -13,6 +13,12 @@ use App\Core\Database;
  */
 final class GameService
 {
+    /** Цена лечения: адены за единицу восстановленного HP/MP. */
+    private const HEAL_COST_PER_POINT = 0.5;
+
+    /** Цена реанимации мёртвого персонажа. */
+    private const RESURRECT_COST = 500;
+
     public const ZONES = [
         'Giran' => ['label' => 'Окрестности Гирана', 'min_level' => 1, 'color' => '#2e4a2e'],
         'DeathPass' => ['label' => 'Перевал Смерти', 'min_level' => 5, 'color' => '#3a2f2a'],
@@ -91,6 +97,17 @@ final class GameService
         $mob = Database::one('SELECT respawn_sec FROM ' . Database::table('mobs') . ' WHERE id = ?', [$mobId]);
         $respawn = (int) ($mob['respawn_sec'] ?? 20);
         return (time() - strtotime($wonAt)) >= $respawn;
+    }
+
+    /**
+     * Блокировка строки при SELECT внутри транзакции (MySQL).
+     *
+     * В SQLite нет SELECT ... FOR UPDATE: файловая блокировка там и так
+     * сериализует писателей, поэтому возвращаем пустую строку.
+     */
+    private function forUpdate(): string
+    {
+        return Database::driver() === 'mysql' ? ' FOR UPDATE' : '';
     }
 
     /** Секунды до возрождения монстра (0 — уже жив). */
@@ -174,17 +191,43 @@ final class GameService
      */
     public function attack(int $charId, int $battleId): array
     {
-        $bt = Database::table('battles');
-        $battle = Database::one("SELECT * FROM {$bt} WHERE id = ? AND char_id = ?", [$battleId, $charId]);
-        if ($battle === null) {
-            throw new \InvalidArgumentException('Бой не найден.');
-        }
-        if ($battle['state'] !== 'active') {
-            throw new \InvalidArgumentException('Бой уже завершён.');
-        }
+        return Database::transaction(function () use ($battleId, $charId) {
+            $bt2 = Database::table('battles');
+            // БАГ: состояние боя читалось ДО транзакции. php-wasm однопоточный,
+            // поэтому это не проявлялось, но на MySQL два параллельных удара
+            // получали одинаковые mob_hp/turn/log и перезаписывали друг друга:
+            // лишние ходы «терялись», а победа могла начисляться дважды.
+            // Перечитываем строку внутри транзакции (при SELECT ... FOR UPDATE).
+            $battle = Database::one(
+                "SELECT * FROM {$bt2} WHERE id = ? AND char_id = ?" . $this->forUpdate(),
+                [$battleId, $charId]
+            );
+            if ($battle === null) {
+                throw new \InvalidArgumentException('Бой не найден.');
+            }
+            if ($battle['state'] !== 'active') {
+                throw new \InvalidArgumentException('Бой уже завершён.');
+            }
 
-        return Database::transaction(function () use ($battle, $charId) {
+            // БАГ (гонка на MySQL): два одновременных удара читали одинаковые
+            // mob_hp/turn/log и второй перезаписывал первого — ходы терялись.
+            // Захватываем ход условным UPDATE: сработает только у одного.
+            $claimed = Database::exec(
+                "UPDATE {$bt2} SET turn = turn + 1
+                 WHERE id = ? AND state = 'active' AND turn = ?",
+                [(int) $battle['id'], (int) $battle['turn']]
+            );
+            if ($claimed !== 1) {
+                throw new \InvalidArgumentException('Ход уже сделан. Обновите бой.');
+            }
+
             $char = $this->requireChar($charId);
+            // Мёртвый персонаж не может драться. Без этой проверки можно было
+            // погибнуть в одном бою и продолжать бить в другом активном бою:
+            // удары проходили, опыт и адена капали, хотя hp = 0.
+            if ((int) $char['hp'] <= 0) {
+                throw new \InvalidArgumentException('Персонаж мёртв — нужна реанимация.');
+            }
             $mob = Database::one('SELECT * FROM ' . Database::table('mobs') . ' WHERE id = ?', [(int) $battle['mob_id']]);
             if ($mob === null) {
                 throw new \InvalidArgumentException('Монстр исчез.');
@@ -241,7 +284,8 @@ final class GameService
 
             $battleUpdate = [
                 'mob_hp' => $mobHp,
-                'turn' => $turn + 1,
+                // turn уже увеличен условным UPDATE выше — здесь не трогаем
+
                 'log_json' => json_encode($log, JSON_UNESCAPED_UNICODE),
                 'state' => $state,
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -369,13 +413,26 @@ final class GameService
         if (!$dead && (int) $char['hp'] >= (int) $char['hp_max'] && (int) $char['mp'] >= (int) $char['mp_max']) {
             throw new \InvalidArgumentException('Персонаж уже полностью здоров.');
         }
-        if ($dead) {
-            $cost = 500;
-            if ((int) $char['adena'] < $cost) {
-                throw new \InvalidArgumentException(
-                    'Не хватает адены на реанимацию (нужно 500). Продайте предмет из инвентаря.'
-                );
+        if (!$dead) {
+            // БАЛАНС: раньше лечение живого было БЕСПЛАТНЫМ в любой момент, и
+            // зелье за 450 адены (120 HP) теряло смысл — выгоднее нажать
+            // «отдых в таверне» и получить полный HP/MP. Цена пропорциональна
+            // недостающему здоровью: полный хил с нуля чуть дороже зелья,
+            // но дешевле трёх зелий.
+            $hpMiss = max(0, (int) $char['hp_max'] - (int) $char['hp']);
+            $mpMiss = max(0, (int) $char['mp_max'] - (int) $char['mp']);
+            if ($hpMiss + $mpMiss > 0) {
+                $cost = max(1, (int) ceil(($hpMiss + $mpMiss) * self::HEAL_COST_PER_POINT));
             }
+        } else {
+            $cost = self::RESURRECT_COST;
+        }
+        if ($cost > 0 && (int) $char['adena'] < $cost) {
+            throw new \InvalidArgumentException(
+                $dead
+                    ? 'Не хватает адены на реанимацию (нужно ' . self::RESURRECT_COST . '). Продайте предмет из инвентаря.'
+                    : 'Не хватает адены на лечение (нужно ' . $cost . '). Здоровье восстанавливается и само.'
+            );
         }
         Database::update('characters', [
             'hp' => (int) $char['hp_max'],
@@ -387,6 +444,9 @@ final class GameService
 
     public function move(int $charId, int $x, int $y, string $city): array
     {
+        // Клиент шлёт координаты из canvas; отрицательные и огромные — обрезаем.
+        // БАГ: мусор в теле запроса ("x":"abc", "x":[], null) превращался в 0,
+        // и персонаж молча телепортировался в левый верхний угол карты.
         $x = max(0, min(900, $x));
         $y = max(0, min(560, $y));
         $city = isset(self::ZONES[$city]) ? $city : 'Giran';

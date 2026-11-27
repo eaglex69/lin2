@@ -123,6 +123,8 @@ CREATE TABLE IF NOT EXISTS battles (
     updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_battles_char_state (char_id, state),
+    -- мировой респавн ищет последнюю победу над мобом любого игрока
+    KEY idx_battles_mob_won (mob_id, state, won_at),
     CONSTRAINT fk_battles_char FOREIGN KEY (char_id) REFERENCES characters (id) ON DELETE CASCADE,
     CONSTRAINT fk_battles_mob FOREIGN KEY (mob_id) REFERENCES mobs (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

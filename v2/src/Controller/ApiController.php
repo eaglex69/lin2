@@ -211,6 +211,17 @@ final class ApiController
         if ($char instanceof Response) {
             return $char;
         }
+        // Отсутствующие/битые координаты не должны двигать персонажа в (0,0):
+        // раньше move {\"x\":\"abc\"} телепортировал героя в угол карты.
+        $d = $req->input();
+        foreach (['x', 'y'] as $axis) {
+            $v = $d[$axis] ?? null;
+            $numeric = is_int($v) || is_float($v)
+                || (is_string($v) && preg_match('/^-?\d+$/', trim($v)) === 1);
+            if (!$numeric) {
+                return Response::error('Нужны числовые координаты x и y.', 422, 'bad_move');
+            }
+        }
         $res = $this->game->move(
             (int) $char['id'],
             $req->intInput('x'),
@@ -333,6 +344,12 @@ final class ApiController
         if ($char instanceof Response) {
             return $char;
         }
+        // Пустое/слишком длинное сообщение — это ошибка ввода (400), а не
+        // «слишком часто» (429). Раньше любой отказ чата отдавался как 429.
+        $text = $req->str('text');
+        if (trim($text) === '') {
+            return Response::error('Сообщение пустое.', 400, 'chat_empty');
+        }
         try {
             $msg = $this->chat->post(
                 (int) $char['id'],
@@ -342,7 +359,9 @@ final class ApiController
             );
             return Response::ok(['message' => $msg]);
         } catch (\InvalidArgumentException $e) {
-            return Response::error($e->getMessage(), 429, 'chat_failed');
+            // антифлуд — 429, остальные отказы (пусто, неизвестный канал) — 400
+            $slow = str_contains($e->getMessage(), 'Слишком часто');
+            return Response::error($e->getMessage(), $slow ? 429 : 400, $slow ? 'chat_flood' : 'chat_failed');
         }
     }
 
