@@ -46,7 +46,7 @@ writeFileSync(join(OUT, 'queries.log'), '');
 // pages and scenarios
 // ---------------------------------------------------------------------------------------------------------------
 const DIRS = ['', 'forum', 'gm', 'total', 'drink', 'kcaptcha', 'bonus'];
-const SKIP = new Set(['php.php', 'gzip_pr.php']);   // phpinfo
+const SKIP = new Set(['php.php', 'gzip_pr.php', 'install.php']);   // phpinfo; the installer has its own test (smoke/install.mjs)
 const files = [];
 for (const d of DIRS) {
   const dir = join(TMP, d);

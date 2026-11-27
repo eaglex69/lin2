@@ -92,6 +92,177 @@ function findTopLevelKeyword(s, kw) {
   return -1;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Stateful mode (used by smoke/install.mjs): the server remembers databases and tables, so the installer can be run
+// against it. It still is not a SQL engine, but it is strict about what the installer is most likely to get wrong:
+//  * wrong user  -> ER_ACCESS_DENIED (1045), unknown database -> 1049, no database selected -> 1046
+//  * CREATE/DROP TABLE, SHOW TABLES, CREATE DATABASE, USE, SELECT VERSION(), SELECT COUNT(*) FROM t are real
+//  * INSERT / UPDATE / DELETE on a missing table -> 1146; unknown column names -> 1054;
+//    "INSERT ... (cols) VALUES (...)" with a different number of columns and values -> 1136
+//  * every statement is recorded in state.queries
+// ---------------------------------------------------------------------------------------------------------------
+function identsOutsideStrings(sql) {
+  const out = []; let q = null;
+  for (let i = 0; i < sql.length; i++) {
+    const c = sql[i];
+    if (q) { if (c === '\\' && q !== '`') i++; else if (c === q) q = null; continue; }
+    if (c === "'" || c === '"') { q = c; continue; }
+    if (c === '`') { const e = sql.indexOf('`', i + 1); if (e < 0) break; out.push(sql.slice(i + 1, e)); i = e; }
+  }
+  return out;
+}
+
+function tuplesOf(s) {
+  const out = []; let depth = 0, q = null, cur = '';
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (q) { cur += c; if (c === '\\') cur += s[++i] || ''; else if (c === q) q = null; continue; }
+    if (c === "'" || c === '"' || c === '`') { q = c; cur += c; continue; }
+    if (c === '(') { if (depth++ === 0) { cur = ''; continue; } }
+    if (c === ')') { if (--depth === 0) { out.push(cur); cur = ''; continue; } }
+    if (depth > 0) cur += c;
+  }
+  return out;
+}
+
+function makeStateful({ opts, schema, sendRows, writeOk, writeErr }) {
+  const st = { user: opts.user || null, dbs: new Map(), queries: [], connections: 0, rejected: [] };
+  for (const d of (opts.databases || [])) st.dbs.set(d, new Map());
+
+  const newTable = (name, cols) => ({ name, cols: cols ? new Set(cols.map(c => c.name.toLowerCase())) : null, autoinc: 0, rows: 0 });
+  // preload = 'schema': an already installed database (every table of shema.sql, three accounts)
+  st.preload = (db) => {
+    const t = st.dbs.get(db) || new Map(); st.dbs.set(db, t);
+    for (const [name, cols] of Object.entries(schema)) t.set(name, newTable(name, cols));
+    t.get('account').rows = 3;
+  };
+  st.tableNames = (db) => [...(st.dbs.get(db) || new Map()).values()].map(t => t.name);
+  st.queriesSince = (n) => st.queries.slice(n).map(q => q.sql);
+
+  const err = (conn, code, message) => { st.rejected.push({ code, message }); writeErr(conn, code, message); return true; };
+  const colErr = (conn, tb, idents) => {
+    if (!tb.cols) return null;
+    for (const id of idents) if (id.toLowerCase() !== tb.name && !tb.cols.has(id.toLowerCase())) return err(conn, 1054, `Unknown column '${id}' in 'field list'`);
+    return null;
+  };
+
+  const handler = (conn, sqlRaw) => {
+    st.queries.push({ db: conn.__db || null, sql: sqlRaw });
+    let sql = sqlRaw.replace(/^\s+/, '').replace(/;\s*$/, '');
+    const cm = /^\/\*!\d+\s*([\s\S]*?)\s*\*\/$/.exec(sql);
+    if (cm) sql = cm[1];
+    const kw = (/^[A-Za-z]+/.exec(sql) || [''])[0].toUpperCase();
+    const tables = () => st.dbs.get(conn.__db);
+    const noDb = () => (!conn.__db ? err(conn, 1046, 'No database selected') : null);
+    let m;
+
+    if (opts.failOn && opts.failOn.test(sql)) return err(conn, 1064, 'You have an error in your SQL syntax (fakedb failOn)');
+    if (kw === 'SET') { writeOk(conn); return true; }
+    if (kw === 'USE') {
+      m = /^USE\s+`?([^`\s]+)`?/i.exec(sql);
+      if (!m || !st.dbs.has(m[1])) return err(conn, 1049, `Unknown database '${m ? m[1] : ''}'`);
+      conn.__db = m[1]; writeOk(conn); return true;
+    }
+    if ((m = /^CREATE\s+(?:DATABASE|SCHEMA)\s+(IF\s+NOT\s+EXISTS\s+)?`?([^`\s]+)`?/i.exec(sql))) {
+      if (st.dbs.has(m[2])) return m[1] ? (writeOk(conn), true) : err(conn, 1007, `Can't create database '${m[2]}'; database exists`);
+      st.dbs.set(m[2], new Map()); writeOk(conn, { affectedRows: 1 }); return true;
+    }
+    if (/^SELECT\s+VERSION\(\)/i.test(sql)) { sendRows(conn, ['VERSION()'], [['5.5.62-fakedb']], ''); return true; }
+    if (/^SELECT\s+DATABASE\(\)/i.test(sql)) { sendRows(conn, ['DATABASE()'], [[conn.__db || null]], ''); return true; }
+    if (/^SHOW\s+TABLES/i.test(sql)) {
+      if (noDb()) return true;
+      sendRows(conn, ['Tables_in_' + conn.__db], [...tables().values()].map(t => [t.name]), ''); return true;
+    }
+    if ((m = /^SELECT\s+COUNT\(\*\)\s+FROM\s+`?(\w+)`?\s*$/i.exec(sql))) {
+      if (noDb()) return true;
+      const tb = tables().get(m[1].toLowerCase());
+      if (!tb) return err(conn, 1146, `Table '${conn.__db}.${m[1]}' doesn't exist`);
+      sendRows(conn, ['COUNT(*)'], [[String(tb.rows)]], ''); return true;
+    }
+    if ((m = /^CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`([^`]+)`/i.exec(sql))) {
+      if (noDb()) return true;
+      const key = m[2].toLowerCase();
+      if (tables().has(key)) return m[1] ? (writeOk(conn), true) : err(conn, 1050, `Table '${m[2]}' already exists`);
+      const cols = parseSchema(sql + '\n')[key] || null;
+      tables().set(key, newTable(m[2], cols && cols.length ? cols : null)); writeOk(conn); return true;
+    }
+    if ((m = /^DROP\s+TABLE\s+(IF\s+EXISTS\s+)?([\s\S]+)$/i.exec(sql))) {
+      if (noDb()) return true;
+      for (const id of identsOutsideStrings(m[2])) {
+        const key = id.toLowerCase();
+        if (!tables().delete(key) && !m[1]) return err(conn, 1051, `Unknown table '${id}'`);
+      }
+      writeOk(conn); return true;
+    }
+    if ((m = /^ALTER\s+TABLE\s+`?(\w+)`?/i.exec(sql))) {
+      if (noDb()) return true;
+      const tb = tables().get(m[1].toLowerCase());
+      if (!tb) return err(conn, 1146, `Table '${conn.__db}.${m[1]}' doesn't exist`);
+      // key names (ADD UNIQUE KEY `id_3` (`id`)) are not columns: cut them out before checking the column list
+      const clauses = sql.slice(m[0].length).replace(/(?:UNIQUE\s+|FULLTEXT\s+)?(?:KEY|INDEX)\s+`[^`]*`/gi, '');
+      if (tb.cols) { const bad = identsOutsideStrings(clauses).find(id => !tb.cols.has(id.toLowerCase())); if (bad) return err(conn, 1072, `Key column '${bad}' doesn't exist in table`); }
+      writeOk(conn); return true;
+    }
+    if ((m = /^(INSERT|REPLACE)\s+(?:IGNORE\s+)?(?:INTO\s+)?`?(\w+)`?/i.exec(sql))) {
+      if (noDb()) return true;
+      const tb = tables().get(m[2].toLowerCase());
+      if (!tb) return err(conn, 1146, `Table '${conn.__db}.${m[2]}' doesn't exist`);
+      const rest = sql.slice(m[0].length);
+      let n = 1;
+      if (/^\s*SET\b/i.test(rest)) {
+        const assigns = splitTopLevel(rest.replace(/^\s*SET\b/i, ''));
+        const names = assigns.map(a => (/^\s*`?(\w+)`?\s*=/.exec(a) || [])[1]).filter(Boolean);
+        if (names.length !== assigns.length) return err(conn, 1064, 'fakedb: cannot parse the SET list');
+        const r = colErr(conn, tb, names); if (r) return r;
+      } else {
+        const lm = /^\s*\(([^)]*)\)\s*VALUES\b/i.exec(rest);
+        const vAt = findTopLevelKeyword(rest, 'VALUES');
+        if (vAt < 0) return err(conn, 1064, 'fakedb: unsupported INSERT form');
+        const names = lm ? identsOutsideStrings(lm[1]).length ? identsOutsideStrings(lm[1]) : lm[1].split(',').map(s => s.trim()) : null;
+        if (names) { const r = colErr(conn, tb, names); if (r) return r; }
+        const rows = tuplesOf(rest.slice(vAt + 6));
+        const width = names ? names.length : (tb.cols ? tb.cols.size : null);
+        for (let i = 0; i < rows.length; i++) {
+          const w = splitTopLevel(rows[i]).length;
+          if (width !== null && w !== width) return err(conn, 1136, `Column count doesn't match value count at row ${i + 1}`);
+        }
+        n = rows.length || 1;
+      }
+      const first = tb.autoinc + 1; tb.autoinc += n; tb.rows += n;
+      writeOk(conn, { affectedRows: n, insertId: first }); return true;
+    }
+    if ((m = /^UPDATE\s+(?:LOW_PRIORITY\s+)?(?:IGNORE\s+)?`?(\w+)`?\s+SET\b/i.exec(sql))) {
+      if (noDb()) return true;
+      const tb = tables().get(m[1].toLowerCase());
+      if (!tb) return err(conn, 1146, `Table '${conn.__db}.${m[1]}' doesn't exist`);
+      const r = colErr(conn, tb, identsOutsideStrings(sql.slice(m[0].length))); if (r) return r;
+      writeOk(conn, { affectedRows: 1 }); return true;
+    }
+    if ((m = /^DELETE\s+FROM\s+`?(\w+)`?/i.exec(sql))) {
+      if (noDb()) return true;
+      const tb = tables().get(m[1].toLowerCase());
+      if (!tb) return err(conn, 1146, `Table '${conn.__db}.${m[1]}' doesn't exist`);
+      const r = colErr(conn, tb, identsOutsideStrings(sql.slice(m[0].length))); if (r) return r;
+      const had = tb.rows; tb.rows = 0; writeOk(conn, { affectedRows: had }); return true;
+    }
+    return false;       // everything else (SELECTs of the game pages ...) is answered by the default handler
+  };
+
+  return {
+    st,
+    handle: handler,
+    initDb: (conn, name) => {
+      if (!st.dbs.has(name)) return err(conn, 1049, `Unknown database '${name}'`);
+      conn.__db = name; writeOk(conn); return true;
+    },
+    auth: (params) => {
+      if (st.user && params.user !== st.user) return { code: 1045, message: `Access denied for user '${params.user}'@'localhost' (using password: YES)` };
+      if (params.database && !st.dbs.has(params.database)) return { code: 1049, message: `Unknown database '${params.database}'` };
+      return null;
+    },
+  };
+}
+
 function lenenc(n) {
   if (n < 251) return Buffer.from([n]);
   if (n < 65536) return Buffer.from([0xfc, n & 0xff, n >> 8]);
@@ -107,7 +278,7 @@ function writeOkPacket(conn, { affectedRows = 0, insertId = 0 } = {}) {
   conn.sequenceId = (conn.sequenceId + 1) % 256;
 }
 
-export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.0.0.1', debugPackets = false, profile = 'dummy' }) {
+export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.0.0.1', debugPackets = false, profile = 'dummy', stateful = null }) {
   const schema = parseSchema(readFileSync(schemaPath, 'utf8'));
   const stats = { queries: 0, unknownTables: {}, selects: 0, writes: 0 };
   let insertId = 100;
@@ -126,6 +297,7 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
 
   function handle(conn, sqlRaw) {
     stats.queries++;
+    if (sf && sf.handle(conn, sqlRaw)) return;
     if (logFile) appendFileSync(logFile, sqlRaw.replace(/\s+/g, ' ').slice(0, 400) + '\n');
     const sql = sqlRaw.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s+/, '');
     const kw = (/^[A-Za-z]+/.exec(sql) || [''])[0].toUpperCase();
@@ -216,7 +388,11 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
     return sendRows(conn, names.length ? names : ['1'], rows.length || names.length === 0 ? rows : [], tableName);
   }
 
+  const writeErr = (conn, code, message) => conn.writeError({ code, message });
+  const sf = stateful ? makeStateful({ opts: stateful, schema, sendRows, writeOk: writeOkPacket, writeErr }) : null;
+
   server.on('connection', conn => {
+    if (sf) sf.st.connections++;
     if (debugPackets) {
       const origWrite = conn.stream.write.bind(conn.stream);
       conn.stream.write = (chunk, ...rest) => {
@@ -225,11 +401,16 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
       };
     }
     conn.serverHandshake({
-      protocolVersion: 10, serverVersion: '8.0.0-fakedb', connectionId: 1, statusFlags: 2,
+      protocolVersion: 10, serverVersion: (stateful && stateful.serverVersion) || '8.0.0-fakedb', connectionId: 1, statusFlags: 2,
       // minimal capability set (no SESSION_TRACK/DEPRECATE_EOF/SSL/compression): mysqlnd is stricter than mysql2's own client
       characterSet: 33, capabilityFlags: 1 | 2 | 4 | 8 | 512 | 8192 | 32768 | 524288,
       // after the handshake's OK packet the next client command starts with sequence id 0 again
-      authCallback: (params, cb) => { cb(null); conn.sequenceId = 0; },
+      authCallback: (params, cb) => {
+        const bad = sf ? sf.auth(params) : null;
+        if (bad) { sf.st.rejected.push(bad); return cb(null, bad); }
+        if (params.database) conn.__db = params.database;
+        cb(null); conn.sequenceId = 0;
+      },
     });
     // mysql2's server side never resets the packet sequence between commands: the reply to every
     // command has to start with sequence id 1, otherwise the client (mysqlnd) drops the connection.
@@ -245,14 +426,14 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
     };
     conn.on('query', reply(sql => handle(conn, sql)));
     conn.on('stmt_prepare', reply(sql => handle(conn, sql)));   // mysql2 routes "SET ..." here
-    conn.on('init_db', reply(() => writeOkPacket(conn)));
+    conn.on('init_db', reply(name => (sf ? sf.initDb(conn, name) : writeOkPacket(conn))));
     conn.on('ping', reply(() => writeOkPacket(conn)));
     conn.on('quit', () => conn.stream.end());
     conn.on('error', () => {});
   });
 
   return new Promise(resolve => {
-    server.listen(port, host, () => resolve({ port: server._server.address().port, stats, schema, close: () => server.close() }));
+    server.listen(port, host, () => resolve({ port: server._server.address().port, stats, schema, state: sf ? sf.st : null, close: () => server.close() }));
   });
 }
 
