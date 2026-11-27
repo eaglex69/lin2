@@ -151,6 +151,11 @@ final class Session
         // Дублируем sid заголовком: setcookie() может потеряться в embed SAPI.
         header('X-Miniage-Session: ' . self::$sid);
         header('Access-Control-Expose-Headers: X-Miniage-Session');
+        // БАГ: cookie жила ровно столько же, сколько серверная сессия, и это
+        // ПРАВИЛЬНО — но только после правки TTL. Раньше cookie ставилась на
+        // SESSION_TTL (сутки), а серверная сессия «старела» от записи данных;
+        // теперь обе стороны считают одно и то же — время активности. Держим
+        // единый источник: SESSION_TTL.
         setcookie($name, self::$sid, [
             'expires' => time() + Config::int('SESSION_TTL', 86400),
             'path' => '/',
@@ -278,8 +283,39 @@ final class Session
             Database::exec("DELETE FROM {$t} WHERE id = ?", [self::$sid]);
             return [];
         }
+        self::touch((string) ($row['last_used'] ?? ''), self::$sid);
         $data = json_decode((string) $row['data_json'], true);
         return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Отметка активности сессии.
+     *
+     * БАГ: last_used обновлялся ТОЛЬКО в saveFileData(), то есть при записи
+     * данных (Session::set). Игрок, который просто играет — bootstrap, карта,
+     * ходы в бою, — данных в сессию не пишет, и его строка «старела». Через
+     * SESSION_TTL (сутки) активного игрока выкидывало, а строка удалялась,
+     * хотя он не пропускал ни минуты. Заодно cookie живёт 30 дней (PHP по
+     * умолчанию), то есть клиент оставался с битым sid.
+     *
+     * Пишем не чаще раза в минуту, чтобы не делать UPDATE на каждый запрос.
+     */
+    private static function touch(string $lastUsed, ?string $sid = null): void
+    {
+        $sid ??= self::$sid;
+        if ($sid === null) {
+            return;
+        }
+        $ts = $lastUsed === '' ? 0 : (int) strtotime($lastUsed);
+        if ($ts > 0 && time() - $ts < 60) {
+            return;
+        }
+        Database::update(
+            'sessions',
+            ['last_used' => date('Y-m-d H:i:s')],
+            'id = ?',
+            [$sid]
+        );
     }
 
     /** Истёк ли срок жизни по метке последней активности. */

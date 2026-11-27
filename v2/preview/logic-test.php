@@ -785,3 +785,42 @@ $ipGot = $ipReq->ip();
 unset($_SERVER['HTTP_X_FORWARDED_FOR']);
 $dbg('T58 Request::ip() при XFF=1.2.3.4: ' . $ipGot . ' -> '
     . ($ipGot === '203.0.113.9' ? 'OK' : 'БАГ (подмена IP)'));
+
+// --- ТЕСТ 59: активность продлевает сессию (last_used = момент запроса)
+Session::resetState();
+Session::start(new \App\Core\Request('GET', '/', [], [], [], [], '', []));
+$actSid = Session::id();
+Session::set('account_id', 9);
+// Метка «почти состарилась»: 23 часа при TTL 24 часа. Игрок всё это время
+// играл, но данных в сессию не писал — раньше метка так и осталась бы на
+// 23 часах и на следующем запросе сессию выбросило бы.
+Database::update('sessions', ['last_used' => date('Y-m-d H:i:s', time() - 82800)], 'id = ?', [$actSid]);
+Session::resetState();
+// читаем сессию (это делает любой запрос) — метка должна обновиться
+Session::start(new \App\Core\Request('GET', '/', [], [], ['miniage_sid' => $actSid], [], '', []));
+$actAcc = Session::get('account_id');   // при истёкшей сессии было бы NULL
+Session::resetState();
+Session::start(new \App\Core\Request('GET', '/', [], [], ['miniage_sid' => $actSid], [], '', []));
+$actFresh = Session::get('account_id');
+$actRow = Database::one('SELECT last_used FROM sessions WHERE id = ?', [$actSid]);
+$actAge = $actRow === null ? -1 : time() - (int) strtotime((string) $actRow['last_used']);
+$dbg('T59 активность продлевает сессию: account=' . var_export($actAcc, true)
+    . ', повтор=' . var_export($actFresh, true) . ', возраст метки=' . $actAge . ' с -> '
+    . ($actAcc === 9 && $actFresh === 9 && $actAge >= 0 && $actAge < 120 ? 'OK' : 'БАГ (TTL считается от записи)'));
+
+// --- ТЕСТ 60: TTL всё ещё выбрасывает по-настоящему брошенную сессию
+$oldSid = $actSid;
+Database::update('sessions', ['last_used' => date('Y-m-d H:i:s', time() - 30 * 86400)], 'id = ?', [$oldSid]);
+// восстановим метку в «старую» и НЕ трогаем строку запросами
+$m = new ReflectionMethod('App\Core\Session', 'expired'); $m->setAccessible(true);
+$isExp = $m->invoke(null, (string) Database::value('SELECT last_used FROM sessions WHERE id = ?', [$oldSid]));
+$dbg('T60 брошенная сессия (30 дней): expired=' . var_export($isExp, true)
+    . ' -> ' . ($isExp === true ? 'OK' : 'БАГ (сессия живёт вечно)'));
+
+// --- ТЕСТ 61: парсер SQL не путается в комментариях и '' внутри строки
+$split = new ReflectionMethod('App\Core\Migrator', 'splitStatements');
+$split->setAccessible(true);
+$sample = "-- don't break\nCREATE TABLE a (id INT);\n/* 'x' */\nINSERT INTO a VALUES ('it''s; ok');\nCREATE TABLE b (id INT);";
+$parts = $split->invoke(null, $sample);
+$dbg('T61 splitStatements: операторов ' . count($parts) . ' из 3 -> '
+    . (count($parts) === 3 ? 'OK' : 'БАГ (комментарий склеил дамп)'));
