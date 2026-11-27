@@ -147,13 +147,48 @@ final class Request
      * `new Request('GET','/')` всегда давал бы 127.0.0.1 и один общий лимит
      * на всех.
      */
+    /**
+     * IP клиента для лимитов (регистрация, антиспам, журнал входов).
+     *
+     * БАГ: X-Forwarded-For принимался БЕЗУСЛОВНО, первым значением. Любой
+     * клиент подставлял заголовок и получал новый «IP» на каждый запрос —
+     * проверено: health отдавал 1.2.3.4 и 9.9.9.9 по желанию. Это ломало
+     * лимит регистраций (5 в час с адреса) и журнал входов: перебор шёл
+     * с «разных» адресов.
+     *
+     * Теперь XFF читается только если запрос пришёл от доверенного прокси
+     * (список в конфиге TRUSTED_PROXIES, по умолчанию пусто — значит
+     * заголовок игнорируется и берётся REMOTE_ADDR).
+     */
     public static function currentIp(): string
     {
+        $remote = (string) ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+
         $fwd = (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
-        if ($fwd !== '') {
-            return trim(explode(',', $fwd)[0]);
+        if ($fwd !== '' && self::isTrustedProxy($remote)) {
+            $first = trim(explode(',', $fwd)[0]);
+            // валидируем: мусор в заголовке не должен становиться «IP»
+            if (filter_var($first, FILTER_VALIDATE_IP) !== false) {
+                return $first;
+            }
         }
-        return (string) ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+        return $remote;
+    }
+
+    /** Доверенный ли прокси-адрес (список в конфиге, через запятую). */
+    private static function isTrustedProxy(string $remote): bool
+    {
+        $list = Config::get('TRUSTED_PROXIES', '');
+        if ($list === '') {
+            return false;
+        }
+        foreach (explode(',', $list) as $entry) {
+            $entry = trim($entry);
+            if ($entry !== '' && $entry === $remote) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function ip(): string

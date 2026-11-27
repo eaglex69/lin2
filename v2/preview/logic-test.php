@@ -13,12 +13,18 @@ spl_autoload_register(function ($class) {
     if (is_file($f)) require $f;
 });
 
-// подменяем путь конфигурации: Config читает /config.json и .env
-file_put_contents('/config.json', json_encode([
-    'APP_ENV' => 'testing', 'DB_DRIVER' => 'sqlite',
-    'DB_SQLITE_PATH' => '/tmp/test.sqlite', 'SEED_DEMO' => '1',
-    'TIMEZONE' => 'Europe/Moscow',
-]));
+// Настройки харнесса задаём через .env, а НЕ через /config.json:
+// /config.json теперь принимается только в wasm-превью и только для
+// белого списка ключей (APP_ENV и пароли через него не задаются — иначе
+// файл в корне ФС мог бы понижать защиту в проде).
+@unlink('/config.json');
+file_put_contents('/tmp/v2/.env', implode("\n", [
+    'APP_ENV=testing',
+    'DB_DRIVER=sqlite',
+    'DB_SQLITE_PATH=/tmp/test.sqlite',
+    'SEED_DEMO=1',
+    'TIMEZONE=Europe/Moscow',
+]) . "\n");
 @unlink('/tmp/test.sqlite');
 
 use App\Core\Config, App\Core\Database, App\Core\Migrator, App\Core\Session;
@@ -627,3 +633,22 @@ $dbg('T47 откат транзакции: адена ' . $txAfter . ' -> ' . ($
 $txNested = Database::transaction(fn () => Database::transaction(fn () => 'inner'));
 $dbg('T47 вложенная транзакция: ' . var_export($txNested, true) . ' -> '
     . ($txNested === 'inner' ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 48: /config.json не может подменить секреты и APP_ENV
+// (в харнессе APP_ENV=testing задан через .env; /config.json подкладываем
+//  враждебный и убеждаемся, что он ничего не меняет)
+file_put_contents('/config.json', json_encode([
+    'APP_ENV' => 'production', 'DB_PASS' => 'attacker', 'SEED_DEMO_PASS' => 'pwned',
+]));
+Config::reload();
+if (!defined('MINIAGE_WASM')) {
+    define('MINIAGE_WASM', true);
+}
+Config::load('/tmp/v2');
+$cfgEnv = Config::get('APP_ENV');
+$cfgPass = Config::get('DB_PASS');
+$cfgSeed = Config::get('SEED_DEMO_PASS');
+$dbg('T48 /config.json: APP_ENV=' . $cfgEnv . ', DB_PASS=' . var_export($cfgPass, true)
+    . ', SEED_DEMO_PASS=' . $cfgSeed . ' -> '
+    . ($cfgEnv === 'testing' && $cfgPass !== 'attacker' && $cfgSeed !== 'pwned' ? 'OK' : 'БАГ'));
+@unlink('/config.json');

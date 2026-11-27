@@ -168,7 +168,14 @@ async function phpRequest(req, body, query) {
     body: body.toString('utf8'),
     headers,
     server: {
-      REMOTE_ADDR: (req.headers['x-forwarded-for'] || '127.0.0.1').toString().split(',')[0].trim(),
+      // БАГ: REMOTE_ADDR собирался из заголовка X-Forwarded-For, который
+      // целиком подконтролен клиенту. Из-за этого лимит регистраций
+      // («5 в час с адреса») обходился сменой заголовка: 7 регистраций
+      // подряд проходили, а в accounts.ip писались 10.0.0.1..10.0.0.6.
+      // Берём настоящий адрес TCP-соединения; XFF передаём отдельным
+      // заголовком, чтобы PHP применил его только для доверенного прокси.
+      REMOTE_ADDR: (req.socket && req.socket.remoteAddress) || '127.0.0.1',
+      HTTP_X_FORWARDED_FOR: (req.headers['x-forwarded-for'] || '').toString(),
       HTTP_USER_AGENT: req.headers['user-agent'] || '',
       HTTP_HOST: req.headers.host || `localhost:${PORT}`,
     },

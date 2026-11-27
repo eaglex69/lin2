@@ -15,6 +15,16 @@ namespace App\Core;
  */
 final class Config
 {
+    /** Путь к конфигу preview-моста php-wasm. */
+    private const WASM_CONFIG = '/config.json';
+
+    /**
+     * Ключи, которые preview-мост НЕ может задавать: это секреты и режим
+     * работы. Превью и так работает с одноразовой БД и не должно уметь
+     * понижать защиту (APP_ENV=testing отключает антиспам регистрации).
+     */
+    private const WASM_CONFIG_DENY = ['APP_ENV', 'DB_PASS', 'SEED_DEMO_PASS', 'SEED_ADMIN_PASS'];
+
     /** @var array<string,string> */
     private static array $values = [];
     private static bool $loaded = false;
@@ -45,6 +55,10 @@ final class Config
             'SEED_DEMO_PASS'  => 'demo',
             'SEED_ADMIN_PASS' => '',
             'TIMEZONE'        => 'Europe/Moscow',
+            // Адреса обратных прокси, которым можно верить в X-Forwarded-For.
+            // Пусто = заголовок игнорируется (см. Request::currentIp).
+            // За прокси укажите его адрес, например: 10.0.0.2
+            'TRUSTED_PROXIES' => '',
         ];
 
         // 2. .env
@@ -63,17 +77,43 @@ final class Config
             }
         }
 
-        // 4. /config.json от preview-моста
-        if (is_file('/config.json')) {
-            $json = json_decode((string) file_get_contents('/config.json'), true);
+        // 4. /config.json от preview-моста (только php-wasm).
+        //
+        // БАГ: файл читался из КОРНЯ файловой системы и принимал ЛЮБЫЕ ключи,
+        // перебивая .env и переменные окружения. Проверено: /config.json с
+        // DB_PASS и APP_ENV подменял пароль БД и включал testing-режим (а он
+        // отключает антиспам регистрации). В проде это означало, что любой
+        // файл, положенный в / по ошибке или чужим скриптом, молча меняет
+        // конфигурацию и пароли.
+        //
+        // Теперь источник работает только внутри wasm-превью (его туда
+        // пишет preview-мост) и только для ключей, нужных превью. Секреты
+        // (DB_PASS, SEED_*_PASS) и APP_ENV через него не задаются.
+        if (self::isWasmPreview() && is_file(self::WASM_CONFIG)) {
+            $json = json_decode((string) file_get_contents(self::WASM_CONFIG), true);
             if (is_array($json)) {
-                foreach ($json as $k => $v) {
-                    self::$values[$k] = is_scalar($v) ? (string) $v : self::$values[$k] ?? '';
+                foreach (self::$values as $key => $_) {
+                    if (!isset($json[$key]) || in_array($key, self::WASM_CONFIG_DENY, true)) {
+                        continue;
+                    }
+                    $v = $json[$key];
+                    self::$values[$key] = is_scalar($v) ? (string) $v : self::$values[$key];
                 }
             }
         }
 
         date_default_timezone_set(self::get('TIMEZONE', 'UTC'));
+    }
+
+    /**
+     * Превью на php-wasm помечает себя константой MINIAGE_WASM (её ставит
+     * тестовый загрузчик). Обращаемся через defined(), а не напрямую:
+     * в неймспейсе App\Core голая константа резолвится как App\Core\MINIAGE_WASM
+     * и падает фатально, если не определена — а в проде она не определена.
+     */
+    private static function isWasmPreview(): bool
+    {
+        return defined('MINIAGE_WASM') && constant('MINIAGE_WASM') === true;
     }
 
     private static function parseEnv(string $raw): array
