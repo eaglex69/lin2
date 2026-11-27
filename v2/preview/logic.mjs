@@ -3,8 +3,8 @@
  *
  *   cd v2/preview && node logic.mjs
  *
- * Исходники PHP и SQL-схемы передаются в виртуальную ФС /tmp/v2,
- * БД — SQLite в памяти (файл /tmp/test.sqlite).
+ * Исходники PHP, SQL-схемы, CSS и JS передаются в виртуальную ФС /tmp/v2
+ * (CSS и разметка нужны проверкам T65–T66), БД — SQLite в памяти.
  */
 import { PhpNode } from 'php-wasm/PhpNode.mjs';
 import sqlite from 'php-wasm-sqlite';
@@ -21,7 +21,7 @@ const files = {};
     const p = path.join(d, f);
     if (fs.statSync(p).isDirectory()) {
       if (f !== 'node_modules' && f !== 'var') walk(p, prefix + f + '/');
-    } else if (/\.(php|sql)$/.test(f)) {
+    } else if (/\.(php|sql|css|js|json|html|svg)$/.test(f)) {
       files[prefix + f] = fs.readFileSync(p, 'utf8');
     }
   }

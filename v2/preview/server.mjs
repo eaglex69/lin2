@@ -116,7 +116,9 @@ function serveStatic(res, urlPath) {
   const ext = path.extname(file).toLowerCase();
   res.writeHead(200, {
     'Content-Type': MIME[ext] || 'application/octet-stream',
-    'Cache-Control': 'public, max-age=300',
+    // Адрес содержит ?v=<версия>, но у нас файлы правятся на лету —
+    // держим короткий кэш, чтобы правки были видны сразу.
+    'Cache-Control': 'no-cache',
   });
   res.end(fs.readFileSync(file));
   return true;

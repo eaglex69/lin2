@@ -853,3 +853,44 @@ $cfgSrc = (string) file_get_contents('/tmp/v2/src/Core/Config.php');
 $relOk = str_contains($cfgSrc, 'DB_SQLITE_PATH') && str_contains($cfgSrc, 'rtrim($root');
 $dbg('T64 относительный DB_SQLITE_PATH: '
     . ($relOk ? 'раскрывается от корня приложения' : 'БАГ (зависит от cwd)') . ' -> ' . ($relOk ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 65: атрибут hidden обязан реально скрывать элементы
+//
+// БАГ: [hidden] не побеждал классовые display-правила (.loading{grid},
+// .auth{grid}, .panel{flex}, .form{flex}) — спиннер загрузки навсегда
+// накрывал экран входа. Проверяем, что глобальное правило есть, стоит с
+// !important и идёт раньше остальных: иначе любой более поздний класс
+// снова перебьёт скрытие.
+$cssSrc = is_file('/tmp/v2/public/assets/css/app.css')
+    ? (string) file_get_contents('/tmp/v2/public/assets/css/app.css')
+    : '';
+$hiddenRule = null;
+if (preg_match('/(^|\})\s*\[hidden\]\s*\{([^}]*)\}/m', $cssSrc, $hm, PREG_OFFSET_CAPTURE)) {
+    $hiddenRule = ['offset' => (int) $hm[0][1], 'body' => $hm[2][0]];
+}
+$hiddenOk = $hiddenRule !== null
+    && str_contains($hiddenRule['body'], 'display')
+    && str_contains($hiddenRule['body'], 'none')
+    && str_contains($hiddenRule['body'], '!important');
+$hiddenFirst = $hiddenRule !== null && $hiddenRule['offset'] < (int) strpos($cssSrc, '#game-canvas');
+$dbg('T65 [hidden]{display:none!important}: '
+    . ($hiddenOk ? 'есть' : 'БАГ (нет глобального правила — hidden не работает)')
+    . ', до первых компонентов: ' . ($hiddenFirst ? 'да' : 'нет')
+    . ' -> ' . (($hiddenOk && $hiddenFirst) ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 66: ссылки на статику версионированы, HTML не кэшируется
+//
+// БАГ: после правки CSS браузеры час держали старый файл (max-age=3600),
+// т.к. /assets/css/app.css не менял адрес. Теперь к ссылкам добавляется
+// ?v=…, а сама оболочка отдаётся с no-cache.
+$pageSrc = (string) file_get_contents('/tmp/v2/src/Controller/PageController.php');
+$routerSrc = (string) file_get_contents('/tmp/v2/src/Core/Router.php');
+$verOk = str_contains($pageSrc, 'assetVersion')
+    && preg_match('#/assets/css/app\.css\?v=\{\$[A-Za-z]+\}#', $pageSrc) === 1
+    && preg_match('#/assets/js/main\.js\?v=\{\$[A-Za-z]+\}#', $pageSrc) === 1;
+$noCacheOk = str_contains($pageSrc, "'Cache-Control' => 'no-cache")
+    && (bool) preg_match("#'Cache-Control' => 'public, max-age=\d{4,}'#", $routerSrc);
+$dbg('T66 версии ассетов: ' . ($verOk ? 'css/js с ?v=' : 'БАГ (ссылки без версии)')
+    . ', оболочка no-cache: ' . ($noCacheOk ? 'да' : 'БАГ')
+    . ', статика долгий кэш: ' . (preg_match("#max-age=(\d{4,})#", $routerSrc, $ma) ? $ma[1] . ' с' : 'нет')
+    . ' -> ' . (($verOk && $noCacheOk) ? 'OK' : 'БАГ'));

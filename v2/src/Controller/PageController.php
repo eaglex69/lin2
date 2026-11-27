@@ -29,6 +29,13 @@ final class PageController
 
         $app = htmlspecialchars(Config::get('APP_NAME', 'Miniage'), ENT_QUOTES);
 
+        // БАГ: статика отдаётся с Cache-Control: max-age=3600, а ссылки на неё
+        // были фиксированные. После исправления CSS браузеры игроков ещё час
+        // держали старый файл (и старый баг). Теперь к именам ассетов
+        // добавляется метка версии приложения — Upgrade принудительно тянет
+        // свежие файлы, а кэш статики при этом остаётся полезным.
+        $assetVer = rawurlencode(self::assetVersion());
+
         $html = <<<HTML
 <!doctype html>
 <html lang="ru">
@@ -38,8 +45,8 @@ final class PageController
 <meta name="theme-color" content="#12100e">
 <meta name="description" content="Miniage — браузерная MMORPG: Canvas-карта, бои, магазин, чат. PHP 8.1 API.">
 <title>{$app} — Lineage-подобная MMORPG</title>
-<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="icon" href="/assets/img/favicon.svg?v={$assetVer}" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/app.css?v={$assetVer}">
 </head>
 <body>
 <div id="app" data-bootstrap="{$bootstrapUrl}{$sid}">
@@ -146,7 +153,7 @@ final class PageController
   <div class="loading" id="loading" hidden><i></i></div>
   <noscript><p class="noscript">Для игры нужен JavaScript: карта рисуется на canvas.</p></noscript>
 </div>
-<script type="module" src="/assets/js/main.js"></script>
+<script type="module" src="/assets/js/main.js?v={$assetVer}"></script>
 </body>
 </html>
 HTML;
@@ -154,6 +161,43 @@ HTML;
         return Response::html($html)->withHeaders([
             'X-Content-Type-Options' => 'nosniff',
             'Referrer-Policy' => 'same-origin',
+            // Оболочка ссылается на версионированные ассеты, поэтому её саму
+            // кэшировать нельзя: иначе после обновления HTML ещё долго
+            // указывает на старые ?v=… (и на старые баги).
+            'Cache-Control' => 'no-cache, must-revalidate',
         ]);
+    }
+
+    /**
+     * Метка версии для ?v=… в ссылках на CSS/JS.
+     *
+     * Приоритет: файл VERSION рядом с приложением (его правят при релизе) →
+     * mtime самого свежего файла ассетов. Считаем один раз на запрос и
+     * никогда не падаем: если ничего не нашли — отдаём пустую строку, и
+     * ссылки остаются прежними.
+     */
+    private static function assetVersion(): string
+    {
+        $root = defined('MINIAGE_ROOT') ? constant('MINIAGE_ROOT') : dirname(__DIR__, 2);
+
+        foreach ([$root . '/VERSION', dirname($root) . '/VERSION'] as $file) {
+            if (is_file($file) && is_readable($file)) {
+                $ver = trim((string) file_get_contents($file));
+                if ($ver !== '') {
+                    return $ver;
+                }
+            }
+        }
+
+        $newest = 0;
+        foreach (['/public/assets/css', '/public/assets/js', '/assets/css', '/assets/js'] as $dir) {
+            foreach (glob($root . $dir . '/*') ?: [] as $f) {
+                if (is_file($f)) {
+                    $newest = max($newest, (int) filemtime($f));
+                }
+            }
+        }
+
+        return $newest > 0 ? (string) $newest : '';
     }
 }

@@ -219,7 +219,9 @@ final class Router
         };
         return new Response((string) file_get_contents($file), 200, [
             'Content-Type' => $mime,
-            'Cache-Control' => 'public, max-age=3600',
+            // ?v=… в ссылке делает адрес уникальным для каждой версии,
+            // поэтому статику можно держать в кэше долго.
+            'Cache-Control' => 'public, max-age=604800',
         ]);
     }
 
