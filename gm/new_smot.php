@@ -208,7 +208,7 @@ mysql_query("INSERT INTO
 echo "Вещь $_POST[name] создана в $_POST[shmot]!<br/>";
 
 }
-echo"<br/><a href=\"adm_panel.php?\">Назад</a>";
+echo"<br/><a href=\"../adm_panel.php?\">Назад</a>";
 
 
 //-------------------   

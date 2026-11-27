@@ -51,8 +51,8 @@ while($arr=mysql_fetch_array($q)){
 
 mysql_query("UPDATE `users` SET `tot_o` = tot_o + 1 WHERE `id`='".$arr['idu']."' LIMIT 1");
 
-$ar=mysql_fetch_array(mysql_query("SELECT `user` FROM `users` WHERE `id`='".$arr['idu']."';"));
-echo "<br><a href='/$arr[idu]'>$ar[user]</a><br/>";
+$ar=mysql_fetch_array(mysql_query("SELECT `usr` FROM `users` WHERE `id`='".$arr['idu']."';"));
+echo "<br><a href='../search.php?nick=$ar[usr]&amp;go=go'>$ar[usr]</a><br/>";
 }
 mysql_query("UPDATE `tot_match` SET `s1`='1' WHERE `id`='$_GET[idm]'");
 
@@ -328,6 +328,6 @@ break;}
 
 
 #####  Если права не соответствуют админу ####
-}else{header("Location: ../enter?");}
+}else{header("Location: ../enter.php?");}
 include($path.'inc/down.php');
 ?>

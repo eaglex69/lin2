@@ -79,7 +79,7 @@ echo "Ставок на матч нет.";
 
 while($arr2=mysql_fetch_array($q2)){
 $ar2=mysql_fetch_array(mysql_query("SELECT `usr` FROM `users` WHERE `id`='".$arr2['idu']."'"));
-echo "<a href='<a href='/search.php?nick=$arr[usr]&go=go'>$ar2[usr]</a><br/>";
+echo "<a href='../search.php?nick=$ar2[usr]&amp;go=go'>$ar2[usr]</a><br/>";
 }
 echo"<br><a href='index.php'>Назад</a><br>";
 echo"<a href='index.php'>В тотализатор</a>";
@@ -94,7 +94,7 @@ if(mysql_num_rows($q) == 0)
 {echo "Угадавшых ставок нет.";}
 while($arr=mysql_fetch_array($q)){
 $ar=mysql_fetch_array(mysql_query("SELECT `usr` FROM `users` WHERE `id`='".$arr['idu']."'"));
-echo "<br><a href='/$arr[idu]'>$ar[usr]</a><br/>";
+echo "<br><a href='../search.php?nick=$ar[usr]&amp;go=go'>$ar[usr]</a><br/>";
 }
 echo"<br><a href='all_matches.php'>Назад</a><br>";
 echo"<a href='index.php'>В тотализатор</a>";

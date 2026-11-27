@@ -519,7 +519,7 @@ $req = mysql_query("SELECT * FROM `zamuj` WHERE `usr` = '$log'");
 $avto=mysql_num_rows($req);
 if($avto>=1){
 echo'<div class="info">';
-echo"<a href=\"zayavka.php\">Предложение замуж</a>";
+echo"<a href=\"".$path."zayavka.php\">Предложение замуж</a>";
 
 echo'</div>';
 }

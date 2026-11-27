@@ -170,6 +170,9 @@ async function runVersion(version) {
   check('B6 security headers', (r.headers['x-frame-options'] || [''])[0] === 'DENY' && /no-store/.test((r.headers['cache-control'] || [''])[0]));
   check('B7 no PHP warnings', s.phpLog() === '');
   check('B8 the page is well-formed HTML', htmlProblems(r.text).length === 0, htmlProblems(r.text).join('; '));
+  check('B9 at the site root the address check is green', /<tr class="ok"><td class="st">[^<]*<\/td><td>Адрес установки/.test(r.text) && !has(r.text, 'в подкаталоге'));
+  const rs = await s.request({ scriptName: '/game/install.php' });
+  check('B10 in a subdirectory the address check warns (links and styles are written from the site root) and the installer still works', /<tr class="warn"><td class="st">[^<]*<\/td><td>Адрес установки/.test(rs.text) && has(rs.text, 'в подкаталоге /game/') && !has(rs.text, '<tr class="fail">') && has(rs.text, 'name="db_name"'), rs.status);
 
   // ------------------------------------------------------------------------------------------------ C. rejected without touching the DB
   section('C. CSRF and validation (no database contact)');

@@ -37,6 +37,9 @@ const OVERRIDES = {
   users: { id: '1', lvl: '20', hp: '100', hpall: '100', mp: '50', mpall: '50', exp: '1000', klas: 'wizard', storona: 'human', city: 'Talking Island Village', clan: '', dostup: '0', status: '', ali: '', zamujem: '', site: '', ref: '', account: '1', pol: 'm', prof: '' },
   mesto: { place: 'index' },
   lvl: { exp: '5000' },
+  tmp: { ltime: String(Math.floor(Date.now() / 1000)) },     // the fight row that ok.php creates (click.mjs, remember mode): started just now, not 50 years ago = not lost by timeout
+  options: { theme: 'osn' },        // a real player has no theme or a stylesheet name from /theme; the dummy '1' would be a link to a file that never existed
+  mobs: { status: 'on', tip: 'mob', hp: '100', hpall: '100', name: 'Wolf', lvl: '5' },     // 'on' = a mob that can be attacked: the page renders its "attack" link
 };
 
 // data profiles:  dummy = plausible values (default) | zero = every number and every string is 0 | empty = SELECTs return no rows
@@ -278,10 +281,15 @@ function writeOkPacket(conn, { affectedRows = 0, insertId = 0 } = {}) {
   conn.sequenceId = (conn.sequenceId + 1) % 256;
 }
 
-export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.0.0.1', debugPackets = false, profile = 'dummy', stateful = null }) {
+// remember: true  ->  a table that is normally empty for a healthy player (tmp = "in battle", ban, ...) answers SELECTs with rows after
+//                      an INSERT into it, and empty again after a DELETE. smoke/click.mjs uses it so that "attack the mob" (ok.php
+//                      INSERTs into tmp) is followed by a battle.php that finds the fight. Off in the full run: that server is shared
+//                      by all pages, so one page's INSERT would change what every other page sees.
+export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.0.0.1', debugPackets = false, profile = 'dummy', stateful = null, remember = false }) {
   const schema = parseSchema(readFileSync(schemaPath, 'utf8'));
   const stats = { queries: 0, unknownTables: {}, selects: 0, writes: 0 };
   let insertId = 100;
+  const written = new Set();       // remember mode: normally-empty tables that have a row now
   const server = mysql.createServer();
 
   const colDef = (name, table = '') => ({
@@ -307,6 +315,7 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
       stats.writes++;
       const tm = /^(?:INSERT|REPLACE)\s+(?:IGNORE\s+)?(?:INTO\s+)?(?:`?\w+`?\.)?`?(\w+)`?/i.exec(sql);
       if (tm && !schema[tm[1].toLowerCase()]) return unknownTable(conn, tm[1]);
+      if (remember && tm) written.add(tm[1].toLowerCase());
       return writeOkPacket(conn, { affectedRows: 1, insertId: ++insertId });
     }
     if (kw === 'UPDATE') {
@@ -319,6 +328,7 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
       stats.writes++;
       const tm = /^DELETE\s+FROM\s+(?:`?\w+`?\.)?`?(\w+)`?/i.exec(sql);
       if (tm && !schema[tm[1].toLowerCase()]) return unknownTable(conn, tm[1]);
+      if (remember && tm) written.delete(tm[1].toLowerCase());
       return writeOkPacket(conn, { affectedRows: 1 });
     }
     if (kw === 'SHOW' || kw === 'DESCRIBE' || kw === 'EXPLAIN') return sendRows(conn, ['Value'], [['1']], '');
@@ -358,7 +368,7 @@ export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.
     let nrows;
     if (!fromAt || fromAt < 0) nrows = 1;
     else if (emptyCmp) nrows = 0;
-    else if (EMPTY_TABLES.has(tableName)) nrows = 0;
+    else if (EMPTY_TABLES.has(tableName) && !(remember && written.has(tableName))) nrows = 0;
     else if (profile === 'empty' && tableName !== 'account' && tableName !== 'users') nrows = 0;
     else nrows = Math.min(2, limit);
 

@@ -138,7 +138,7 @@ if($mob['status']=='on')
 //ok$mob[id]
 //ok.php?id=$mob[id]<img src=\"pic/mob.png\" alt=\"pic\"/>
 echo '<table style="width:100%" cellspacing="0" cellpadding="0"><tr><td style="vertical-align:inherit;width:100%;">';
-echo " <a href=\"ok$mob[id]\"><font color='$color'><img src=\"pic/mob.png\" alt=\"pic\"/><font color='$color'>$mob[name] <font color=#ffffcc> [$mob[lvl]] (".number_format($mob['hp'], 0, ',', "`")."<b>/</b>".number_format($mob['hpall'], 0, ',', "`")." <font color=#ffffcc>hp)</font></font></a>";
+echo " <a href=\"ok.php?id=$mob[id]\"><font color='$color'><img src=\"pic/mob.png\" alt=\"pic\"/><font color='$color'>$mob[name] <font color=#ffffcc> [$mob[lvl]] (".number_format($mob['hp'], 0, ',', "`")."<b>/</b>".number_format($mob['hpall'], 0, ',', "`")." <font color=#ffffcc>hp)</font></font></a>";
 echo ' </td> <td style="vertical-align:inherit;width:24px;font-size:22px;">';
 echo " <a href=\"okrestnosti.php?mod=info&amp;id=$mob[id]\"><small>[i]</a></td></tr></table>";
 }
@@ -159,7 +159,7 @@ mysql_query("DELETE FROM `tmp` WHERE usr='$mob[oponent]'");
 mysql_query("DELETE FROM `log` WHERE usr='$mob[oponent]'");
 
 echo '<table style="width:100%" cellspacing="0" cellpadding="0"><tr><td style="vertical-align:inherit;width:100%;">';
-echo " <a href=\"ok$mob[id]\"><font color='$color'><img src=\"pic/mob.png\" alt=\"pic\"/>$mob[name] (".number_format($mob['hp'], 0, ',', "`")." <font color=red>HP</font>/$mob[lvl] lvl)</font></a>";
+echo " <a href=\"ok.php?id=$mob[id]\"><font color='$color'><img src=\"pic/mob.png\" alt=\"pic\"/>$mob[name] (".number_format($mob['hp'], 0, ',', "`")." <font color=red>HP</font>/$mob[lvl] lvl)</font></a>";
 echo ' </td> <td style="vertical-align:inherit;width:24px;font-size:22px;">';
 echo " <a href=\"okrestnosti.php?mod=info&amp;id=$mob[id]\">[i]</a></td></tr></table>";
 }
@@ -171,7 +171,7 @@ if($d>=($mob['oponent']+$mob['time'])){
 mysql_query("UPDATE `mobs` SET `status`='on',`hp`='$mob[hpall]', `oponent`='not' WHERE `id` = '$mob[id]'");
 
 echo '<table style="width:100%" cellspacing="0" cellpadding="0"><tr><td style="vertical-align:inherit;width:100%;">';
-echo " <a href=\"ok$mob[id]\"><font color='$color'><img src=\"pic/mob.png\" alt=\"pic\"/><font color='$color'>$mob[name] <font color=#ffffcc> [$mob[lvl]] (".number_format($mob['hp'], 0, ',', "`")."<b>/</b>".number_format($mob['hpall'], 0, ',', "`")." <font color=#ffffcc>hp)</font></font></a>";
+echo " <a href=\"ok.php?id=$mob[id]\"><font color='$color'><img src=\"pic/mob.png\" alt=\"pic\"/><font color='$color'>$mob[name] <font color=#ffffcc> [$mob[lvl]] (".number_format($mob['hp'], 0, ',', "`")."<b>/</b>".number_format($mob['hpall'], 0, ',', "`")." <font color=#ffffcc>hp)</font></font></a>";
 echo ' </td> <td style="vertical-align:inherit;width:24px;font-size:22px;">';
 echo " <a href=\"okrestnosti.php?mod=info&amp;id=$mob[id]\"><small>[i]</a></td></tr></table>";
 
@@ -315,7 +315,7 @@ $b++;
 echo "- - - - -<br/>Шанс дропа: $mob[shans] %<br/><br/>";
 }
 
-echo"<a href=\"ok$mob[id]\">Атаковать</a>";
+echo"<a href=\"ok.php?id=$mob[id]\">Атаковать</a>";
 echo"<hr/><a href=\"okrestnosti.php?\">Назад</a>";
 break;
 

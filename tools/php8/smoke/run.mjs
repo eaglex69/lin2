@@ -27,6 +27,7 @@ const CONC = Number(process.env.CONC || 2);
 const WORKER_TIMEOUT_MS = Number(process.env.WORKER_TIMEOUT || 120000);
 const PROFILE = String(opt('profile', 'dummy'));       // fake DB data: dummy | zero (all values 0) | empty (no rows)
 const GARBAGE = opt('garbage', null);                    // replace the placeholder value 1 of GET/POST params, e.g. --garbage abc  (use --garbage "" for empty)
+const LINKS = !!opt('links', false);                     // also check that every link, form action and redirect points to an existing file
 const NO_DIRS = !!opt('no-dirs', false);                 // do not create the user-content directories (pic/smiles, pic/clan, foto...): a checkout without images
 const COOKIES = 'nick=Tester; password=abc';
 
@@ -107,7 +108,7 @@ function runWorker(file) {
   return new Promise(resolve => {
     const scenarios = scenariosFor(file);
     const jobPath = join(OUT, 'job_' + file.replace(/[\\/]/g, '__') + '.json');
-    writeFileSync(jobPath, JSON.stringify({ php: PHP, root: TMP, file, env, scenarios }));
+    writeFileSync(jobPath, JSON.stringify({ php: PHP, root: TMP, file, env, scenarios, links: LINKS }));
     const child = spawn('node', [join(HERE, 'smoke', 'worker.mjs'), jobPath], { cwd: HERE, stdio: ['ignore', 'pipe', 'pipe'] });
     const res = { file, scenarios: [], crashed: null };
     let buf = '', lastStart = null, timer = setTimeout(() => { res.crashed = 'timeout (hang) in scenario ' + lastStart; child.kill('SIGKILL'); }, WORKER_TIMEOUT_MS);
@@ -146,12 +147,22 @@ process.stderr.write('\n');
 // ---------------------------------------------------------------------------------------------------------------
 const NOISE = /^(Undefined variable|Undefined array key|Undefined property|Trying to access array offset|Attempt to read property)/;
 const fatals = new Map(), crashes = [], warns = new Map(), deprecs = new Map(), restricted = [];
+const badLinks = new Map();      // "kind /resolved/path" (digits -> <n>) -> { n, example }
+let nLinks = 0;
 let nScen = 0;
 for (const r of results) {
   if (r.crashed) crashes.push({ file: r.file, why: r.crashed });
   if (r.scenarios.length && r.scenarios.every(s => s.status === 'restricted')) restricted.push(r.file);
   for (const s of r.scenarios) {
     nScen++;
+    if (s.links) {
+      nLinks += s.links.checked;
+      for (const b of s.links.bad) {
+        const key = `${b.kind.padEnd(8)} ${b.resolved.replace(/\d+/g, '<n>')}`;
+        const e = badLinks.get(key) || { n: 0, pages: new Set(), example: `${r.file} [${s.done}]  ->  ${b.target}` };
+        e.n++; e.pages.add(r.file); badLinks.set(key, e);
+      }
+    }
     for (const d of s.diags) {
       const key = `${d.file}:${d.line}  ${d.message}`;
       const bucket = d.level === 'Fatal error' || d.level === 'Parse error' ? fatals : d.level === 'Deprecated' ? deprecs : (d.level === 'Warning' && !NOISE.test(d.message)) || d.level === 'Notice' ? warns : null;
@@ -169,6 +180,7 @@ lines.push(`\n=== FATAL ERRORS (${fatals.size} distinct) ===\n` + fmt(fatals, 20
 lines.push(`\n=== worker crashes / hangs (${crashes.length}) ===\n` + crashes.map(c => `  ${c.file}: ${c.why}`).join('\n'));
 lines.push(`\n=== other warnings, without "undefined variable/key" noise (${warns.size} distinct) ===\n` + fmt(warns, 60));
 lines.push(`\n=== deprecations (${deprecs.size} distinct) ===\n` + fmt(deprecs, 30));
+if (LINKS) lines.push(`\n=== links, forms and redirects to files that do not exist (${badLinks.size} distinct; ${nLinks} links checked) ===\n` + (badLinks.size ? fmt(badLinks, 200) : '  none'));
 lines.push(`\n=== queries on tables that are not in shema.sql ===\n  ` + (JSON.stringify(db.stats.unknownTables)));
 const text = lines.join('\n');
 writeFileSync(join(OUT, 'report.txt'), text + '\n');

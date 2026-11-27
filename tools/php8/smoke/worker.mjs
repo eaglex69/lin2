@@ -2,6 +2,7 @@
 // usage: node smoke/worker.mjs <job.json>      (progress and the result go to stdout as JSON lines)
 import { readFileSync } from 'node:fs';
 import { startPhp } from '../common.mjs';
+import { findBadLinks } from './links.mjs';
 
 const job = JSON.parse(readFileSync(process.argv[2], 'utf8'));
 const MAX_OUT = 200000;
@@ -41,7 +42,7 @@ for (const sc of job.scenarios) {
   const uri = '/' + job.file + (sc.query ? '?' + sc.query : '');
   const headers = { 'user-agent': 'Mozilla/5.0 (smoke)', ...(sc.cookies ? { cookie: sc.cookies } : {}) };
   if (sc.body !== undefined) headers['content-type'] = 'application/x-www-form-urlencoded';
-  let text = '', errors = '', exitCode = 0, thrown = null, t0 = Date.now();
+  let text = '', errors = '', exitCode = 0, thrown = null, location = null, t0 = Date.now();
   try {
     const r = await php.run({
       scriptPath: '/internal/smoke/runner.php',
@@ -53,6 +54,7 @@ for (const sc of job.scenarios) {
       $_SERVER: { SCRIPT_FILENAME: target, SCRIPT_NAME: '/' + job.file, PHP_SELF: '/' + job.file, DOCUMENT_ROOT: '/work', REMOTE_ADDR: '127.0.0.1', HTTP_HOST: 'localhost', SERVER_NAME: 'localhost' },
     });
     text = r.text; errors = r.errors || ''; exitCode = r.httpStatusCode;
+    location = (r.headers && r.headers.location && r.headers.location[0]) || null;
   } catch (e) {
     thrown = String(e && e.message || e).split('\n')[0];
     const resp = e && e.response;
@@ -64,7 +66,8 @@ for (const sc of job.scenarios) {
   const restricted = /Error: restricted access/.test(text);
   process.stdout.write(JSON.stringify({
     done: sc.name, ms: Date.now() - t0, bytes: text.length, status: fatal ? 'fatal' : restricted ? 'restricted' : thrown ? 'crash' : 'ok',
-    thrown, diags, redirect: undefined,
+    thrown, diags, redirect: location || undefined,
+    links: job.links ? findBadLinks(job.root, job.file, text, location) : undefined,
     head: (fatal || thrown) ? text.slice(-1500) : undefined,
     sample: sc.keepOutput ? text.slice(0, MAX_OUT) : undefined,
   }) + '\n');
