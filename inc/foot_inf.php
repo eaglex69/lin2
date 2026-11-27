@@ -1,5 +1,5 @@
 <?php
-echo "</table></table></div></div></div></div><span style=text-align:center;>";
+echo '<div class="lx-foot"><span style=text-align:center;>';
 ///////////////////////////////////////////////////////////
 
 
@@ -34,7 +34,7 @@ echo'<center><span style=color:#af9878;> '.$times.'  | '.$date.'</center>';
 $Y_god = date("Y"); 
 
 echo '</span><div align="center"><span style=color:#af9878;font-size:10px;> <br/> 
-	© '.$_SERVER['HTTP_HOST'].', '.$Y_god.'  <br/><br/>  </span>';
+	© '.$_SERVER['HTTP_HOST'].', '.$Y_god.'  <br/><br/>  </span></div></div>';
 
 //    info_compress();
 

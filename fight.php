@@ -141,17 +141,12 @@ timer();
 lose();
 win();
 pit();
+include_once dirname(__FILE__).'/inc/lin2_ui.php';
 if(!empty($pit['id'])){
 if($pit['status']=='on'){
-echo"<b>$pit[name]:</b> ($pit[hp]/$pit[hpall])<br/>";
+echo '<div class="lx-ally"><b>'.lin2_ui_h($pit['name']).':</b> ('.(int)$pit['hp'].'/'.(int)$pit['hpall'].')</div>';
 }}
-echo"<b>$mob[name]:</b> ($mob[hp]/$mob[hpall])<br/>";
-echo "<form action='fight.php?mod=ataka' method='post'>";
-echo "<b>Атака:</b><br/>
-<select name=\"udar\">
-<option value=\"1\">Голова</option>
-<option value=\"2\">Туловище</option>
-<option value=\"3\">Ноги</option>";
+$lxmagic='';
 $req = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log'");
 if(mysql_num_rows($req)>=1)
 {
@@ -170,17 +165,10 @@ $mag['plushp']=$maghp[$mag['lvl']];//+хп
 $maghp=explode("|",$mag['uron']);
 $mag['uron']=$maghp[$mag['lvl']];//+урон
 
-echo"<option value=\"mag,$mag[id]\">$mag[name]($mag[uron],$mag[mp],$mag[hp],$mag[plushp])</option>";
+$lxmagic.='<option value="mag,'.(int)$mag['id'].'">'.lin2_ui_h($mag['name']).' ('.lin2_ui_h($mag['uron'].','.$mag['mp'].','.$mag['hp'].','.$mag['plushp']).')</option>';
 }
 }
-echo"</select><br/>";
-echo "<b>Защита:</b><br/>
-<select name=\"block\">
-<option value=\"1\">Голова</option>
-<option value=\"2\">Туловище</option>
-<option value=\"3\">Ноги</option>
-</select><br/>";
-echo "<input type='submit' value='Ок' /></form>";
+echo lin2_ui_duel(array('action'=>'fight.php?mod=ataka','key'=>'g'.(int)$mob['id'],'foe'=>$mob,'me'=>$udata,'art'=>lin2_ui_mob_art(array('name'=>$mob['name'])),'magic'=>$lxmagic));
 log_msg($tlog='battle');
 }
 //////////

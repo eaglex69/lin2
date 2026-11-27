@@ -274,38 +274,14 @@ timer();
 lose();
 win();
 goboj();
-echo'<form action="pk.php?mod=ataka" method="post">';
-echo '<table border="0" align="left">';
-
-echo "
- <tr>
-<td class=\"zagolovok\" width=\"50%\"><strong>Удар:</strong></td>
-<td class=\"zagolovok\" width=\"50%\"><strong>Блок:</strong></td>
-</tr>
-<tr>
-<td>
-<select  name=\"udar\">
-<option value=\"1\">Голова</option>
-<option value=\"2\">Грудь</option>
-<option value=\"3\">Ноги</option>
-</select>
-</td>
-<td>
-<select  name=\"block\">
-<option value=\"1\">Голова</option>
-<option value=\"2\">Грудь</option>
-<option value=\"3\">Ноги</option>
-</select>
-</td>
-</tr>
-</table><br/>
-";
-
-echo '<input class="button" type="submit" value="Ok" /></form>';
+include_once dirname(__FILE__).'/inc/lin2_ui.php';
+echo lin2_ui_duel(array('action'=>'pk.php?mod=ataka','key'=>'pk'.(int)$he['id'],'foe'=>$he,'me'=>$udata));
 
 $ma = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log' LIMIT 1");
+echo '<div class="lx-skills">';
 if(mysql_num_rows($ma)>=1)
 {
+echo '<h4>Скилы:</h4>';
 While($mag = mysql_fetch_array($ma))
 {
 
@@ -322,11 +298,12 @@ $mag['plushp']=$maghp[$mag['lvl']];//+хп
 $maghp=explode("|",$mag['uron']);
 $mag['uron']=$maghp[$mag['lvl']];//+урон
 
-echo"<br/><a href=\"pk.php?mod=mag&amp;id=$mag[id]\">$mag[name]</a> ($mag[uron],$mag[mp],$mag[hp],$mag[plushp])";
+echo '<a class="lx-skill" href="pk.php?mod=mag&amp;id='.(int)$mag['id'].'">'.lin2_ui_h($mag['name']).'<em>('.lin2_ui_h($mag['uron'].','.$mag['mp'].','.$mag['hp'].','.$mag['plushp']).')</em></a>';
 }
 }else{
-echo'<br/><b>Нет умений</b>';
+echo'<h4>Нет умений</h4>';
 }
+echo '</div>';
 log_msg($tlog='pk');
 }
 //////////

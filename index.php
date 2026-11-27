@@ -54,7 +54,7 @@ echo "<center>
 		
 
 
-$newstext  = nl2br($msg['text']);
+$newstext  = nl2br((string)$msg['text']);
 
 
  if (strlen($newstext)>600)
@@ -372,7 +372,7 @@ if (empty($arer)){$arer=0;}
 
 
 
-$newstext  = nl2br($msg['text']);
+$newstext  = nl2br((string)$msg['text']);
 
 
  if (strlen($newstext)>700)

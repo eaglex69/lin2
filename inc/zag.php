@@ -119,8 +119,8 @@ mysql_query("DELETE FROM `paty` WHERE `act` = 'kill' && `act2` = 'kill'"); // ч
 include($path.'inc/lvl.php');
 
 
-echo'<div class="head">';
-
+include_once $path.'inc/lin2_ui.php';
+echo'<div class="head lx-head" data-lx-live="head">';
 
 include($path.'inc/opit.php');
 
@@ -134,44 +134,27 @@ $req222 = mysql_query("SELECT * FROM `color_akk` WHERE `usr` = '$log' LIMIT 1");
 $avto=mysql_num_rows($req222);
 if($avto==1){
 $col = mysql_fetch_array($req222);
-echo '<font color="#'.$col['color'].'"><b>'.$log.' </b></font>'; 
+$nick_html = '<font color="#'.$col['color'].'"><b>'.$log.'</b></font>'; 
 }else{
-echo '<font color="#ffffcc">'.$log.' | </font>';}
-echo '<font color="#ffffcc">'.$udata['lvl'].'  ур.  '.$lvlplus.'</font> <font color=#ffffff></font><br/>';
+$nick_html = $log;}
 
+// шапка: аватар, ник, уровень и полосы HP / MP / EXP (оформление: theme/fantasy.css)
+echo lin2_ui_avatar($udata);
+echo '<div class="lx-hd"><div class="lx-nick"><span class="n">'.$nick_html.'</span><span class="lv">'.$udata['lvl'].'  ур.  '.$lvlplus.'</span></div>';
 
+$mprez=lin2_div($udata['mp'],$udata['mpall'])*100;
 if ($udata['hp']>=0){
 $hprez=lin2_div($udata['hp'],$udata['hpall'])*100;
-$mprez=lin2_div($udata['mp'],$udata['mpall'])*100;
 
 if ($hprez>100) {$hprez=100;};
 if ($mprez>100) {$mprez=100;};
 } else {$udata['hp']=0; $hprez=0;}
 
-
-
-// полоса жизней
-//echo '<div style="border:0px solid #330000;background:#282828 url(../theme/pic/fon.png) repeat-x top;height:9px;width:100%;border-radius:1px;"><div style="background:#990000 url(../theme/pic/hp.png) repeat-x top;height:9px;border-radius:1px;width:'.$hprez.'%;"> </div></div>';
-echo "
-<div style='height:15px;background: #330000 url(../theme/pic/exp2.gif) repeat-x top;width:40%; font-size: 15px; position: relative;'>
-<div style='height:15px;background: #990000 url(../theme/pic/hp.gif) repeat-x top;width:$hprez%;font-size: 11px; position: relative;'><div style='position: static;'><p align='left'><nobr>&nbsp;&nbsp;HP&nbsp;&nbsp;&nbsp;&nbsp;$udata[hp]/$udata[hpall]</nobr></p></div></div></div>";
-
-
-// полоса маны
-//echo '<div style="border:0px solid #000066;background:#282828 url(../theme/pic/fon.png) repeat-x top;height:9px;width:100%;border-radius:1px;"><div style="background:#3333FF url(../theme/pic/mp.png) repeat-x top;height:9px;border-radius:1px;width:'.$mprez.'%;"> </div></div>';
-echo "
-<div style='height:15px;background: #000066 url(../theme/pic/exp2.gif) repeat-x top;width:40%; font-size: 15px;position: relative;'>
-<div style='height:15px;background: #3333FF url(../theme/pic/mp.gif) repeat-x top;width:$mprez%;font-size: 11px; position: relative;'><div style='position: static;'><p align='left'><nobr>&nbsp;&nbsp;MP&nbsp;&nbsp;&nbsp;&nbsp;$udata[mp]/$udata[mpall]</nobr></p></div></div></div>";
-
-
-// отображает опыт старая
-//echo '<br/><div style="background:1px #999999;height:2px;"><div style="background-color:#9900FF;height:2px;width:'.$exp.'%;"></div></div>';
-
-// отображает опыт
-echo '
-<div style="height:15px;background: #757575 url(../theme/pic/exp2.gif) repeat-x top;width:40%; font-size: 15px; position: relative;">
-<div style="height:15px;background: #B300FF url(../theme/pic/exp.gif) repeat-x top;width:'.$exp.'%;font-size: 11px; position: relative;"><div style="position: static;"><NOBR><p align="left">&nbsp;&nbsp;EXP&nbsp;&nbsp;&nbsp;&nbsp;'.$exp.'%</p></NOBR></div></div></div>';
-echo "<br/></div>";
+// полоса жизней, маны и опыта (ширина всегда 0..100%)
+echo '<div class="lx-bar lx-hp"><i style="width:'.max(0,min(100,$hprez)).'%"></i><b>HP&nbsp;&nbsp;'.$udata['hp'].'/'.$udata['hpall'].'</b></div>';
+echo '<div class="lx-bar lx-mp"><i style="width:'.max(0,min(100,$mprez)).'%"></i><b>MP&nbsp;&nbsp;'.$udata['mp'].'/'.$udata['mpall'].'</b></div>';
+echo '<div class="lx-bar lx-xp"><i style="width:'.max(0,min(100,$exp)).'%"></i><b>EXP&nbsp;&nbsp;'.max(0,min(100,$exp)).'%</b></div>';
+echo "</div></div>";
 
 
 

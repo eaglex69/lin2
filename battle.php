@@ -112,7 +112,7 @@ if($pit['hp']<=0){
 mysql_query("UPDATE pit SET status = 'die' WHERE `usr` = '$log'");
 }
 }
-echo"<font color=#990033><center><br/><b> Вы проиграли бой! </b></font><br/>";
+echo '<div class="lx-end lose" data-res="lose"><span class="res">Поражение</span><b>Вы проиграли бой!</b></div>';
 echo '<hr>';
 echo"<br/><div class=inoy><a href=\"res.php?\">Храм жизни...</a></center></div>";
 include($path.'inc/down.php');
@@ -476,7 +476,7 @@ mysql_query("UPDATE `user_kill` SET `killing` = '$u_k[killing]'  WHERE `quest` =
 }
 }
 
-echo"<font color=#6FCD72><center><b> <img src=\"pic/winl.png\" alt=\"\"/> ВЫ ПОБЕДИЛИ МОНСТРА ! </b></font> ";
+echo '<div class="lx-end win" data-res="win"><span class="res">Победа!</span><b>Вы победили монстра!</b></div><center>';
 echo '<hr>';
 if(!empty($drop['name'])){
 echo"<b>Выпало: $drop[name] x$coldrop</b><br/>";
@@ -529,7 +529,7 @@ $col_new = $udata['almaz']+$col_rand_skoko;
 mysql_query("UPDATE users SET almaz = '$col_new' WHERE usr = '$log'");
 echo '<div class=dot><font color=#6FCD72>Выпало '.$col_rand_skoko.' Coin of Luck</font></div>';
 }
-echo"<div class=news><a href=\"okrestnosti.php?\"><img src=\"pic/skils/drop.png\" height=25 width=25></a></div></div></center>";
+echo '</font></font></font></font><div class="lx-acts"><a href="okrestnosti.php?">Продолжить</a></div></div></center>';
 
 
 include($path.'inc/down.php');
@@ -549,22 +549,27 @@ timer($log);
 lose($log,$pas,$m,$pit,$ass,$a,$mob,$udata);
 win($log,$pas,$m,$mob,$ass,$pit,$a,$udata,$usr,$p);
 pit($log,$pas,$pit,$udata);
-if($pit['status']=='on'){
-echo"<b>$pit[name]:</b> ($pit[hp]/$pit[hpall])<br/>";
-}
+// ---- экран боя: панель врага, карточка с портретом, кнопка атаки, панель игрока (оформление: theme/fantasy.css, анимация: theme/battle.js) ----
+include_once dirname(__FILE__).'/inc/lin2_ui.php';
 if ($mob['hp']>=0){
 $hprez=lin2_div($mob['hp'],$mob['hpall'])*100;
 if ($hprez>100) {$hprez=100;};
 } else {$mob['hp']=0; $hprez=0;}
-echo "<b><img src=\"pic/mob.png\" alt=\"pic\"/> $mob[name] -<font color=#ffffcc> &#160 [<font color=#ff4040>HP<font color=#ffffcc>:</b></font><font color=#ffffcc>    ".number_format($mob['hp'], 0, ',', "`")."<b>/</b>".number_format($mob['hpall'], 0, ',', "`")."] </font>";
 
-echo "</div>";
+$lx_wiz = ($udata['klas']=='wizard');
+$lx_art = lin2_ui_mob_art($mob);
+echo '<div class="lx-bt" id="lx-bt" data-foe="'.(int)$mob['id'].'">';
+echo lin2_ui_side('lx-foe','lx-foe',$mob['name'],$mob['lvl'],$lx_art[1],($lx_wiz ? $mob['matt'] : $mob['patt']),($lx_wiz ? $mob['mdef'] : $mob['pdef']),$mob['hp'],$mob['hpall']);
+echo '<div class="lx-name">'.lin2_ui_h($mob['name']).' <small>['.(int)$mob['lvl'].' ур.]</small></div>';
+echo lin2_ui_card($lx_art[0],$mob['name']);
+echo '<a class="lx-atk" id="lx-atk" data-lx-act="hit" href="battle.php?mod=ataka&amp;udar=at" title="Атаковать"><span>Атаковать</span></a>';
+echo lin2_ui_side('lx-me','lx-me',$log,$udata['lvl'],lin2_ui_user_img($udata),($lx_wiz ? $udata['matt'] : $udata['patt']),($lx_wiz ? $udata['mdef'] : $udata['pdef']),$udata['hp'],$udata['hpall']);
+if($pit['status']=='on'){
+echo '<div class="lx-ally"><b>'.lin2_ui_h($pit['name']).':</b> ('.(int)$pit['hp'].'/'.(int)$pit['hpall'].')</div>';
+}
 
-//-----пк в бою----------
-
-///////////////игроки
-echo "<br/>";
-echo'<hr/><small>';
+// ---- кто ещё рядом (как и раньше: ники и ссылки [PK]) ----
+echo '<div class="lx-near" data-lx-live="near"><small>';
 $odin=false;
 $timeout=time()-150;//оффлайн
 
@@ -595,14 +600,9 @@ echo "$pk";
 $odin=true;
 }
 }
-if($odin==false){
-//echo' &#160 <small>Никого нет рядом!</small>';
-}else{
-echo '<hr/>';}
-echo "</small>";
+echo "</small></div>";
 /////////////////
 //-----------------------
-echo" <div class=inoy><a href=\"battle.php?mod=ataka&udar=at\"> <img src=\"pic/skils/att.jpg\" height=25 width=25> Атаковать</a></div>";
 
 $reqs = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log'");
 
@@ -618,13 +618,11 @@ $req = mysql_query("SELECT * FROM `mag` WHERE
 `tip` != 'bafzash' && `tip` != 'bafzat'  && `tip` != 'bafkrit'  && `tip` != 'resp'  && `tip` != 'bafat'
  && `tip` != 'bafhp'  && `tip` != 'bafmp'  && `tip` != 'spoil'   && `tip` != 'spoilall'");
 
-
+// ---- умения (ссылки такие же, как раньше: battle.php?mod=ataka&udar=mag?<id>) ----
+echo '<div class="lx-skills" data-lx-live="skills">';
 if(mysql_num_rows($req)>=1)
 {
-
-echo" &#160<font color=#af9878><i> Скилы: </i><div class=inoy><br>";
-echo '<table style="width:100%" cellspacing="0" cellpadding="0"><tr>';
-$i = 0;
+echo '<h4>Скилы:</h4>';
 While($mag = mysql_fetch_array($req))
 {
 $mag['lvl']=$mag['lvl']-1;
@@ -645,42 +643,23 @@ if ($mag['mp']>=1)  {$mag['mp'] = " / -$mag[mp] MP";}			else	{$mag['mp'] = "";}
 if ($mag['hp']>=1)  {$mag['hp'] = " / -$mag[hp] HP";}			else	{$mag['hp'] = "";}
 if ($mag['plushp']>=1) {$mag['plushp'] = "+$mag[plushp] HP";}	else	{$mag['plushp'] = "";}
 if ($mag['plusmp']>=1) {$mag['plusmp'] = "+$mag[plusmp] MP";}	else	{$mag['plusmp'] = "";}
-if ($i==5){echo "</tr><tr>";}if ($i==10){echo "</tr><tr>";}if ($i==15){echo "</tr><tr>";}if ($i==20){echo "</tr><tr>";}
 
-
+$lx_icon = '<img src="pic/skils/'.rawurlencode($mag['name']).'.jpg" alt=""/>';
 // откат скила
 $time=time();
 if ($mag['time']>$time and $mag['time']!==0)
 {
 $trez = $mag['time'] - $time;
-
-echo"</div><img src=\"pic/skils/$mag[name].jpg\" height=20 width=20> <font color=#af9878> $mag[name]</font> <font color=#ffffcc> [Откат  <font color=#af9878><b>$trez</b></font> сек.]</font><div class=silka> ";
-
-//echo "<td style=text-align:center; class=silka> <img src=\"pic/skils/$mag[name].jpg\" height=30 width=30 style='margin-right:10px;border:3px solid red;'> </td>";
-
+echo '<span class="lx-skill cd">'.$lx_icon.lin2_ui_h($mag['name']).'<em>Откат <b>'.$trez.'</b> сек.</em></span>';
 }else{
-//----------------
-echo"<a href=\"battle.php?mod=ataka&udar=mag?$mag[id]\"><img src=\"pic/skils/$mag[name].jpg\" height=20 width=20> $mag[name] <font color=#ffffcc>[$mag[uron]$mag[plushp]$mag[mp]$mag[hp]$mag[plusmp]]</font></a> ";
-
-
-//echo "<td style=text-align:center; class=silka> <a href=\"battle.php?mod=ataka&udar=mag?$mag[id]\"><img src=\"pic/skils/$mag[name].jpg\" height=30 width=30 style='margin-right:10px;border:2px solid #636261'></a> </td>";
-
-
-}$i++;
-
+echo '<a class="lx-skill" data-lx-act="hit" href="battle.php?mod=ataka&amp;udar=mag?'.(int)$mag['id'].'">'.$lx_icon.lin2_ui_h($mag['name']).'<em>['.lin2_ui_h($mag['uron'].$mag['plushp'].$mag['mp'].$mag['hp'].$mag['plusmp']).']</em></a>';
 }
-echo '</div></tr></table>';
 }
+}
+echo '</div>';
 
-/*
-echo"</div><div class=silka><br/>
-<a href=\"battle.php?mod=ataka&udar=no\">Покинуть бой</a> </div>";
-*/
-echo '</div><br/><table style="width:100%" cellspacing="0" cellpadding="0"><tr><td style="vertical-align:top;width:19%;text-align			:center;">
-<a class="top_menu_link" href="/battle.php" title="Ждать">Ждать</a></td><td style="vertical-align:top;width:19%;text-align			:center;">
-<a class="top_menu_link" href="/battle.php?mod=ataka&udar=no" title="Покинуть бой">Покинуть бой</a></td></tr></table>
-<br>
-</div></div>';
+echo '<div class="lx-acts"><a data-lx-act="wait" href="/battle.php" title="Ждать">Ждать</a><a class="leave" data-lx-act="leave" href="/battle.php?mod=ataka&amp;udar=no" title="Покинуть бой">Покинуть бой</a></div>';
+echo '</div>';  // .lx-bt
 
 
 ///////-----------
@@ -689,22 +668,20 @@ $req = mysql_query("SELECT * FROM `res` WHERE `usr` = '$log' and `tip`='elexir'"
 $avto=mysql_num_rows($req);
 if($avto>=1){
 
-echo "<form action=\"elexirs.php?btl=y\" method=\"POST\"><hr/>";
+echo "<div class=\"lx-elx\"><form action=\"elexirs.php?btl=y\" method=\"POST\">";
 
 While($mag = mysql_fetch_array($req))
 {
 echo " <label><input type='radio' name='result' value='$mag[id]' /></label>\n";
 echo " <a href=\"inventar.php?mod=info&amp;act=elexir&amp;id=$mag[id]\">$mag[name]</a>";
-echo " <font color=grey>   ($mag[kol] штук) </font><br/>";
+echo " <font color=grey>   ($mag[kol] штук) </font><br/>\n";
 
 }
-echo "<div class=menu><b><font color=grey>Кол-во:</font></b><br/>
+echo "<b><font color=grey>Кол-во:</font></b><br/>
 <input type=\"text\" name=\"col\" size=\"5\" maxlength=\"9\"/> ";
-echo "<input type='submit' name='ok' value=' Go ' /><hr/></div>\n";
+echo "<input type='submit' name='ok' value=' Go ' /></form></div>\n";
 }
 //------------
-
-echo "</div>";
 
 
 

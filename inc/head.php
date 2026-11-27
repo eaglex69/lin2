@@ -40,34 +40,28 @@ $user_opt = mysql_fetch_array(mysql_query("SELECT theme FROM `options` where `us
 if (empty($user_opt['theme'])){$style = 'osn';}else{$style = $user_opt['theme'];}
 echo "\n" . '<link rel="stylesheet" href="/theme/'.$style.'.css" type="text/css" />';
 echo "\n" . '<link rel="stylesheet" href="/theme/osn.css" type="text/css" />';
+/* fantasy theme: theme/fantasy.css goes LAST (it overrides osn.css), ajax.js = page changes without reloads,
+   battle.js = animated battle screen.  The old look is in git history (commit 7c23752: this file, zag.php, nogi.php,
+   foot_pic.php, foot_inf.php, chat2.php, battle.php, pk.php, combat.php, fight.php). */
+include_once dirname(__FILE__) . '/lin2_ui.php';
+echo "\n" . '<meta name="viewport" content="width=device-width, initial-scale=1" />';
+echo "\n" . '<link rel="stylesheet" href="' . lin2_ui_asset('fantasy.css') . '" type="text/css" />';
+echo "\n" . '<script type="text/javascript" src="' . lin2_ui_asset('ajax.js') . '" defer="defer"></script>';
+echo "\n" . '<script type="text/javascript" src="' . lin2_ui_asset('battle.js') . '" defer="defer"></script>';
 /*------------------------------------------------------------------------------------------------------*/
 
 
 
 
-echo "\n" . '</head><body>
-<script src="theme/fon.gif"></script>';
+echo "\n" . '</head><body>';
+/* frame of every page: bronze frame with corner gems, teal banner, one table cell for the content.
+   The single-cell table is deliberate: the old pages print stray </div> tags and a table cell keeps them from
+   closing the frame. inc/nogi.php closes it. */
 echo '
-
-<td valign="top" width="100%">
-
-<table width="100%" cellpadding="0" 
-<tr>
-<td class="lt1"></td>
-<td height="48">
- <table width="100%" border="0" cellpadding="0" cellspacing="0">
- <tr>
- <td class="t1">&nbsp;</td>
- <td height="48" width="232" align="center" valign="middle" class="tc"><div><font color=#af9878><b>miniage <b>ru</b></div>
-</td>
- <td class="t1">&nbsp;</td>
- </tr>
- </table>
-</td>
-<td class="rt1">&nbsp;</td>
-<tr>
-<td width="19" class="l">&nbsp;</td>
-<td class="centertd">';
+<div class="lx-app" id="lx-app">
+<i class="lx-corner tl"></i><i class="lx-corner tr"></i><i class="lx-corner bl"></i><i class="lx-corner br"></i>
+<div class="lx-banner-wrap"><div class="lx-banner"><b>miniage <i>ru</i></b></div></div>
+<table class="lx-frame" cellspacing="0" cellpadding="0"><tr><td class="centertd">';
 ///////////////////
 }
 ///получаем положение

@@ -1,0 +1,11 @@
+{
+  "name": "lin2-ui-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Headless-browser checks of the fantasy theme, the ajax page changes and the animated battles (run against tools/php8/demo/server.mjs)",
+  "type": "module",
+  "dependencies": {
+    "@sparticuz/chromium": "^158.0.0",
+    "puppeteer-core": "^25.19.0"
+  }
+}

@@ -3,7 +3,7 @@ define('PROTECTOR', 1);
 
 
 
-echo "</div></div></div></div><div class=gameBorder><div class=menu><div class=chat2>";
+echo "</div></div></div></div><div class=gameBorder><div class=menu><div class=\"lx-sec\"><b>Чат</b></div><div class=chat2>";
 
 //---------------------------------------------------------
 $in_chat = (mysql_query("SELECT chat FROM option_game WHERE id = '1' LIMIT 1"));

@@ -450,7 +450,7 @@ global $log;
 $req=mysql_query("SELECT * FROM log WHERE usr = '$log' and place='$tlog' ORDER BY id DESC LIMIT 6");
 $avto = mysql_num_rows($req);
 if($avto=1){
-echo'<div class="logtext">';
+echo'<div class="logtext" data-lx-live="log">';
 While($ilok = mysql_fetch_assoc($req))
 {
 if($ilok['kto']=='system'){$color='grey';}
