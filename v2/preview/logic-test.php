@@ -276,3 +276,35 @@ $dbg('T19 intInput("42") -> ' . var_export($req2->intInput('n'), true)
 // (проверяется отдельным прогоном seedtest; здесь фиксируем, что флаг не влияет на мобов)
 $mobsBefore = (int) Database::value('SELECT COUNT(*) FROM mobs');
 $dbg('T20 мобы в БД: ' . $mobsBefore . ' -> ' . ($mobsBefore >= 10 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 21: мировой респавн (второй игрок не может бить того же моба)
+// создаём второго игрока с персонажем
+$pid = \App\Core\Migrator::createAccount('resptester', 'Str0ngPass!1');
+$pcid = \App\Core\Migrator::createCharacter($pid, 'resptester', 'human', 'fighter', 'm');
+\App\Core\Migrator::giveStarterKit($pcid);
+
+// моб 1: убиваем первым персонажем
+Database::exec('DELETE FROM battles');
+Database::update('characters', ['hp' => 500, 'hp_max' => 500, 'level' => 1], 'id = ?', [1]);
+$b = $game->startBattle(1, 1);
+for ($i = 0; $i < 40; $i++) { $st = $game->attack(1, (int) $b['id']); if ($st['state'] !== 'active') break; }
+$dbg('T21 первый игрок убил моба: ' . $st['state'] . ' -> ' . ($st['state'] === 'won' ? 'OK' : 'БАГ'));
+
+// второй игрок пытается начать бой с тем же мобом СРАЗУ
+$blocked = false;
+try { $game->startBattle($pcid, 1); }
+catch (Throwable $e) { $blocked = str_contains($e->getMessage(), 'возродился'); }
+$dbg('T21 второй игрок атакует того же моба: ' . ($blocked ? 'отказ (респавн общий) -> OK' : 'БАГ: бой разрешён!'));
+
+// respawnIn возвращает адекватное время
+$left = $game->respawnIn(1);
+$respawn = (int) Database::value('SELECT respawn_sec FROM mobs WHERE id = 1');
+$dbg('T21 respawnIn(1) = ' . $left . 'с из ' . $respawn . ' -> '
+    . ($left > 0 && $left <= $respawn ? 'OK' : 'БАГ'));
+
+// после истечения времени — снова жив
+Database::update('battles', ['won_at' => date('Y-m-d H:i:s', time() - $respawn - 1)], 'mob_id = ? AND state = ?', [1, 'won']);
+$dbg('T21 после истечения респавна respawnIn = ' . $game->respawnIn(1) . ' -> '
+    . ($game->respawnIn(1) === 0 ? 'OK' : 'БАГ'));
+try { $game->startBattle($pcid, 1); $dbg('T21 второй игрок начал бой после респавна -> OK'); }
+catch (Throwable $e) { $dbg('T21 БАГ: бой не начался: ' . $e->getMessage()); }

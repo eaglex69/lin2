@@ -25,7 +25,6 @@ final class GameService
     {
         $t = Database::table('mobs');
         $rows = Database::all("SELECT * FROM {$t} WHERE zone = ? ORDER BY level", [$zone]);
-        $now = time();
         $out = [];
         foreach ($rows as $i => $m) {
             $mobId = (int) $m['id'];
@@ -49,7 +48,10 @@ final class GameService
                 'x' => $x,
                 'y' => $y,
                 'alive' => $alive,
-                'respawn_in' => $alive ? 0 : max(0, (int) $m['respawn_sec'] - ($now % max(1, (int) $m['respawn_sec']))),
+                // БАГ: здесь был фиктивный расчёт по остатку от деления time()
+                // на respawn_sec — таймер не совпадал с фактическим респавном
+                // и всегда показывал произвольное число. Берём настоящее время.
+                'respawn_in' => $alive ? 0 : $this->respawnIn($mobId),
             ];
         }
         return $out;
@@ -61,10 +63,27 @@ final class GameService
         // ВАЖНО: updated_at меняется при любом изменении строки, в том числе
         // при отступлении (flee) после победы. Тогда респавн обнулялся и можно
         // было убивать одного моба бесконечно. Храним время победы отдельно.
+        //
+        // БАГ: раньше респавн считался по battles.char_id = ? — то есть у
+        // КАЖДОГО игрока был свой таймер. Два игрока могли по очереди бить
+        // одного и того же монстра без ожидания: для второго он всегда жив.
+        // Теперь решение принимается по последней победе над этим монстром
+        // любого игрока («мировой» респавн, как в обычной MMO).
         $row = Database::one(
-            "SELECT state, updated_at, won_at FROM {$t} WHERE char_id = ? AND mob_id = ? AND state = 'won' ORDER BY id DESC LIMIT 1",
-            [$charId, $mobId]
+            "SELECT won_at, updated_at FROM {$t}
+             WHERE mob_id = ? AND state = 'won' AND won_at IS NOT NULL
+             ORDER BY won_at DESC, id DESC LIMIT 1",
+            [$mobId]
         );
+        if ($row === null) {
+            // запасной путь для старых записей без won_at
+            $row = Database::one(
+                "SELECT updated_at AS won_at, updated_at FROM {$t}
+                 WHERE mob_id = ? AND state = 'won'
+                 ORDER BY id DESC LIMIT 1",
+                [$mobId]
+            );
+        }
         if ($row === null) {
             return true;
         }
@@ -72,6 +91,24 @@ final class GameService
         $mob = Database::one('SELECT respawn_sec FROM ' . Database::table('mobs') . ' WHERE id = ?', [$mobId]);
         $respawn = (int) ($mob['respawn_sec'] ?? 20);
         return (time() - strtotime($wonAt)) >= $respawn;
+    }
+
+    /** Секунды до возрождения монстра (0 — уже жив). */
+    public function respawnIn(int $mobId): int
+    {
+        $t = Database::table('battles');
+        $row = Database::one(
+            "SELECT won_at FROM {$t} WHERE mob_id = ? AND state = 'won' AND won_at IS NOT NULL
+             ORDER BY won_at DESC, id DESC LIMIT 1",
+            [$mobId]
+        );
+        if ($row === null || $row['won_at'] === null) {
+            return 0;
+        }
+        $mob = Database::one('SELECT respawn_sec FROM ' . Database::table('mobs') . ' WHERE id = ?', [$mobId]);
+        $respawn = max(1, (int) ($mob['respawn_sec'] ?? 20));
+        $left = $respawn - (time() - strtotime((string) $row['won_at']));
+        return max(0, $left);
     }
 
     /**
@@ -163,7 +200,9 @@ final class GameService
             $atk = max((int) $char['p_atk'], (int) $char['m_atk']);
             $critChance = (int) $char['crit'];
             $crit = random_int(1, 100) <= $critChance;
-            $dmg = max(1, (int) round($atk * (0.9 + mt_rand(0, 40) / 100) - (int) $mob['p_def'] * 0.4));
+            $dRaw = $atk * (0.9 + mt_rand(0, 40) / 100);
+            $dReduction = min(0.55, (int) $mob['p_def'] * 0.012);
+            $dmg = max(1, (int) round($dRaw * (1 - $dReduction)));
             if ($crit) {
                 $dmg = (int) round($dmg * 1.7);
             }
@@ -180,7 +219,13 @@ final class GameService
             } else {
                 // --- ответ монстра
                 $mAtk = (int) $mob['p_atk'];
-                $mDmg = max(1, (int) round($mAtk * (0.85 + mt_rand(0, 30) / 100) - (int) $char['p_def'] * 0.45));
+                // БАЛАНС: раньше защита вычиталась целиком, и при def 22 любой
+                // моб с atk <= 9 наносил ровно 1 урона — первые два уровня были
+                // безрисковыми, зелья не нужны. Теперь защита срезает процент:
+                // не более 60 % урона, поэтому слабый моб всё равно кусается.
+                $mRaw = $mAtk * (0.85 + mt_rand(0, 30) / 100);
+                $mReduction = min(0.6, (int) $char['p_def'] * 0.012);
+                $mDmg = max(1, (int) round($mRaw * (1 - $mReduction)));
                 $charHp = max(0, (int) $char['hp'] - $mDmg);
                 $log[] = ['t' => 'mob', 'turn' => $turn, 'dmg' => $mDmg, 'target_hp' => $charHp];
                 Database::update('characters', ['hp' => $charHp], 'id = ?', [(int) $char['id']]);
