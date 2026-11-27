@@ -487,3 +487,38 @@ Database::exec('UPDATE battles SET updated_at = ? WHERE id = ?',
 $freeStale = true;
 try { $gameT->startBattle($cidB, 2); } catch (Throwable $e) { $freeStale = false; }
 $dbg('T38 брошенный бой не держит моба: ' . ($freeStale ? 'OK' : 'БАГ: моб занят вечно'));
+
+// --- ТЕСТ 39: большие суммы адены не обрезаются (PHP_INT_MAX = 2^31-1)
+$bigAcc = Migrator::createAccount('bigmoney', 'Str0ngPass!1');
+$bigCid = Migrator::createCharacter($bigAcc, 'bigmoney', 'human', 'fighter', 'm');
+Migrator::giveStarterKit($bigCid);
+Database::update('characters', ['adena' => 9000000000], 'id = ?', [$bigCid]);
+$bigChar = $game->requireChar($bigCid);
+$dbg('T39 requireChar 9e9: ' . var_export($bigChar['adena'], true) . ' -> '
+    . ($bigChar['adena'] == 9000000000 ? 'OK' : 'БАГ: обрезано до ' . (int) $bigChar['adena']));
+$bigShop = new ShopService();
+$bigBuy = $bigShop->buy($bigCid, 'hp_potion', 99);
+$dbg('T39 после покупки: ' . var_export($bigBuy['adena'], true) . ' -> '
+    . ($bigBuy['adena'] == 9000000000 - 44550 ? 'OK' : 'БАГ'));
+$bigJson = json_encode(['adena' => $bigBuy['adena']]);
+$dbg('T39 JSON: ' . $bigJson . ' -> ' . (str_contains($bigJson, '8999955450') ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 40: мёртвый персонаж не ходит
+$deadAcc = Migrator::createAccount('deadwalker', 'Str0ngPass!1');
+$deadCid = Migrator::createCharacter($deadAcc, 'deadwalker', 'human', 'fighter', 'm');
+Database::update('characters', ['hp' => 0, 'x' => 100, 'y' => 100], 'id = ?', [$deadCid]);
+$moved = true;
+try { $game->move($deadCid, 500, 300, 'Giran'); } catch (Throwable $e) { $moved = false; }
+$pos = Database::one('SELECT x, y FROM characters WHERE id = ?', [$deadCid]);
+$dbg('T40 move мёртвого: ' . ($moved ? 'БАГ: сдвинулся в (' . $pos['x'] . ',' . $pos['y'] . ')' : 'отказ -> OK'));
+
+// --- ТЕСТ 41: канал all не показывает system
+Database::exec('DELETE FROM chat_messages');
+$chatT = new ChatService();
+$someChar = (int) Database::value('SELECT id FROM characters LIMIT 1');
+Database::insert('chat_messages', ['channel' => 'system', 'char_id' => $someChar, 'author' => 'Система', 'text' => 'служебное', 'created_at' => date('Y-m-d H:i:s')]);
+Database::insert('chat_messages', ['channel' => 'global', 'char_id' => $someChar, 'author' => 'Игрок', 'text' => 'обычное', 'created_at' => date('Y-m-d H:i:s')]);
+$all = $chatT->list('all', 0);
+$channels = array_map(fn ($m) => $m['channel'], $all);
+$dbg('T41 all: каналы=' . implode(',', $channels) . ' -> '
+    . (!in_array('system', $channels, true) && in_array('global', $channels, true) ? 'OK' : 'БАГ'));

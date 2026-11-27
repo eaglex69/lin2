@@ -423,8 +423,9 @@ final class GameService
     /** @return array{exp:int,adena:int,levelup:bool,level:int} */
     private function applyRewards(array $char, array $mob): array
     {
-        $exp = (int) $char['exp'] + (int) $mob['exp_reward'];
-        $adena = (int) $char['adena'] + (int) $mob['adena_reward'];
+        // та же причина, что и в requireChar: (int) от больших сумм врёт
+        $exp = (float) $char['exp'] + (int) $mob['exp_reward'];
+        $adena = (float) $char['adena'] + (int) $mob['adena_reward'];
         $level = (int) $char['level'];
         $levelup = false;
 
@@ -527,7 +528,7 @@ final class GameService
         } else {
             $cost = self::RESURRECT_COST;
         }
-        if ($cost > 0 && (int) $char['adena'] < $cost) {
+        if ($cost > 0 && (float) $char['adena'] < $cost) {
             throw new \InvalidArgumentException(
                 $dead
                     ? 'Не хватает адены на реанимацию (нужно ' . self::RESURRECT_COST . '). Продайте предмет из инвентаря.'
@@ -537,13 +538,20 @@ final class GameService
         Database::update('characters', [
             'hp' => (int) $char['hp_max'],
             'mp' => (int) $char['mp_max'],
-            'adena' => (int) $char['adena'] - $cost,
+            'adena' => (float) $char['adena'] - $cost,
         ], 'id = ?', [$charId]);
         return ['cost' => $cost, 'char' => $this->requireChar($charId)];
     }
 
     public function move(int $charId, int $x, int $y, string $city): array
     {
+        // БАГ: мёртвый персонаж свободно ходил по карте. Единственное действие,
+        // которое не проверяло HP (атака, зелья, экипировка проверяли).
+        // Мёртвый должен сначала реанимироваться в городе.
+        $char = $this->requireChar($charId);
+        if ((int) $char['hp'] <= 0) {
+            throw new \InvalidArgumentException('Персонаж мёртв — нужна реанимация в городе.');
+        }
         // Клиент шлёт координаты из canvas; отрицательные и огромные — обрезаем.
         // БАГ: мусор в теле запроса ("x":"abc", "x":[], null) превращался в 0,
         // и персонаж молча телепортировался в левый верхний угол карты.
@@ -581,8 +589,17 @@ final class GameService
             throw new \InvalidArgumentException('Персонаж не найден.');
         }
         $char = $this->applyRegen($char);
-        foreach (['id', 'level', 'exp', 'hp', 'hp_max', 'mp', 'mp_max', 'p_atk', 'm_atk', 'p_def', 'm_def', 'crit', 'adena', 'wins', 'losses', 'x', 'y'] as $k) {
+        foreach (['id', 'level', 'hp', 'hp_max', 'mp', 'mp_max', 'p_atk', 'm_atk', 'p_def', 'm_def', 'crit', 'wins', 'losses', 'x', 'y'] as $k) {
             $char[$k] = (int) $char[$k];
+        }
+        // БАГ: adena/exp кастовались в int, а PHP_INT_SIZE здесь 4 (32 бита):
+        // 9 000 000 000 превращалось в 2 147 483 647, и вся арифметика шла
+        // по обрезанному значению. Обратный каст после round() тоже врёт
+        // (410 065 408), поэтому оставляем double — он держит 53 бита точно,
+        // чего с запасом хватает для адены, а json_encode пишет его без
+        // дробной части.
+        foreach (['adena', 'exp'] as $k) {
+            $char[$k] = round((float) $char[$k]);
         }
         return $char;
     }

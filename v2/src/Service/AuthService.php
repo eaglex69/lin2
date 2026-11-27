@@ -338,11 +338,19 @@ final class AuthService
     /** Приводим типы и добавляем производные поля для JSON API. */
     public function decorate(array $c): array
     {
-        foreach (['id', 'account_id', 'level', 'exp', 'hp', 'hp_max', 'mp', 'mp_max',
-                  'p_atk', 'm_atk', 'p_def', 'm_def', 'crit', 'adena', 'x', 'y',
+        foreach (['id', 'account_id', 'level', 'hp', 'hp_max', 'mp', 'mp_max',
+                  'p_atk', 'm_atk', 'p_def', 'm_def', 'crit', 'x', 'y',
                   'wins', 'losses', 'pvp'] as $k) {
             if (isset($c[$k])) {
                 $c[$k] = (int) $c[$k];
+            }
+        }
+        // БАГ: adena и exp кастовались в int, а PHP_INT_SIZE здесь 4 (32 бита).
+        // Сумма 9 000 000 000 превращалась в 2 147 483 647 и такой же
+        // показывалась в HUD. Оставляем double (53 бита точно).
+        foreach (['adena', 'exp'] as $k) {
+            if (isset($c[$k])) {
+                $c[$k] = round((float) $c[$k]);
             }
         }
         $c['exp_next'] = ExpTable::totalFor((int) $c['level'] + 1);

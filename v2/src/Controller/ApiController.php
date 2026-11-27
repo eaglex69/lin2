@@ -231,13 +231,17 @@ final class ApiController
                 return Response::error('Нужны числовые координаты x и y.', 422, 'bad_move');
             }
         }
-        $res = $this->game->move(
-            (int) $char['id'],
-            $req->intInput('x'),
-            $req->intInput('y'),
-            $req->str('city', 'Giran')
-        );
-        return Response::ok($res);
+        try {
+            $res = $this->game->move(
+                (int) $char['id'],
+                $req->intInput('x'),
+                $req->intInput('y'),
+                $req->str('city', 'Giran')
+            );
+            return Response::ok($res);
+        } catch (\InvalidArgumentException $e) {
+            return Response::error($e->getMessage(), 409, 'move_failed');
+        }
     }
 
     public function heal(Request $req): Response

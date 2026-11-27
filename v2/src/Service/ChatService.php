@@ -13,6 +13,9 @@ final class ChatService
 {
     public const CHANNELS = ['global', 'trade', 'clan', 'system'];
 
+    /** Каналы, которые попадают в общий поток (без служебного system). */
+    public const PUBLIC_CHANNELS = ['global', 'trade', 'clan'];
+
     /** Максимальная длина сообщения в символах. */
     private const MAX_LEN = 240;
 
@@ -135,9 +138,15 @@ final class ChatService
         $limit = max(1, min(100, $limit));
 
         if ($channel === 'all') {
+            // БАГ: канал all отдавал вообще всё, включая system. Служебные
+            // записи (объявления сервера, события) не должны всплывать в общем
+            // потоке — иначе игрок видит админские сообщения и путает их с
+            // обычными. Отдаём только игровые каналы.
+            $public = self::PUBLIC_CHANNELS;
+            $in = implode(',', array_fill(0, count($public), '?'));
             $rows = Database::all(
-                "SELECT * FROM {$t} WHERE id > ? ORDER BY id DESC LIMIT {$limit}",
-                [$afterId]
+                "SELECT * FROM {$t} WHERE id > ? AND channel IN ({$in}) ORDER BY id DESC LIMIT {$limit}",
+                array_merge([$afterId], $public)
             );
         } else {
             $rows = Database::all(
