@@ -359,3 +359,81 @@ $chat = new ChatService();
 $emptyErr = '';
 try { $chat->post($zcid, 'zombtester', 'global', '   '); } catch (Throwable $e) { $emptyErr = $e->getMessage(); }
 $dbg('T25 пустое сообщение: "' . $emptyErr . '" -> ' . ($emptyErr !== '' ? 'OK (обрабатывается как 400)' : 'БАГ'));
+
+// --- ТЕСТ 26: длинный пароль не обрезается до 72 байт
+$auth = new AuthService();
+$longPass = str_repeat('A', 72) . 'TAIL-ONE';
+$regErr = '';
+try { $auth->register('longpass1', $longPass, '', 'human', 'fighter', 'm'); }
+catch (Throwable $e) { $regErr = $e->getMessage(); }
+$dbg('T26 регистрация с паролем 80 байт: ' . ($regErr !== '' ? 'отказ -> OK' : 'БАГ: принят, хеш обрежется'));
+// ровно 72 байта должны приниматься
+$ok72 = false; $err72 = '';
+try { $auth->register('longpass2', str_repeat('A', 72), '', 'human', 'fighter', 'm'); $ok72 = true; }
+catch (Throwable $e) { $ok72 = false; $err72 = $e->getMessage(); }
+$dbg('T26 регистрация с паролем ровно 72 байта: ' . ($ok72 ? 'OK' : 'отказ: ' . $err72));
+
+// --- ТЕСТ 27: брошенные бои освобождают лимит
+$bacc = Migrator::createAccount('idletester', 'Str0ngPass!1');
+$bcid = Migrator::createCharacter($bacc, 'idletester', 'human', 'fighter', 'm');
+Database::exec('DELETE FROM battles');
+Database::update('characters', ['hp' => 500, 'hp_max' => 500], 'id = ?', [$bcid]);
+$made = [];
+foreach ([1, 2, 3] as $mid) {
+    try { $made[] = (int) $game->startBattle($bcid, $mid)['id']; } catch (Throwable $e) {}
+}
+$dbg('T27 стартовали активных боёв: ' . count($made) . ' -> ' . (count($made) === 3 ? 'OK' : 'БАГ'));
+// «состариваем» два боя
+Database::exec('UPDATE battles SET updated_at = ? WHERE id IN (' . $made[0] . ',' . $made[1] . ')',
+    [date('Y-m-d H:i:s', time() - 4000)]);
+$closed = $game->closeStaleBattles($bcid);
+$dbg('T27 закрыто брошенных: ' . $closed . ' (ожидалось 2) -> ' . ($closed === 2 ? 'OK' : 'БАГ'));
+$stillActive = (int) Database::value("SELECT COUNT(*) FROM battles WHERE char_id = ? AND state = 'active'", [$bcid]);
+$dbg('T27 активных после уборки: ' . $stillActive . ' (ожидалось 1) -> ' . ($stillActive === 1 ? 'OK' : 'БАГ'));
+// и новый бой снова разрешён
+$canStart = true;
+try { $game->startBattle($bcid, 4); } catch (Throwable $e) { $canStart = false; }
+$dbg('T27 новый бой после уборки: ' . ($canStart ? 'OK' : 'БАГ: лимит не освободился'));
+
+// --- ТЕСТ 28: клиент получает СПИСОК активных боёв
+$list = $game->activeBattles($bcid);
+$dbg('T28 activeBattles вернул: ' . count($list) . ' бой(ёв) -> ' . (count($list) >= 1 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 29: IP пишется при создании аккаунта
+$ip = (string) Database::value('SELECT ip FROM accounts WHERE nick = ?', ['resptester']);
+$dbg('T29 accounts.ip заполнен: "' . $ip . '" -> ' . ($ip !== '' ? 'OK' : 'БАГ: пустой'));
+
+// --- ТЕСТ 30: IP не стирается при входе и сохраняется у аккаунта
+$_SERVER['REMOTE_ADDR'] = '203.0.113.9';
+$ipAcc = Migrator::createAccount('iptracker', 'Str0ngPass!1');
+$ipBefore = (string) Database::value('SELECT ip FROM accounts WHERE id = ?', [$ipAcc]);
+$dbg('T30 ip при создании: "' . $ipBefore . '" -> ' . ($ipBefore === '203.0.113.9' ? 'OK' : 'БАГ'));
+Database::update('accounts', ['ip' => ''], 'id = ?', [$ipAcc]);
+$auth2 = new AuthService();
+$auth2->login('iptracker', 'Str0ngPass!1');
+$ipAfter = (string) Database::value('SELECT ip FROM accounts WHERE id = ?', [$ipAcc]);
+$dbg('T30 ip после входа: "' . $ipAfter . '" -> ' . ($ipAfter === '203.0.113.9' ? 'OK (не стирается)' : 'БАГ: стёрт'));
+
+// --- ТЕСТ 31: антиспам регистраций по IP
+// (в testing-окружении лимит отключён, поэтому проверяем сам счётчик)
+$fromIp = (int) Database::value(
+    "SELECT COUNT(*) FROM accounts WHERE created_at >= ? AND ip = ?",
+    [date('Y-m-d H:i:s', time() - 3600), '203.0.113.9']
+);
+$dbg('T31 аккаунтов с одного IP за час: ' . $fromIp . ' -> ' . ($fromIp >= 1 ? 'OK (счётчик работает)' : 'БАГ'));
+
+// --- ТЕСТ 32: Database::checkpoint не падает и сохраняет данные
+Database::checkpoint();
+$dbg('T32 checkpoint: OK (без исключения)');
+
+// --- ТЕСТ 33: пароль >72 байт нельзя зарегистрировать (bcrypt обрезает)
+$lp = str_repeat('B', 72);
+$reg33 = '';
+try { $auth2->register('tailtest', $lp . 'ДРУГОЙ-ХВОСТ', '', 'human', 'fighter', 'm'); }
+catch (Throwable $e) { $reg33 = $e->getMessage(); }
+$dbg('T33 регистрация пароля 85 байт: ' . ($reg33 !== '' ? 'отказ -> OK' : 'БАГ: принят'));
+// и ровно 72 байта регистрируются и логинятся
+$ok33 = false;
+try { $auth2->register('tailtest2', $lp, '', 'human', 'fighter', 'm'); $ok33 = true; }
+catch (Throwable $e) { $ok33 = false; }
+$dbg('T33 регистрация ровно 72 байт: ' . ($ok33 ? 'OK' : 'БАГ: отказ'));

@@ -140,6 +140,22 @@ final class Request
         return (string) ($this->server[$key] ?? '');
     }
 
+    /**
+     * IP текущего запроса без создания объекта Request.
+     *
+     * Нужен сервисам (антиспам регистрации), которые не получают Request:
+     * `new Request('GET','/')` всегда давал бы 127.0.0.1 и один общий лимит
+     * на всех.
+     */
+    public static function currentIp(): string
+    {
+        $fwd = (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
+        if ($fwd !== '') {
+            return trim(explode(',', $fwd)[0]);
+        }
+        return (string) ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+    }
+
     public function ip(): string
     {
         $fwd = $this->header('X-Forwarded-For');

@@ -132,13 +132,18 @@ function serialized(fn) {
 
 /** Переносит SQLite-файл из ФС PHP на диск и обратно (персистентность). */
 const DB_DISK = path.join(V2, 'var', 'miniage.sqlite');
+let pullErrors = 0;
 async function pullDb() {
   try {
     const bytes = await php.readFile('/var/miniage.sqlite');
     if (!bytes || !bytes.length) return;
     fs.mkdirSync(path.dirname(DB_DISK), { recursive: true });
     fs.writeFileSync(DB_DISK, Buffer.from(bytes));
-  } catch { /* файла ещё нет */ }
+  } catch (e) {
+    // Раньше ошибка молча глоталась: изменения оставались только в памяти
+    // php-wasm и терялись при рестарте. Теперь хотя бы видно в логе.
+    if (pullErrors++ < 5) console.error('[pullDb]', e && e.message ? e.message : e);
+  }
 }
 async function pushDb() {
   try {
@@ -226,6 +231,8 @@ chdir('/v2/public');
 require '/v2/public/index.php';
 $__html = ob_get_clean();
 $__status = http_response_code() ?: 200;
+// WAL -> основной файл, иначе pullDb() сохранит снимок без последних коммитов
+try { \App\Core\Database::checkpoint(); } catch (Throwable $e) {}
 echo "\n@@MINIAGE_RESPONSE@@";
 echo base64_encode(json_encode([
   'status' => $__status,

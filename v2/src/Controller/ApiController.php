@@ -202,7 +202,13 @@ final class ApiController
         if ($char instanceof Response) {
             return $char;
         }
-        return Response::ok(['battle' => $this->game->activeBattle((int) $char['id']), 'character' => $char]);
+        // battle — последний активный бой (обратная совместимость),
+        // battles — все активные, чтобы клиент не «терял» брошенные бои.
+        return Response::ok([
+            'battle' => $this->game->activeBattle((int) $char['id']),
+            'battles' => $this->game->activeBattles((int) $char['id']),
+            'character' => $char,
+        ]);
     }
 
     public function move(Request $req): Response
@@ -406,6 +412,8 @@ final class ApiController
             'db' => Database::driver(),
             'wasm' => defined('MINIAGE_WASM'),
             'time' => date('c'),
+            // для диагностики антиспама: какой адрес видит PHP
+            'ip' => Request::currentIp(),
         ]);
     }
 

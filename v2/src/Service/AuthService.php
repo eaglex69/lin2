@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Core\Config;
 use App\Core\Database;
 use App\Core\Migrator;
 use App\Core\Session;
@@ -39,6 +40,15 @@ final class AuthService
         if ($passLen > 200) {
             throw new \InvalidArgumentException('Пароль слишком длинный (максимум 200 символов).');
         }
+        // bcrypt обрезает пароль на 72 байтах: «AAA…(75)» и «AAA…(80)» дали бы
+        // одинаковый хеш и вход по чужому паролю. Кириллица — 2 байта на символ,
+        // поэтому 200 символов легко перерастают 72 байта.
+        $algo = (string) (password_get_info(password_hash('probe', PASSWORD_DEFAULT))['algoName'] ?? '');
+        if (strlen($pass) > self::passwordBytes($algo)) {
+            throw new \InvalidArgumentException(
+                'Пароль слишком длинный: для этого алгоритма максимум ' . self::passwordBytes($algo) . ' байт.'
+            );
+        }
         // не даём регистрировать очевидно слабые пароли
         if (preg_match('/^(?:pass|password|1234567|qwerty|letmein|admin|demo|1111)/i', $pass)) {
             throw new \InvalidArgumentException('Пароль слишком простой.');
@@ -74,6 +84,11 @@ final class AuthService
             throw new \InvalidArgumentException('Такой персонаж уже существует.');
         }
 
+        // Антиспам: регистрация не требует пароля для проверки, поэтому
+        // скрипт мог за минуту создать тысячи аккаунтов (каждый — argon2id,
+        // ~50 мс CPU в проде). Ограничиваем по IP и общим суточным числом.
+        $this->assertCanRegister();
+
         return Database::transaction(function () use ($nick, $pass, $email, $race, $class, $gender) {
             $accountId = Migrator::createAccount($nick, $pass, $email);
             $charId = Migrator::createCharacter($accountId, $nick, $race, $class, $gender);
@@ -86,6 +101,22 @@ final class AuthService
 
     /** Порог и окно блокировки подбора пароля. */
     private const LOGIN_MAX_ATTEMPTS = 5;
+
+    /**
+     * Сколько байт пароля реально участвует в хеше.
+     *
+     * БАГ: password_hash() по умолчанию bcrypt молча обрезает пароль на 72
+     * байтах. Регистрация с длинным паролем («A…» 79 символов) проходила, но
+     * вход принимал ЛЮБОЙ пароль с теми же первыми 72 байтами — проверено
+     * вживую: пароль с другим хвостом после 72-го байта пускал в аккаунт.
+     * Теперь, если алгоритм не поддерживает длинные пароли, отказываем в
+     * регистрации вместо тихой обрезки.
+     */
+    public static function passwordBytes(string $algo): int
+    {
+        return str_contains($algo, 'bcrypt') ? 72 : 4096;
+    }
+
     private const LOGIN_WINDOW_SEC = 300;
     private const LOGIN_BLOCK_SEC = 600;
 
@@ -123,14 +154,21 @@ final class AuthService
 
         $this->clearFailedLogins($nick);
 
-        // обновляем хеш при смене алгоритма PHP
-        if (password_needs_rehash((string) $acc['pass_hash'], PASSWORD_DEFAULT)) {
+        // Обновляем хеш при смене алгоритма PHP. Только если пароль целиком
+        // попадает в лимит алгоритма: иначе перехеширование молча обрезало бы
+        // его, и старый (полный) пароль перестал бы подходить.
+        $rehashAlgo = (string) (password_get_info(password_hash('probe', PASSWORD_DEFAULT))['algoName'] ?? '');
+        if (password_needs_rehash((string) $acc['pass_hash'], PASSWORD_DEFAULT)
+            && strlen($pass) <= self::passwordBytes($rehashAlgo)) {
             Database::update('accounts', ['pass_hash' => password_hash($pass, PASSWORD_DEFAULT)], 'id = ?', [(int) $acc['id']]);
         }
 
+        // БАГ: при каждом входе ip обнулялся ('ip' => ''), поэтому после
+        // регистрации (она сразу логинит) адрес оказывался пустым, а антиспам
+        // регистраций по IP не мог ничего посчитать. Пишем настоящий адрес.
         Database::update('accounts', [
             'last_login' => date('Y-m-d H:i:s'),
-            'ip' => '',
+            'ip' => \App\Core\Request::currentIp(),
         ], 'id = ?', [(int) $acc['id']]);
 
         Session::regenerate();
@@ -165,6 +203,39 @@ final class AuthService
         if ($until > time()) {
             $wait = (int) ceil(($until - time()) / 60);
             throw new \InvalidArgumentException("Слишком много попыток. Повторите через {$wait} мин.");
+        }
+    }
+
+    /** Порог и окно антиспама регистрации. */
+    private const REGISTER_MAX_PER_IP = 5;
+    private const REGISTER_WINDOW_SEC = 3600;
+    private const REGISTER_MAX_TOTAL_PER_DAY = 300;
+
+    /**
+     * Ограничение регистраций: 5 в час с одного IP и 300 в сутки всего.
+     * @throws \InvalidArgumentException
+     */
+    private function assertCanRegister(): void
+    {
+        // в тестах лимит отключён: харнесс создаёт десятки аккаунтов подряд
+        if (Config::get('APP_ENV') === 'testing') {
+            return;
+        }
+        $t = Database::table('accounts');
+        $dayAgo = date('Y-m-d H:i:s', time() - 86400);
+        $total = (int) Database::value("SELECT COUNT(*) FROM {$t} WHERE created_at >= ?", [$dayAgo]);
+        if ($total >= self::REGISTER_MAX_TOTAL_PER_DAY) {
+            throw new \InvalidArgumentException('Регистрация временно недоступна: слишком много новых аккаунтов за сутки.');
+        }
+
+        $ip = \App\Core\Request::currentIp();
+        $hourAgo = date('Y-m-d H:i:s', time() - self::REGISTER_WINDOW_SEC);
+        $fromIp = (int) Database::value(
+            "SELECT COUNT(*) FROM {$t} WHERE created_at >= ? AND ip = ?",
+            [$hourAgo, $ip]
+        );
+        if ($fromIp >= self::REGISTER_MAX_PER_IP) {
+            throw new \InvalidArgumentException('Слишком много регистраций с этого адреса. Попробуйте позже.');
         }
     }
 

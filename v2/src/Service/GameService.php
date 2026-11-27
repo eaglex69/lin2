@@ -19,6 +19,17 @@ final class GameService
     /** Цена реанимации мёртвого персонажа. */
     private const RESURRECT_COST = 500;
 
+    /**
+     * Через сколько секунд бездействия бой считается брошенным.
+     *
+     * БАГ: лимит в 3 активных боя не освобождался. Клиент при входе
+     * восстанавливает только ОДИН последний бой (battle/current → ORDER BY id
+     * DESC LIMIT 1), поэтому два брошенных висели вечно, и игрок больше не мог
+     * начать ни одного боя: «Слишком много активных боёв». Проверено вживую.
+     * Теперь такие бои закрываются как «fled» — без награды и без штрафа.
+     */
+    private const BATTLE_IDLE_SEC = 1800;
+
     public const ZONES = [
         'Giran' => ['label' => 'Окрестности Гирана', 'min_level' => 1, 'color' => '#2e4a2e'],
         'DeathPass' => ['label' => 'Перевал Смерти', 'min_level' => 5, 'color' => '#3a2f2a'],
@@ -100,6 +111,33 @@ final class GameService
     }
 
     /**
+     * Закрывает бои, в которых игрок не делал хода дольше BATTLE_IDLE_SEC.
+     * Награды нет, поражение не засчитывается.
+     */
+    public function closeStaleBattles(int $charId): int
+    {
+        $bt = Database::table('battles');
+        $cutoff = date('Y-m-d H:i:s', time() - self::BATTLE_IDLE_SEC);
+        $stale = Database::all(
+            "SELECT id FROM {$bt} WHERE char_id = ? AND state = 'active' AND updated_at < ?",
+            [$charId, $cutoff]
+        );
+        foreach ($stale as $row) {
+            $log = json_decode((string) Database::value(
+                "SELECT log_json FROM {$bt} WHERE id = ?",
+                [(int) $row['id']]
+            ), true) ?: [];
+            $log[] = ['t' => 'system', 'turn' => 0, 'text' => 'Бой прерван: вы слишком долго не сражались.'];
+            Database::update('battles', [
+                'state' => 'fled',
+                'log_json' => json_encode($log, JSON_UNESCAPED_UNICODE),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ], 'id = ?', [(int) $row['id']]);
+        }
+        return count($stale);
+    }
+
+    /**
      * Блокировка строки при SELECT внутри транзакции (MySQL).
      *
      * В SQLite нет SELECT ... FOR UPDATE: файловая блокировка там и так
@@ -154,6 +192,10 @@ final class GameService
         }
 
         $bt = Database::table('battles');
+        // сначала закрываем брошенные бои: иначе лимит съедают бои, к которым
+        // клиент уже не может вернуться (восстанавливается только последний)
+        $this->closeStaleBattles($charId);
+
         // не даём держать десятки параллельных боёв (спам запросами)
         $activeCnt = (int) Database::value(
             "SELECT COUNT(*) FROM {$bt} WHERE char_id = ? AND state = 'active'",
@@ -393,6 +435,17 @@ final class GameService
             'mob_hp' => (int) $battle['mob_hp'],
             'log' => $log,
         ];
+    }
+
+    /** Все активные бои персонажа (клиент мог «потерять» часть из них). */
+    public function activeBattles(int $charId): array
+    {
+        $bt = Database::table('battles');
+        $rows = Database::all(
+            "SELECT * FROM {$bt} WHERE char_id = ? AND state = 'active' ORDER BY id",
+            [$charId]
+        );
+        return array_map(fn (array $r) => $this->battleState($r), $rows);
     }
 
     public function activeBattle(int $charId): ?array

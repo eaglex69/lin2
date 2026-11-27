@@ -193,6 +193,27 @@ final class Database
         }
     }
 
+    /**
+     * Сбрасывает WAL в основной файл БД (только SQLite).
+     *
+     * В режиме WAL свежие коммиты живут в файле -wal, а основной файл
+     * обновляется при закрытии соединения/чекпоинте. Preview-мост читает
+     * основной файл, чтобы сохранить его на диск, поэтому без явного
+     * чекпоинта последние изменения (регистрация, бой) не попадали в
+     * снимок и терялись при рестарте сервера.
+     */
+    public static function checkpoint(): void
+    {
+        if (self::$pdo === null || self::$driver !== 'sqlite') {
+            return;
+        }
+        try {
+            self::$pdo->exec('PRAGMA wal_checkpoint(TRUNCATE)');
+        } catch (\Throwable $e) {
+            error_log('[miniage] checkpoint: ' . $e->getMessage());
+        }
+    }
+
     /** NOW() одинаково в MySQL и SQLite — возвращает SQL-выражение текущего времени. */
     public static function nowExpr(): string
     {

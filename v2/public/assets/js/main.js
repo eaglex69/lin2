@@ -129,10 +129,16 @@ async function enterGame() {
   const city = state.char.city && state.zones.find((z) => z.key === state.char.city) ? state.char.city : 'Giran';
   await loadZone(city);
 
-  // восстановить бой, если он был
+  // восстановить бой, если он был. БАГ: открывался только последний бой, а
+  // остальные (до 3 активных) оставались «невидимыми» и вечно занимали лимит.
+  // Теперь в HUD показываем, если боёв несколько, и подсказываем, как их закрыть.
   try {
     const cur = await api.battleCurrent();
-    if (cur.battle) openBattle(cur.battle);
+    const list = cur.battles && cur.battles.length ? cur.battles : (cur.battle ? [cur.battle] : []);
+    if (list.length) openBattle(list[list.length - 1]);
+    if (list.length > 1) {
+      toast(`Незавершённых боёв: ${list.length}. Откройте карту и завершите их.`, 'warn');
+    }
   } catch { /* не критично */ }
 
   const urlPanel = new URLSearchParams(location.search).get('panel');

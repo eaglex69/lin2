@@ -322,6 +322,10 @@ final class Migrator
             'pass_hash' => password_hash($pass, PASSWORD_DEFAULT),
             'email' => $email,
             'role' => $role,
+            // БАГ: ip не заполнялся вовсе, поэтому антиспам регистраций по IP
+            // и журнал входа были пустыми (AuthService::login только чистил
+            // поле на 'ip' => '').
+            'ip' => \App\Core\Request::currentIp(),
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }
