@@ -11,7 +11,18 @@ declare(strict_types=1);
  */
 
 defined('MINIAGE_START') || define('MINIAGE_START', microtime(true));
-defined('MINIAGE_ROOT') || define('MINIAGE_ROOT', dirname(__DIR__));
+// Корень приложения: папка с src/, db/, var/.
+//
+// Поддерживаются обе раскладки, в которые игра ставится:
+//   * вложенная — файлы в public/, приложение на уровень выше (репозиторий);
+//   * плоская   — все файлы в одном каталоге (хостинг, куда архив кладут в
+//                 public_html целиком). Тогда корень — этот же каталог.
+// install.php и preview-мост задают MINIAGE_ROOT сами, поэтому проверяем
+// defined() первым.
+defined('MINIAGE_ROOT') || define(
+    'MINIAGE_ROOT',
+    is_dir(dirname(__DIR__) . '/src') ? dirname(__DIR__) : __DIR__
+);
 
 // --- автозагрузка PSR-4: App\ -> src/
 if (!isset($GLOBALS['__miniage_autoload_registered'])) {

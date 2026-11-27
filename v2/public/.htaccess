@@ -30,6 +30,22 @@ Options -Indexes
 </IfModule>
 
 # не отдавать служебные файлы
-<FilesMatch "\.(sql|md|env|log|sqlite)$">
-    Require all denied
+<FilesMatch "(^\.env|\.sql$|\.md$|\.log$|\.sqlite|\.sqlite3|\.db$|\.ini$|\.bak$|\.tmp$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
+
+# пример конфигурации — не секрет
+<Files ".env.example">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+</Files>
+
+# каталог служебных данных (SQLite, отметка установки) — наружу нельзя
+RedirectMatch 403 ^/var/.*$

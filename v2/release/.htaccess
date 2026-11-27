@@ -1,0 +1,74 @@
+# Miniage v2 — корневой .htaccess (плоская установка: все файлы в public_html)
+#
+# Если хостинг не поддерживает mod_rewrite, игра всё равно работает по прямым
+# ссылкам вида index.php?panel=map, но «красивые» адреса /api/... не появятся.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Если игра лежит в подкаталоге, раскомментируйте и поправьте:
+    # RewriteBase /miniage/
+
+    # существующие файлы и каталоги отдаём напрямую (assets, favicon, install.php)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # всё остальное — на фронт-контроллер
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# ---------------------------------------------------------------- безопасность
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "same-origin"
+</IfModule>
+
+Options -Indexes
+
+# Не отдавать наружу конфигурацию, базу, логи, исходники и служебные файлы.
+# .env и var/ лежат в том же каталоге, что и index.php, поэтому без этих
+# правил их можно было бы скачать по прямой ссылке.
+<FilesMatch "(^\.env|\.env$|\.env\.|\.sql$|\.md$|\.log$|\.sqlite|\.sqlite3|\.db$|\.ini$|\.bak$|\.orig$|\.tmp$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# .env.example можно отдавать, это не секрет
+<Files ".env.example">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
+</Files>
+
+# Каталог var/ (SQLite и отметка установки) — закрыть целиком
+<IfModule mod_rewrite.c>
+    RewriteRule ^var/ - [F,L]
+</IfModule>
+RedirectMatch 403 ^/var/.*$
+
+# ------------------------------------------------------------------ кэш статики
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType text/javascript "access plus 7 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+</IfModule>
+
+# --------------------------------------------------------------- кодировка/типы
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+    AddType image/svg+xml .svg
+    AddType application/javascript .js
+</IfModule>

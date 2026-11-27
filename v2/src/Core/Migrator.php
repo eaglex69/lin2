@@ -20,7 +20,7 @@ final class Migrator
 
         $sql = (string) file_get_contents($file);
         foreach (self::splitStatements($sql) as $stmt) {
-            Database::pdo()->exec($stmt);
+            Database::pdo()->exec(self::applyPrefix($stmt));
         }
 
         self::upgrade();
@@ -122,6 +122,32 @@ final class Migrator
             Database::pdo()->exec("UPDATE {$bt} SET won_at = updated_at WHERE state = 'won' AND won_at IS NULL");
             error_log('[miniage] миграция: добавлена колонка battles.won_at');
         }
+    }
+
+    /**
+     * Подставляет префикс таблиц в SQL из схемы.
+     *
+     * DB_PREFIX существовал в конфиге, но схема его не учитывала: с
+     * непустым префиксом миграция создавала таблицы без него, а весь код
+     * (Database::table) искал таблицы с префиксом — установка на хостинг,
+     * где в базе уже живут другие таблицы, ломалась на первом же запросе.
+     *
+     * Имена таблиц в схеме пишутся «голыми» после CREATE TABLE/INDEX и
+     * упоминаются только там, поэтому аккуратно правим эти конструкции.
+     */
+    private static function applyPrefix(string $stmt): string
+    {
+        $prefix = (string) Config::get('DB_PREFIX', '');
+        if ($prefix === '' || preg_match('/^[A-Za-z0-9_]{1,12}$/', $prefix) !== 1) {
+            return $stmt;
+        }
+        $q = Database::driver() === 'mysql' ? '`' : '"';
+        return (string) preg_replace(
+            '/\b(CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?|CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?)'
+            . '([' . $q . ']?)([A-Za-z_][A-Za-z0-9_]*)\2/i',
+            '$1$2' . $prefix . '$3$2',
+            $stmt
+        );
     }
 
     /**

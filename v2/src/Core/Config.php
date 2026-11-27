@@ -102,6 +102,15 @@ final class Config
             }
         }
 
+        // Относительный путь к SQLite (var/miniage.sqlite из установщика)
+        // раскрываем от корня приложения: иначе он зависел бы от текущей
+        // рабочей директории процесса (а у PHP-FPM/моста она разная).
+        $sqlitePath = self::$values['DB_SQLITE_PATH'] ?? '';
+        $isAbsolute = $sqlitePath !== '' && ($sqlitePath[0] === '/' || preg_match('#^[A-Za-z]:[\\/]#', $sqlitePath) === 1);
+        if ($sqlitePath !== '' && !$isAbsolute) {
+            self::$values['DB_SQLITE_PATH'] = rtrim($root, '/') . '/' . $sqlitePath;
+        }
+
         date_default_timezone_set(self::get('TIMEZONE', 'UTC'));
     }
 

@@ -94,6 +94,28 @@ final class Router
             return $result instanceof Response ? $result : new Response((string) $result);
         }
 
+        // Установщик: исполняем, а не отдаём исходником.
+        //
+        // БАГ: /install.php уходил в статику (в плоской раскладке он лежит
+        // рядом с index.php), но расширение php не в белом списке — Router
+        // отвечал 404. На Apache файл спасал mod_rewrite (он отдаёт
+        // существующие файлы напрямую), а на Nginx с try_files ... /index.php
+        // установщик был недоступен вовсе. Встроенный сервер php -S тоже
+        // отдавал 404. Явная проверка закрывает все три случая.
+        //
+        // Проверяем ДО статики и независимо от метода: установщик принимает
+        // и GET (форма), и POST (установка) — иначе POST отвечал 404.
+        if ($path === '/install.php') {
+            $installRoot = defined('MINIAGE_ROOT') ? constant('MINIAGE_ROOT') : dirname(__DIR__, 2) . '/public';
+            $installFile = is_file($installRoot . '/install.php')
+                ? $installRoot . '/install.php'
+                : dirname(__DIR__, 2) . '/public/install.php';
+            if (!is_file($installFile)) {
+                return Response::error('Установщик не найден.', 404, 'not_found');
+            }
+            return self::runScript($installFile);
+        }
+
         // статические файлы отдаём как есть (Apache/Nginx обычно делают это раньше).
         // SECURITY: путь нормализуем и жёстко ограничиваем каталогом /public —
         // иначе /../src/Core/Config.php отдаёт исходники, а /../var/*.sqlite — базу.
@@ -132,7 +154,12 @@ final class Router
             return null;
         }
 
-        $publicDir = realpath(dirname(__DIR__, 2) . '/public');
+        // корень статики зависит от раскладки: в репозитории это public/,
+        // в плоской установке — тот же каталог, где лежит index.php.
+        // Берём реальный путь к index.php, чтобы «..» не увёл за пределы.
+        $base = defined('MINIAGE_ROOT') ? constant('MINIAGE_ROOT') : dirname(__DIR__, 2);
+        $nested = $base . '/public';
+        $publicDir = realpath(is_dir($nested) ? $nested : $base);
         if ($publicDir === false) {
             return null;
         }
@@ -149,6 +176,30 @@ final class Router
             return null;
         }
         return $candidate;
+    }
+
+    /**
+     * Выполняет PHP-скрипт и забирает его вывод в Response.
+     *
+     * Нужно для install.php: он рисует страницу сам, а роутер должен отдать
+     * результат как обычный ответ (со статусом 200). Вывод буферизуем, иначе
+     * заголовки, выставленные скриптом вручную, станут недоступны.
+     */
+    private static function runScript(string $file): Response
+    {
+        ob_start();
+        try {
+            // изолируем переменные скрипта от области видимости роутера
+            (static function (string $__file): void {
+                require $__file;
+            })($file);
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            error_log('[miniage] install: ' . $e->getMessage());
+            return Response::error('Ошибка установщика: ' . $e->getMessage(), 500, 'install_failed');
+        }
+        $body = (string) ob_get_clean();
+        return Response::html($body);
     }
 
     private static function serveFile(string $file): Response

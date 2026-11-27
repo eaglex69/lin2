@@ -1,0 +1,11 @@
+# конфигурация с секретами
+.env
+# база SQLite и служебные отметки
+var/*.sqlite
+var/*.sqlite-*
+var/.installed
+var/release/
+# прочее
+*.log
+.DS_Store
+preview/node_modules/

@@ -824,3 +824,32 @@ $sample = "-- don't break\nCREATE TABLE a (id INT);\n/* 'x' */\nINSERT INTO a VA
 $parts = $split->invoke(null, $sample);
 $dbg('T61 splitStatements: операторов ' . count($parts) . ' из 3 -> '
     . (count($parts) === 3 ? 'OK' : 'БАГ (комментарий склеил дамп)'));
+
+// --- ТЕСТ 62: установщик на месте и корень приложения определяется
+$instPath = '/tmp/v2/public/install.php';
+$instSrc = is_file($instPath) ? (string) file_get_contents($instPath) : '';
+$instOk = $instSrc !== ''
+    && str_contains($instSrc, 'MINIAGE_INSTALL_VERSION')
+    && str_contains($instSrc, 'var/.installed')
+    && str_contains($instSrc, 'miniage_install_main');
+$dbg('T62 install.php: ' . ($instOk ? 'есть, версия и блокировка на месте' : 'БАГ (файл отсутствует или неполон)')
+    . ' -> ' . ($instOk ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 63: префикс таблиц применяется к схеме (нужен для установки в чужую базу)
+$pfx = new ReflectionMethod('App\Core\Migrator', 'applyPrefix');
+$pfx->setAccessible(true);
+\App\Core\Config::set('DB_PREFIX', 'pre_');
+$pfxSql = $pfx->invoke(null, 'CREATE TABLE IF NOT EXISTS "battles" (id INTEGER PRIMARY KEY);');
+$pfxIdx = $pfx->invoke(null, 'CREATE INDEX IF NOT EXISTS "idx_battles_char_state" ON battles (char_id, state);');
+$pfxBad = $pfx->invoke(null, 'INSERT INTO battles (id) VALUES (1);');
+$pfxOk = str_contains($pfxSql, '"pre_battles"')
+    && str_contains($pfxIdx, '"pre_idx_battles_char_state"')
+    && str_contains($pfxBad, 'INSERT INTO battles') === true;   // данные не переписываем
+$dbg('T63 префикс таблиц: ' . substr(trim($pfxSql), 0, 46) . ' -> ' . ($pfxOk ? 'OK' : 'БАГ'));
+\App\Core\Config::set('DB_PREFIX', '');
+
+// --- ТЕСТ 64: относительный путь SQLite раскрывается от корня приложения
+$cfgSrc = (string) file_get_contents('/tmp/v2/src/Core/Config.php');
+$relOk = str_contains($cfgSrc, 'DB_SQLITE_PATH') && str_contains($cfgSrc, 'rtrim($root');
+$dbg('T64 относительный DB_SQLITE_PATH: '
+    . ($relOk ? 'раскрывается от корня приложения' : 'БАГ (зависит от cwd)') . ' -> ' . ($relOk ? 'OK' : 'БАГ'));
