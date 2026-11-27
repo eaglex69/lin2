@@ -51,12 +51,18 @@ final class Session
             }
         }
 
-        // Резерв 2: sid в URL (iframe-превью, где cookie заблокированы)
+        // Резерв 2: sid в URL (iframe-превью, где cookie заблокированы).
+        // БАГ: клиент (api.js) и PageController шлют короткий параметр ?s=,
+        // а сервер искал только ?miniage_sid= — резервный путь не работал
+        // вовсе. Принимаем оба имени.
         if ($candidate === '') {
-            $q = $req->get[$name] ?? '';
-            if (is_string($q) && preg_match('/^[a-f0-9]{32,64}$/', $q)) {
-                $candidate = $q;
-                self::$sessionInUrl = true;
+            foreach (['s', $name] as $param) {
+                $q = $req->get[$param] ?? '';
+                if (is_string($q) && preg_match('/^[a-f0-9]{32,64}$/', $q)) {
+                    $candidate = $q;
+                    self::$sessionInUrl = true;
+                    break;
+                }
             }
         }
 

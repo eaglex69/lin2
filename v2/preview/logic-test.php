@@ -243,3 +243,36 @@ for ($i = 0; $i < 5; $i++) {
 $adena = (int) Database::value('SELECT adena FROM characters WHERE id = 1');
 $dbg('T17 покупки при 500 адены: успешных=' . $ok . ', остаток=' . $adena
     . ' -> ' . ($adena >= 0 && $ok * 450 <= 500 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 18: toBool не путает строку "false" с true
+$req = new \App\Core\Request('POST', '/api/inventory/equip', [], [], [], [], json_encode([
+    'inv_id' => 1, 'equip' => 'false',
+]), []);
+$boolVal = \App\Controller\ApiController::class; // статический метод приватный, проверяем через Reflection
+$rm = new ReflectionMethod($boolVal, 'toBool');
+$rm->setAccessible(true);
+$cases = [
+    ['false', false], ['true', true], [0, false], [1, true], [false, false], [true, true], ['0', false], ['on', true],
+];
+$bad = [];
+foreach ($cases as [$in, $want]) {
+    $got = $rm->invoke(null, $in);
+    if ($got !== $want) $bad[] = var_export($in, true) . "->" . var_export($got, true);
+}
+$dbg('T18 toBool: ' . (count($bad) === 0 ? 'все 8 случаев OK' : 'БАГ: ' . implode(', ', $bad)));
+
+// --- ТЕСТ 19: Request::str/intInput не пропускают массивы
+$req2 = new \App\Core\Request('POST', '/api/chat', [], [], [], [], json_encode([
+    'text' => ['a' => 1], 'qty' => ['x'], 'n' => '42',
+]), []);
+$dbg('T19 str(массив) -> ' . var_export($req2->str('text'), true)
+    . ' -> ' . ($req2->str('text') === '' ? 'OK' : 'БАГ'));
+$dbg('T19 intInput(массив) -> ' . var_export($req2->intInput('qty'), true)
+    . ' -> ' . ($req2->intInput('qty') === 0 ? 'OK' : 'БАГ'));
+$dbg('T19 intInput("42") -> ' . var_export($req2->intInput('n'), true)
+    . ' -> ' . ($req2->intInput('n') === 42 ? 'OK' : 'БАГ'));
+
+// --- ТЕСТ 20: seed при SEED_DEMO=0 создаёт контент
+// (проверяется отдельным прогоном seedtest; здесь фиксируем, что флаг не влияет на мобов)
+$mobsBefore = (int) Database::value('SELECT COUNT(*) FROM mobs');
+$dbg('T20 мобы в БД: ' . $mobsBefore . ' -> ' . ($mobsBefore >= 10 ? 'OK' : 'БАГ'));

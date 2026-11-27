@@ -100,6 +100,40 @@ final class Request
         return is_array($data) ? $data : [];
     }
 
+    /**
+     * Безопасно достаёт строку из входных данных.
+     *
+     * (string) от массива даёт «Array» с warning — в чат попадало слово
+     * "Array" при text={...}. Здесь не-скаляры превращаются в пустую строку.
+     */
+    public function str(string $key, string $default = ''): string
+    {
+        $v = $this->input()[$key] ?? null;
+        if ($v === null) {
+            return $default;
+        }
+        return is_scalar($v) ? (string) $v : $default;
+    }
+
+    /** Безопасно достаёт int из входных данных (массивы -> 0). */
+    public function intInput(string $key, int $default = 0): int
+    {
+        $v = $this->input()[$key] ?? null;
+        if ($v === null) {
+            return $default;
+        }
+        if (is_int($v)) {
+            return $v;
+        }
+        if (is_float($v)) {
+            return (int) $v;
+        }
+        if (is_string($v) && preg_match('/^-?\d+$/', trim($v))) {
+            return (int) trim($v);
+        }
+        return $default;
+    }
+
     public function header(string $name): string
     {
         $key = 'HTTP_' . strtoupper(str_replace('-', '_', $name));

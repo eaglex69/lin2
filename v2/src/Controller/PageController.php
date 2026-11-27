@@ -20,8 +20,12 @@ final class PageController
     public function index(Request $req): Response
     {
         $bootstrapUrl = '/api/bootstrap';
-        // Если cookie недоступны (iframe), пробрасываем sid в запросе API
-        $sid = Session::inUrl() ? '?s=' . urlencode(Session::id()) : '';
+        // Если cookie недоступны (iframe/приватный режим), пробрасываем sid.
+        // Проверяем и параметр ?s=, и флаг in_url: клиент всё равно хранит sid
+        // в localStorage и передаёт заголовком, но первая загрузка должна
+        // получить ту же сессию, что и страница.
+        $hasSid = Session::inUrl() || (string) ($req->get['s'] ?? '') !== '';
+        $sid = $hasSid ? '?s=' . urlencode(Session::id()) : '';
 
         $app = htmlspecialchars(Config::get('APP_NAME', 'Miniage'), ENT_QUOTES);
 

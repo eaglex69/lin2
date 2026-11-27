@@ -149,23 +149,34 @@ $router->get('/api/rating', fn (Request $r) => $api->rating($r));
 $router->get('/api/news', fn (Request $r) => $api->news($r));
 
 // --- старые URL: аккуратные редиректы вместо 404 (сохраняем совместимость ссылок)
+//
+// БАГ: раньше редирект терял ?s=<sid>, и в iframe без cookie (превью, приватный
+// режим) сессия обрывалась прямо на старом URL. Теперь параметр переносится.
+$legacyRedirect = static function (Request $r, string $target): Response {
+    $sid = (string) ($r->get['s'] ?? '');
+    if ($sid !== '' && preg_match('/^[a-f0-9]{32,64}$/', $sid)) {
+        $target .= (str_contains($target, '?') ? '&' : '?') . 's=' . rawurlencode($sid);
+    }
+    return Response::redirect($target);
+};
+
 foreach (['index.php', 'home.php', 'main.php', 'auto.php', 'portal.php', 'office.php', 'pers.php'] as $legacy) {
-    $router->get('/' . $legacy, fn (Request $r) => Response::redirect('/'));
+    $router->get('/' . $legacy, fn (Request $r) => $legacyRedirect($r, '/'));
 }
 foreach (['gorod.php', 'okrestnosti.php', 'battle.php', 'fight.php'] as $legacy) {
-    $router->get('/' . $legacy, fn (Request $r) => Response::redirect('/?panel=map'));
+    $router->get('/' . $legacy, fn (Request $r) => $legacyRedirect($r, '/?panel=map'));
 }
 foreach (['shop.php', 'inventar.php', 'sklad.php'] as $legacy) {
-    $router->get('/' . $legacy, fn (Request $r) => Response::redirect('/?panel=shop'));
+    $router->get('/' . $legacy, fn (Request $r) => $legacyRedirect($r, '/?panel=shop'));
 }
 foreach (['chat.php', 'msg.php'] as $legacy) {
-    $router->get('/' . $legacy, fn (Request $r) => Response::redirect('/?panel=chat'));
+    $router->get('/' . $legacy, fn (Request $r) => $legacyRedirect($r, '/?panel=chat'));
 }
 foreach (['rating.php', 'online.php'] as $legacy) {
-    $router->get('/' . $legacy, fn (Request $r) => Response::redirect('/?panel=top'));
+    $router->get('/' . $legacy, fn (Request $r) => $legacyRedirect($r, '/?panel=top'));
 }
 foreach (['news.php', 'news_index.php'] as $legacy) {
-    $router->get('/' . $legacy, fn (Request $r) => Response::redirect('/?panel=news'));
+    $router->get('/' . $legacy, fn (Request $r) => $legacyRedirect($r, '/?panel=news'));
 }
 
 $response = $router->dispatch($req);

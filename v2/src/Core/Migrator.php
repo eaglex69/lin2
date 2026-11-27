@@ -172,15 +172,36 @@ final class Migrator
 
     public static function seed(): void
     {
-        if (Config::get('SEED_DEMO', '1') !== '1') {
-            return;
-        }
-
+        // БАГ: раньше SEED_DEMO=0 (рекомендуется для прода!) отключал ВСЮ
+        // инициализацию, включая уровни, предметы и мобов — игра оставалась
+        // без контента. Демо-флаг должен касаться только демо-аккаунтов.
         self::seedLevels();
         self::seedItems();
         self::seedMobs();
-        self::seedAccounts();
+        self::seedNews();
+
+        if (Config::get('SEED_DEMO', '1') === '1') {
+            self::seedAccounts();
+        }
         self::seedChat();
+    }
+
+    private static function seedNews(): void
+    {
+        if ((int) Database::value('SELECT COUNT(*) FROM ' . Database::table('news')) > 0) {
+            return;
+        }
+        foreach ([
+            ['Запуск Miniage v2', 'Сервер переписан на PHP 8.1: canvas-карта, AJAX, MySQL. Добро пожаловать!', 'Admin'],
+            ['Как играть', 'Кликните по монстру на карте — начнётся бой. Победа даёт опыт и адену.', 'Admin'],
+        ] as [$title, $body, $author]) {
+            Database::insert('news', [
+                'title' => $title,
+                'body' => $body,
+                'author' => $author,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
     }
 
     private static function seedLevels(): void

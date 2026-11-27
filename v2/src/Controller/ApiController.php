@@ -70,8 +70,7 @@ final class ApiController
     public function login(Request $req): Response
     {
         try {
-            $data = $req->input();
-            $res = $this->auth->login((string) ($data['nick'] ?? ''), (string) ($data['pass'] ?? ''));
+            $res = $this->auth->login($req->str('nick'), $req->str('pass'));
             return Response::ok($res + [
                 'csrf' => Session::csrfToken(),
                 'session' => ['id' => Session::id(), 'in_url' => Session::inUrl()],
@@ -84,14 +83,13 @@ final class ApiController
     public function register(Request $req): Response
     {
         try {
-            $d = $req->input();
             $res = $this->auth->register(
-                (string) ($d['nick'] ?? ''),
-                (string) ($d['pass'] ?? ''),
-                (string) ($d['email'] ?? ''),
-                (string) ($d['race'] ?? 'human'),
-                (string) ($d['class'] ?? 'fighter'),
-                (string) ($d['gender'] ?? 'm'),
+                $req->str('nick'),
+                $req->str('pass'),
+                $req->str('email'),
+                $req->str('race', 'human'),
+                $req->str('class', 'fighter'),
+                $req->str('gender', 'm'),
             );
             return Response::ok($res + [
                 'csrf' => Session::csrfToken(),
@@ -160,7 +158,7 @@ final class ApiController
         }
         try {
             $in = $req->input();
-            $mobId = (int) ($in['mob_id'] ?? $req->get['mob_id'] ?? 0);
+            $mobId = $req->intInput('mob_id', $req->int('mob_id', 0));
             $battle = $this->game->startBattle((int) $char['id'], $mobId);
             return Response::ok(['battle' => $battle, 'character' => $this->refreshChar((int) $char['id'])]);
         } catch (\InvalidArgumentException $e) {
@@ -175,7 +173,7 @@ final class ApiController
             return $char;
         }
         try {
-            $battleId = (int) ($req->input()['battle_id'] ?? 0);
+            $battleId = $req->intInput('battle_id');
             $battle = $this->game->attack((int) $char['id'], $battleId);
             return Response::ok(['battle' => $battle, 'character' => $this->refreshChar((int) $char['id'])]);
         } catch (\InvalidArgumentException $e) {
@@ -190,7 +188,7 @@ final class ApiController
             return $char;
         }
         try {
-            $battleId = (int) ($req->input()['battle_id'] ?? 0);
+            $battleId = $req->intInput('battle_id');
             $battle = $this->game->flee((int) $char['id'], $battleId);
             return Response::ok(['battle' => $battle, 'character' => $this->refreshChar((int) $char['id'])]);
         } catch (\InvalidArgumentException $e) {
@@ -213,12 +211,11 @@ final class ApiController
         if ($char instanceof Response) {
             return $char;
         }
-        $d = $req->input();
         $res = $this->game->move(
             (int) $char['id'],
-            (int) ($d['x'] ?? 0),
-            (int) ($d['y'] ?? 0),
-            (string) ($d['city'] ?? 'Giran')
+            $req->intInput('x'),
+            $req->intInput('y'),
+            $req->str('city', 'Giran')
         );
         return Response::ok($res);
     }
@@ -254,8 +251,7 @@ final class ApiController
             return $char;
         }
         try {
-            $d = $req->input();
-            $res = $this->shop->buy((int) $char['id'], (string) ($d['code'] ?? ''), (int) ($d['qty'] ?? 1));
+            $res = $this->shop->buy((int) $char['id'], $req->str('code'), $req->intInput('qty', 1));
             return Response::ok($res + ['character' => $this->refreshChar((int) $char['id'])]);
         } catch (\InvalidArgumentException $e) {
             return Response::error($e->getMessage(), 409, 'buy_failed');
@@ -269,8 +265,7 @@ final class ApiController
             return $char;
         }
         try {
-            $d = $req->input();
-            $res = $this->shop->sell((int) $char['id'], (int) ($d['inv_id'] ?? 0), (int) ($d['qty'] ?? 1));
+            $res = $this->shop->sell((int) $char['id'], $req->intInput('inv_id'), $req->intInput('qty', 1));
             return Response::ok($res + ['character' => $this->refreshChar((int) $char['id'])]);
         } catch (\InvalidArgumentException $e) {
             return Response::error($e->getMessage(), 409, 'sell_failed');
@@ -297,7 +292,9 @@ final class ApiController
         }
         try {
             $d = $req->input();
-            $res = $this->shop->equip((int) $char['id'], (int) ($d['inv_id'] ?? 0), (bool) ($d['equip'] ?? true));
+            // (bool) 'false' === true — строка «false» надевала предмет вместо
+            // снятия. Разбираем явно: принимаем bool, 0/1, 'true'/'false'.
+            $res = $this->shop->equip((int) $char['id'], $req->intInput('inv_id'), self::toBool($d['equip'] ?? true));
             return Response::ok(['character' => $this->refreshChar((int) $char['id'])]);
         } catch (\InvalidArgumentException $e) {
             return Response::error($e->getMessage(), 409, 'equip_failed');
@@ -311,8 +308,7 @@ final class ApiController
             return $char;
         }
         try {
-            $d = $req->input();
-            $res = $this->shop->useItem((int) $char['id'], (int) ($d['inv_id'] ?? 0));
+            $res = $this->shop->useItem((int) $char['id'], $req->intInput('inv_id'));
             return Response::ok($res);
         } catch (\InvalidArgumentException $e) {
             return Response::error($e->getMessage(), 409, 'use_failed');
@@ -338,12 +334,11 @@ final class ApiController
             return $char;
         }
         try {
-            $d = $req->input();
             $msg = $this->chat->post(
                 (int) $char['id'],
                 (string) $char['name'],
-                (string) ($d['channel'] ?? 'global'),
-                (string) ($d['text'] ?? '')
+                $req->str('channel', 'global'),
+                $req->str('text')
             );
             return Response::ok(['message' => $msg]);
         } catch (\InvalidArgumentException $e) {
@@ -396,6 +391,21 @@ final class ApiController
     }
 
     // ------------------------------------------------------------------ helpers
+    /** Приведение значения из JSON/формы к bool без ловушек 'false' -> true. */
+    private static function toBool(mixed $v): bool
+    {
+        if (is_bool($v)) {
+            return $v;
+        }
+        if (is_int($v) || is_float($v)) {
+            return $v != 0;
+        }
+        if (is_string($v)) {
+            return in_array(strtolower(trim($v)), ['1', 'true', 'on', 'yes', 'y'], true);
+        }
+        return (bool) $v;
+    }
+
     private function requireChar(): array|Response
     {
         $char = $this->auth->character();

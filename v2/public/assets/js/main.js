@@ -149,8 +149,9 @@ function updateHud(char) {
     if (bar) bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
     if (label) label.textContent = text;
   };
-  set('bar-hp', char.hp / char.hp_max * 100, `HP ${fmt(char.hp)}/${fmt(char.hp_max)}`);
-  set('bar-mp', char.mp / char.mp_max * 100, `MP ${fmt(char.mp)}/${fmt(char.mp_max)}`);
+  const pct = (v, max) => (max > 0 ? (v / max) * 100 : 0);
+  set('bar-hp', pct(char.hp, char.hp_max), `HP ${fmt(char.hp)}/${fmt(char.hp_max)}`);
+  set('bar-mp', pct(char.mp, char.mp_max), `MP ${fmt(char.mp)}/${fmt(char.mp_max)}`);
   set('bar-exp', char.exp_percent, `EXP ${char.exp_percent}% · ${char.level} ур.`);
   el.adena.textContent = fmt(char.adena) + ' адены';
   if (world) world.setHero(char);
@@ -166,7 +167,8 @@ async function loadZone(zoneKey) {
     updateHud(data.character);
     world.setZone(data.zone);
     world.setMobs(state.mobs);
-    el.zoneLabel.textContent = `${data.zone.label} · ур. ${state.char.level}`;
+    // state.char может быть null (не вошли) — раньше это давало TypeError
+    el.zoneLabel.textContent = `${data.zone.label} · ур. ${state.char ? state.char.level : '—'}`;
     el.zone.hidden = false;
     panel?.close();
     if (panel && panel.current === 'map') openPanel('map');
@@ -420,6 +422,8 @@ function bindShop() {
         updateHud(data.character);
         toast(`Куплено: ${data.item.name} за ${fmt(data.paid)}`, 'success');
         beep(640, 0.07, 'triangle');
+        // обновляем витрину: цена/наличие могли измениться, важно для UX
+        openPanel('shop');
       } catch (e) { handleError(e); } finally { loading(false); }
     });
   });
