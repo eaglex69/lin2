@@ -1,0 +1,12 @@
+{
+  "name": "lin2-php8-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dev tooling used for the PHP 8 port: lint/audit/run PHP code on PHP 5.2 ... 8.5 via WebAssembly builds (no system PHP needed).",
+  "type": "module",
+  "dependencies": {
+    "@php-wasm/node": "^3.1.66",
+    "@php-wasm/universal": "^3.1.66",
+    "mysql2": "^3.24.6"
+  }
+}
