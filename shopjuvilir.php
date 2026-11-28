@@ -15,115 +15,69 @@ place_tower();
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
+include_once $path.'inc/lin2_ui.php';
 
-$tip2=$_GET['tip2'];
-$lvlus=$_GET['lvlus'];
+// Оформление как у shop.php: красные вкладки магазинов, плитки, фишки грейда, карточки товаров.
+// id и грейд из адреса приводятся к числу.
+$lvlus = isset($_GET['lvlus']) ? (int)$_GET['lvlus'] : 0;
+$o = isset($_GET['o']) ? (string)$_GET['o'] : '';
+$mod = isset($_GET['mod']) ? (string)$_GET['mod'] : '';
+$money = isset($udata['money']) ? $udata['money'] : null;
 
-
-switch($_GET['mod']){
+switch($mod){
 
 default:
-echo "<div class=inoy>";
-echo"<a href=\"shopjuvilir.php?mod=mag&amp;o=amulet\">Амулеты</a>";
-echo"<a href=\"shopjuvilir.php?mod=mag&amp;o=kolco\">Левые кольца</a></div>";
-echo"<a href=\"shopjuvilir.php?mod=mag&amp;o=rkolco\">Правые кольца</a></div>";
+echo lin2_ui_shop_tabs('jewel');
+echo lin2_ui_note('Украшения: серьги, кольца и амулеты.');
+echo lin2_ui_tiles(array(
+array('shopjuvilir.php?mod=mag&o=amulet', 'g-amulet', 'Амулеты'),
+array('shop.php?mod=b&o=poyas', 'g-earring', 'Левые серьги'),
+array('shop.php?mod=b&o=rpoyas', 'g-earring', 'Правые серьги'),
+array('shopjuvilir.php?mod=mag&o=kolco', 'g-ring', 'Левые кольца'),
+array('shopjuvilir.php?mod=mag&o=rkolco', 'g-ring', 'Правые кольца'),
+));
+echo lin2_ui_go(array(array('shop.php?', 'Назад')));
 break;
 
 case 'mag':
-if($_GET['o']!='amulet' && $_GET['o']!='kolco'&& $_GET['o']!='rkolco'){
-echo'Ошибка!';
+if($o!='amulet' && $o!='kolco' && $o!='rkolco'){
+echo lin2_ui_note('Ошибка!');
 include($path.'inc/down.php');
 exit;
 }
-$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `tip`='$_GET[o]' and `nlvl`='$lvlus' ORDER BY cena");
+$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `tip`='$o' and `nlvl`='$lvlus' ORDER BY cena");
 ////////////////////////////
-
-
-
-echo"<b>Класы:</b> | ";
-if ($lvlus==0){echo"NG | ";}else{ echo"<a href=\"shopjuvilir.php?mod=mag&lvlus=0&o=$_GET[o]\">NG</a> | ";}
-if ($lvlus==20){echo"D | ";}else{ echo"<a href=\"shopjuvilir.php?mod=mag&lvlus=20&o=$_GET[o]\">D</a> | ";}
-if ($lvlus==40){echo"C | ";}else{ echo"<a href=\"shopjuvilir.php?mod=mag&lvlus=40&o=$_GET[o]\">C</a> | ";}
-if ($lvlus==52){echo"B | ";}else{ echo"<a href=\"shopjuvilir.php?mod=mag&lvlus=52&o=$_GET[o]\">B</a> | ";}
-if ($lvlus==62){echo"A | ";}else{ echo"<a href=\"shopjuvilir.php?mod=mag&lvlus=62&o=$_GET[o]\">A</a> | ";}
-if ($lvlus==76){echo"S | <br/>";}else{ echo"<a href=\"shopjuvilir.php?mod=mag&lvlus=76&o=$_GET[o]\">S</a> |<br/>";}
-
-if (empty($lvlus)) {$lvlus = '0';}
-
-if($lvlus<20){$st="NG";}
-elseif($lvlus>=20 and $lvlus<40){$st="D";}
-elseif($lvlus>=40 and $lvlus<52){$st="C";}
-elseif($lvlus>=52 and $lvlus<62){$st="B";}
-elseif($lvlus>=62 and $lvlus<76){$st="A";}
-elseif($lvlus>=76){$st="S";}
-
-echo "<br/><b>Клас:</b> $st<hr/>";
-///////////////////////////
-$avto=mysql_num_rows($req);
-if($avto>=1){
+$rows = array();
 While($mag = mysql_fetch_array($req))
 {
-echo"<img src=\"shmot/$mag[name].png\" alt=\"pic\"/> 
-<a href=\"shopjuvilir.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/>
-Цена: $mag[cena] Аден <hr/>";
+$rows[] = $mag;
 }
-}else{
-echo"<b>Нет вещей</b><br/>";
-}
-echo"<br/><a href=\"shopjuvilir.php?\">Назад</a>";
+
+echo lin2_ui_shop_tabs('jewel');
+echo lin2_ui_sub(lin2_ui_tip_name($o, true), 'грейд '.lin2_ui_grade($lvlus));
+echo lin2_ui_grade_chips('shopjuvilir.php?mod=mag&o='.$o.'&lvlus=', $lvlus, 76);   // украшения продаются до S
+echo lin2_ui_goods($rows, 'shopjuvilir.php?mod=info&id=', 'sell.php?act=ask&id=', $money);
+echo lin2_ui_go(array(array('shopjuvilir.php?', 'Назад')));
 break;
 case 'info':
-$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `id`='$_GET[id]'");
+$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `id`='".(int)(isset($_GET['id']) ? $_GET['id'] : 0)."'");
 
 $avto=mysql_num_rows($req);
 if($avto==0){
-echo'Ошибка!';
+echo lin2_ui_note('Ошибка!');
 include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag['tip']){
-case 'amulet':
-$tip='Амулет';
-break;
-case 'kolco':
-$tip='Левое кольцо';
-break;
-case 'rkolco':
-$tip='Правое кольцо';
-break;
-}
-switch($mag['klas']){
-case 'not':
-$klas='Все';
-break;
-case 'wizard':
-$klas='Маг';
-break;
-case 'fighert':
-$klas='Воин';
-break;
-}
 
-if($mag['nlvl']<20){$st="NG";}
-elseif($mag['nlvl']>=20 and $mag['nlvl']<40){$st="D";}
-elseif($mag['nlvl']>=40 and $mag['nlvl']<52){$st="C";}
-elseif($mag['nlvl']>=52 and $mag['nlvl']<62){$st="B";}
-elseif($mag['nlvl']>=62 and $mag['nlvl']<76){$st="A";}
-elseif($mag['nlvl']>=76 and $mag['nlvl']<91){$st="S";}
-elseif($mag['nlvl']>=91){$st="R";}
-
-echo"<b></div></div></div><div class=menu><img src=\"shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b><br/>
-Тип: $tip<br/>
-Цена: ".number_format($mag['cena'], 0, ',', "'")." Аден <br/><br/>";
-
-
-
-echo "
-Физ. защ.: $mag[pdef]<br/>
-Маг. защ.: $mag[mdef]<br/><br/>";
-
-echo"<br/><a href=\"sell.php?act=ask&amp;id=$mag[id]\">Купить</a><br/><a href=\"shopjuvilir.php?\">Назад</a>";
+echo lin2_ui_shop_tabs('jewel');
+echo lin2_ui_item_sheet($mag, array(
+'price' => $mag['cena'],
+'acts' => array(
+array('sell.php?act=ask&id='.(int)$mag['id'], 'Купить', ($money === null || (float)$money >= (float)$mag['cena']) ? '' : 'grey'),
+array('shopjuvilir.php?mod=mag&lvlus='.(int)$mag['nlvl'].'&o='.$mag['tip'], 'Назад', 'grey'),
+),
+));
 break;
 }
 include($path.'inc/down.php');

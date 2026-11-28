@@ -15,10 +15,18 @@ place_tower();
 include($path.'inc/core.php');
 include($path.'inc/head.php');
 include($path.'inc/zag.php');
+include_once $path.'inc/lin2_ui.php';
 
-$tip2=$_GET['tip2'];
-$lvlus=$_GET['lvlus'];
-$o=isset($_GET['o'])?$_GET['o']:'';
+// Оформление: плитки разделов, красные вкладки «Оружие / Броня / Украшения», фишки грейда и типа, карточки товаров
+// (theme/fantasy.css, раздел 10; разметка: inc/lin2_ui.php). Запросы, ссылки и параметры те же, что были.
+// id, грейд и тип из адреса приводятся к числу / к списку допустимых значений.
+$weapon_kinds = array('ydar'=>'Ударное', 'luk'=>'Луки', 'kin'=>'Кинжалы', 'sdv'=>'Сдвоенное', 'kas'=>'Кастеты',
+    'kniga'=>'Книги', 'koppik'=>'Копья/Пики', 'me4'=>'Мечи', 'rap'=>'Рапиры');
+$tip2 = (isset($_GET['tip2']) && isset($weapon_kinds[$_GET['tip2']])) ? $_GET['tip2'] : 'ydar';
+$lvlus = isset($_GET['lvlus']) ? (int)$_GET['lvlus'] : 0;
+$o = isset($_GET['o']) ? (string)$_GET['o'] : '';
+$mod = isset($_GET['mod']) ? (string)$_GET['mod'] : '';
+$money = isset($udata['money']) ? $udata['money'] : null;
 
 /*if ($udata[dostup]<4){
 
@@ -28,99 +36,57 @@ echo "<hr/><p><font color=red>Приносим свои извенения. Пр
 }*/
 
 
-switch($_GET['mod']){
+switch($mod){
 
 default:
-echo"</div></div> <div class=menu> <font color=#ffffcc>Решил прикупиться? <br/>Выбирай что нужно: </font><br/><br/></div>";
-echo "<div class=inoy>";
-echo"<a href=\"shop.php?mod=weapon\">Магазин оружия</a>";
-echo"<a href=\"shop.php?mod=b\">Магазин брони</a>";
-echo"<a href=\"/shopjuvilir.php?\">Магазин амулетов и колец</a>";
+echo lin2_ui_note('<b>Решил прикупиться?</b> Выбирай что нужно:');
+echo lin2_ui_tiles(array(
+array('shop.php?mod=weapon', 'g-weapon', 'Магазин оружия', array('sub'=>'Мечи, луки, кинжалы, книги, копья')),
+array('shop.php?mod=b', 'g-body', 'Магазин брони', array('sub'=>'Шлемы, доспехи, штаны, сапоги, щиты')),
+array('/shopjuvilir.php?', 'g-ring', 'Амулеты и кольца', array('sub'=>'Серьги, кольца, амулеты')),
+), 'big');
 //echo"<a href=\"shopsoul.php\">Магазин SoulShots</a>";
-
-
-echo "</div>";
+echo lin2_ui_go(array(array('gorod.php?pl=shop_zone', 'Торговая площадь')));
 break;
 
 case 'w':
-echo"<a href=\"shop.php?mod=weapon\">Отдел оружия</a><br/>";
-echo"<a href=\"shop.php?\">Назад</a>";
+echo lin2_ui_go(array(array('shop.php?mod=weapon', 'Отдел оружия'), array('shop.php?', 'Назад')));
 break;
 
 case 'b':
-if(empty($_GET['o'])){
-echo"<font color=grey> Хах...Защита важная часть!!! </font><br/><br/>";
-
-echo "<div class=inoy>";
-echo"<a href=\"shop.php?mod=b&amp;o=shit\"> Щиты</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=golova\"> Шлемы</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=body\"> Доспехи</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=poyas\"> Левые серёжки</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=rpoyas\"> Правые серёжки</a>";
-echo"<a href=\"shopjuvilir.php?mod=mag&amp;o=amulet\"> Амулеты</a>";
-echo"<a href=\"shopjuvilir.php?mod=mag&amp;o=rkolco\">Правые кольца</a>";
-echo"<a href=\"shopjuvilir.php?mod=mag&amp;o=kolco\">Левые кольца</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=plash\"> Отдел плащей</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=pants\"> Штаны</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=ruki\"> Рукавицы</a>";
-echo"<a href=\"shop.php?mod=b&amp;o=nogi\"> Сапоги</a>";
-
-
-
-echo"<br/><a href=\"shop.php?\">Назад</a>";
-echo "</div>";
+// ----- броня: плитки по видам, внутри вид -> грейд -> карточки
+$armor = array('golova', 'body', 'pants', 'nogi', 'ruki', 'shit', 'plash');
+$glyph = array('golova'=>'g-golova', 'body'=>'g-body', 'pants'=>'g-pants', 'nogi'=>'g-nogi', 'ruki'=>'g-ruki', 'shit'=>'g-shit',
+    'plash'=>'g-plash', 'poyas'=>'g-earring', 'rpoyas'=>'g-earring');
+if(empty($o)){
+echo lin2_ui_shop_tabs('b');
+echo lin2_ui_note('Защита — важная часть! Выбери, что хочешь надеть.');
+$tiles = array();
+foreach ($armor as $t) {
+$tiles[] = array('shop.php?mod=b&o='.$t, $glyph[$t], lin2_ui_tip_name($t, true));
+}
+echo lin2_ui_tiles($tiles, 'sm');
+echo lin2_ui_go(array(array('shop.php?', 'Назад')));
 
 }else{
-if($_GET['o']!='shit' && $_GET['o']!='golova' && $_GET['o']!='body' && $_GET['o']!='rpoyas' && $_GET['o']!='poyas' && $_GET['o']!='plash' && $_GET['o']!='pants' && $_GET['o']!='ruki' && $_GET['o']!='nogi'){
-echo'Ошибка!';
+if(!in_array($o, array('shit','golova','body','rpoyas','poyas','plash','pants','ruki','nogi'), true)){
+echo lin2_ui_note('Ошибка!');
 include($path.'inc/down.php');
 exit;
 }
-$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `tip`='$_GET[o]' and `nlvl`='$lvlus' ORDER BY cena");
+$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `tip`='$o' and `nlvl`='$lvlus' ORDER BY cena");
 ////////////////////////////
-
-echo"<b>Классы:</b> | ";
-if ($lvlus==0){echo"NG | ";}else{ echo"<a href=\"shop.php?mod=b&lvlus=0&o=$_GET[o]\">NG</a> | ";}
-if ($lvlus==20){echo"D | ";}else{ echo"<a href=\"shop.php?mod=b&lvlus=20&o=$_GET[o]\">D</a> | ";}
-if ($lvlus==40){echo"C | ";}else{ echo"<a href=\"shop.php?mod=b&lvlus=40&o=$_GET[o]\">C</a> | ";}
-if ($lvlus==52){echo"B | ";}else{ echo"<a href=\"shop.php?mod=b&lvlus=52&o=$_GET[o]\">B</a> | ";}
-if ($lvlus==62){echo"A | ";}else{ echo"<a href=\"shop.php?mod=b&lvlus=62&o=$_GET[o]\">A</a> | ";}
-if ($lvlus==76){echo"S | ";}else{ echo"<a href=\"shop.php?mod=b&lvlus=76&o=$_GET[o]\">S</a> | ";}
-if ($lvlus==91){echo"R | <br/>";}else{ echo"<a href=\"shop.php?mod=b&lvlus=91&o=$_GET[o]\"> R </a> |<br/>";}
-
-if (empty($lvlus)) {$lvlus = '0';}
-
-if($lvlus<20){$st="NG";}
-elseif($lvlus>=20 and $lvlus<40){$st="D";}
-elseif($lvlus>=40 and $lvlus<52){$st="C";}
-elseif($lvlus>=52 and $lvlus<62){$st="B";}
-elseif($lvlus>=62 and $lvlus<76){$st="A";}
-elseif($lvlus>=76 and $lvlus<91){$st="S";}
-elseif($lvlus>=91){$st="R";}
-
-if ($o=='golova'){$tp="Шлем";}
-if ($o=='body'){$tp="Доспех";}
-if ($o=='plash'){$tp="Плащ";}
-if ($o=='pants'){$tp="Штаны";}
-if ($o=='ruki'){$tp="Рукавицы";}
-if ($o=='nogi'){$tp="Сапоги";}
-if ($o=='shit'){$tp="Щит";}
-if ($o=='poyas'){$tp="Левая серьга";}
-if ($o=='rpoyas'){$tp="Правая серьга";}
-echo "<hr/>";
-
-///////////////////////////
-$avto=mysql_num_rows($req);
-
+$rows = array();
 While($mag = mysql_fetch_array($req))
 {
-$mag['name'] = htmlspecialchars(stripslashes(addslashes($mag['name'])));
-
-echo" <img src=\"shmot/$mag[name].png\" alt=\"pic\"/>
- <a href=\"shop.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/> Цена: ".number_format($mag['cena'])." <hr/>";
+$rows[] = $mag;
 }
 
-echo"<br/><a href=\"shop.php?mod=b\">Назад</a>";
+echo lin2_ui_shop_tabs(($o=='poyas' || $o=='rpoyas') ? 'jewel' : 'b');
+echo lin2_ui_sub(lin2_ui_tip_name($o, true), 'грейд '.lin2_ui_grade($lvlus));
+echo lin2_ui_grade_chips('shop.php?mod=b&o='.$o.'&lvlus=', $lvlus);
+echo lin2_ui_goods($rows, 'shop.php?mod=info&id=', 'sell.php?act=ask&id=', $money);
+echo lin2_ui_go(array(array('shop.php?mod=b', 'Назад')));
 
 }
 break;
@@ -128,158 +94,51 @@ break;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 case 'weapon':
 
-
-if($lvlus<20){$st="NG";}
-elseif($lvlus>=20 and $lvlus<40){$st="D";}
-elseif($lvlus>=40 and $lvlus<52){$st="C";}
-elseif($lvlus>=52 and $lvlus<62){$st="B";}
-elseif($lvlus>=62 and $lvlus<76){$st="A";}
-elseif($lvlus>=76 and $lvlus<91){$st="S";}
-elseif($lvlus>=91){$st="R";}
-
-
-if ($tip2=='ydar'){$tp="Ударное";}
-if ($tip2=='luk'){$tp="Луки";}
-if ($tip2=='kin'){$tp="Кинжалы";}
-if ($tip2=='sdv'){$tp="Сдвоенное";}
-if ($tip2=='kas'){$tp="Кастеты";}
-if ($tip2=='kniga'){$tp="Книги";}
-if ($tip2=='koppik'){$tp="Копья/Пики";}
-if ($tip2=='me4'){$tp="Луки";}
-if ($tip2=='rap'){$tp="Мечи";}
-
-
-echo"<b>Классы:</b> | ";
-if ($lvlus==0){echo"NG | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=0&tip2=$tip2\">NG</a> | ";}
-if ($lvlus==20){echo"D | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=20&tip2=$tip2\">D</a> | ";}
-if ($lvlus==40){echo"C | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=40&tip2=$tip2\">C</a> | ";}
-if ($lvlus==52){echo"B | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=52&tip2=$tip2\">B</a> | ";}
-if ($lvlus==62){echo"A | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=62&tip2=$tip2\">A</a> | ";}
-if ($lvlus==76){echo"S | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=76&tip2=$tip2\">S</a> | ";}
-if ($lvlus==91){echo"R | <br/>";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=91&tip2=$tip2\">R</a> |<br/>";}
-
-
-if (empty($tip2)) {$tip2='ydar';}
-
-echo"<b>Тип:</b> | ";
-if ($tip2=='ydar'){echo"Ударное | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=ydar\">Ударное</a> | ";}
-if ($tip2=='luk'){echo"Луки | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=luk\">Луки</a> | ";}
-if ($tip2=='kin'){echo"Кинжалы | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=kin\">Кинжалы</a> | ";}
-if ($tip2=='sdv'){echo"Сдвоенное | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=sdv\">Сдвоенное</a> | ";}
-if ($tip2=='kas'){echo"Кастеты | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=kas\">Кастеты</a> | ";}
-if ($tip2=='kniga'){echo"Книги | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=kniga\">Книги</a> | ";}
-if ($tip2=='koppik'){echo"Копья/Пики | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=koppik\">Копья/Пики</a> | ";}
-if ($tip2=='me4'){echo"Мечи | ";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=me4\">Мечи</a> | ";}
-if ($tip2=='rap'){echo"Рапиры | <br/><br/>";}else{ echo"<a href=\"shop.php?mod=weapon&lvlus=$lvlus&tip2=rap\">Рапиры</a> | <br/><br/>";}
-
-
-
-echo "<hr/>";
 $req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `tip`='weapon' and `tip2`='$tip2' and `nlvl`='$lvlus' ORDER BY cena");
 ////////////////////////////
-$avto=mysql_num_rows($req);
-
+$rows = array();
 While($mag = mysql_fetch_array($req))
 {
-//*********************
-
-
-echo"	<img src=\"shmot/$mag[name].png\" alt=\"pic\"/>
-		<a href=\"shop.php?mod=info&amp;id=$mag[id]\">$mag[name]</a><br/>
-		Цена: ".number_format($mag['cena'])." Аден "; 
-		//[<a href=\"sell.php?act=ask&amp;id=$mag[id]\">купить</a>]<br/>";
-echo "<hr/>";
+$rows[] = $mag;
 }
-echo"<br/><a href=\"shop.php?\">Назад</a>";
+
+echo lin2_ui_shop_tabs('weapon');
+echo lin2_ui_grade_chips('shop.php?mod=weapon&tip2='.$tip2.'&lvlus=', $lvlus);
+$kinds = array();
+foreach ($weapon_kinds as $k => $title) {
+$kinds[] = array($title, $k == $tip2 ? null : 'shop.php?mod=weapon&lvlus='.$lvlus.'&tip2='.$k);
+}
+echo lin2_ui_chips('Тип', $kinds);
+echo lin2_ui_sub($weapon_kinds[$tip2], 'грейд '.lin2_ui_grade($lvlus));
+echo lin2_ui_goods($rows, 'shop.php?mod=info&id=', 'sell.php?act=ask&id=', $money);
+echo lin2_ui_go(array(array('shop.php?', 'Назад')));
 break;
+
 case 'info':
-$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `id`='$_GET[id]'");
+$req = mysql_query("SELECT * FROM `shop` WHERE `city` != '' and `id`='".(int)(isset($_GET['id']) ? $_GET['id'] : 0)."'");
 
 $avto=mysql_num_rows($req);
 if($avto==0){
-echo'Ошибка!';
+echo lin2_ui_note('Ошибка!');
 include($path.'inc/down.php');
 exit;
 }
 $mag = mysql_fetch_array($req);
-switch($mag['tip']){
-case 'weapon':
-$tip='Оружие';
-break;
-case 'body':
-$tip='Доспехи';
-break;
-case 'golova':
-$tip='Шлем';
-break;
-case 'nogi':
-$tip='Сапоги';
-break;
-case 'shit':
-$tip='Щит';
-break;
-case 'poyas':
-$tip='Левая серьга'; //серьга
-break;
-case 'rpoyas':
-$tip='Правая серьга'; //серьга
-break;
-case 'plash':
-$tip='Плащ';
-break;
-case 'pants':
-$tip='Штаны';
-break;
-case 'ruki':
-$tip='Рукавицы';
-break;
+
+$jewel = in_array($mag['tip'], array('poyas','rpoyas','amulet','kolco','rkolco'), true);
+echo lin2_ui_shop_tabs($mag['tip']=='weapon' ? 'weapon' : ($jewel ? 'jewel' : 'b'));
+// «Назад» ведёт в тот отдел и грейд, откуда пришли
+if ($mag['tip']=='weapon') {
+$back = 'shop.php?mod=weapon&lvlus='.(int)$mag['nlvl'].'&tip2='.urlencode((string)$mag['tip2']);
+} elseif ($mag['tip']=='amulet' || $mag['tip']=='kolco' || $mag['tip']=='rkolco') {
+$back = 'shopjuvilir.php?mod=mag&lvlus='.(int)$mag['nlvl'].'&o='.$mag['tip'];
+} else {
+$back = 'shop.php?mod=b&lvlus='.(int)$mag['nlvl'].'&o='.$mag['tip'];
 }
-switch($mag['klas']){
-case 'not':
-$klas='Все';
-break;
-case 'wizard':
-$klas='Маг';
-break;
-case 'fighert':
-$klas='Воин';
-break;
-}
-
-
-if($mag['nlvl']<20){$st="NG";}
-elseif($mag['nlvl']>=20 and $mag['nlvl']<40){$st="D";}
-elseif($mag['nlvl']>=40 and $mag['nlvl']<52){$st="C";}
-elseif($mag['nlvl']>=52 and $mag['nlvl']<62){$st="B";}
-elseif($mag['nlvl']>=62 and $mag['nlvl']<76){$st="A";}
-elseif($mag['nlvl']>=76 and $mag['nlvl']<91){$st="S";}
-elseif($mag['nlvl']>=91){$st="R";}
-
-
-echo"<b></div></div></div><div class=menu><img src=\"shmot/$mag[name].png\" alt=\"pic\"/> $mag[name]</b><br/>
-Тип: $tip<br/>
-Цена: ".number_format($mag['cena'], 0, ',', "'")." Аден <br/><br/>";
-
-if ($tip=="Оружие"){
-echo "
-Физ. атака: $mag[patt]<br/>
-Маг. атака: $mag[matt]<br/>
-Уровень: $mag[nlvl]<br/><br/>
-
-SoulShot: x$mag[soul]<br/>
-SpiritShot: x$mag[spirit]<br/><br/>";}else{
-
-echo "
-Физ. защ.: $mag[pdef]<br/>
-Маг. защ.: $mag[mdef]<br/>
-Уровень: $mag[nlvl]<br/><br/>";}
-
-
-echo "
-Грейд: $st<br/><br/></div><div class=inoy>
-";
-echo "<a href=\"sell.php?act=ask&amp;id=$mag[id]\">Купить</a>";
-echo"<a href=\"shop.php?\">Назад</a></div>";
+echo lin2_ui_item_sheet($mag, array(
+'price' => $mag['cena'],
+'acts' => array(array('sell.php?act=ask&id='.(int)$mag['id'], 'Купить', ($money === null || (float)$money >= (float)$mag['cena']) ? '' : 'grey'), array($back, 'Назад', 'grey')),
+));
 break;
 
 case 'soulshots':
@@ -296,26 +155,24 @@ if($res==0){
 mysql_query("INSERT INTO `soulshots` (`id` ,`usr` ,`kol` )
 VALUES (NULL , '$log', '100');");
 $nk=$rs['kol']+$co;
-echo "<p><font color=blue>Вы купили $co Shots. У Вас теперь $nk Shots.</font></p>";
+echo lin2_ui_note('Вы купили '.$co.' Shots. У Вас теперь '.$nk.' Shots.');
 }else{
 $nk=$rs['kol']+$co;
 mysql_query("UPDATE `soulshots` SET `kol` = '$nk' WHERE `usr` = '$log'");
-echo "<p><font color=blue>Вы купили $co Shots. У Вас теперь $nk Shots.</font></p>";
+echo lin2_ui_note('Вы купили '.$co.' Shots. У Вас теперь '.$nk.' Shots.');
 
 }
 mysql_query("UPDATE `users` SET `almaz` = '$colnew' WHERE `usr` = '$log' LIMIT 1");
 
 
 }else{
-echo "<p><font color=red>Не хватает Coin of Luck</font></p>";
+echo lin2_ui_note('<b>Не хватает Coin of Luck</b>');
 }
 }else{
 
 /*echo "<p><font color=#057F46><b>Купить Shots:</b></font></p>";*/
 
-echo"<div class=inoy>";
-echo"<a href=\"shop.php?mod=soulshots&t\"> <img src=\"pic/skr/s.jpeg\" height=30 width=30> Shots x100 <font color=silver> [1 CoL] </font></a>";
-echo"</div>";
+echo lin2_ui_thing_row('Shots x100', '', 'g-crystal', '/pic/skr/s.jpeg', 'Цена: 1 Coin of Luck', array(array('shop.php?mod=soulshots&t', 'Купить')));
 
 }
 break;
@@ -325,4 +182,3 @@ break;
 
 }
 include($path.'inc/down.php');
-?>

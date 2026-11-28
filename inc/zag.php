@@ -154,6 +154,9 @@ if ($mprez>100) {$mprez=100;};
 echo '<div class="lx-bar lx-hp"><i style="width:'.max(0,min(100,$hprez)).'%"></i><b>HP&nbsp;&nbsp;'.$udata['hp'].'/'.$udata['hpall'].'</b></div>';
 echo '<div class="lx-bar lx-mp"><i style="width:'.max(0,min(100,$mprez)).'%"></i><b>MP&nbsp;&nbsp;'.$udata['mp'].'/'.$udata['mpall'].'</b></div>';
 echo '<div class="lx-bar lx-xp"><i style="width:'.max(0,min(100,$exp)).'%"></i><b>EXP&nbsp;&nbsp;'.max(0,min(100,$exp)).'%</b></div>';
+// кошелёк: Адена и Coin of Luck (зелёный «+» = пополнить), как плашки монет в углу экрана
+echo '<div class="lx-wal"><span class="lx-pill" title="Адена">'.lin2_ui_num($udata['money']).'</span>'
+    .'<a class="lx-pill gem" href="/zaksms.php?" title="Coin of Luck: пополнить">'.lin2_ui_num($udata['almaz']).'<u>+</u></a></div>';
 echo "</div></div>";
 
 

@@ -54,13 +54,27 @@ echo "\n" . '<script type="text/javascript" src="' . lin2_ui_asset('battle.js') 
 
 
 echo "\n" . '</head><body>';
-/* frame of every page: bronze frame with corner gems, teal banner, one table cell for the content.
+/* frame of every page: steel frame with rivets, red ribbon with the title of the page, one table cell for the content.
+   The title is the page's own $textl ('Магазин', 'Инвентарь' ...); «miniage ru» when a page has none.
+   The round red cross (top right) leads to the main menu; the menu itself and the guest pages do not need it.
    The single-cell table is deliberate: the old pages print stray </div> tags and a table cell keeps them from
    closing the frame. inc/nogi.php closes it. */
+$lx_title = isset($textl) ? trim((string)$textl) : '';
+if ($lx_title === '') {
+    $lx_ribbon = 'miniage <i>ru</i>';
+    $lx_size = '';
+} else {
+    $lx_ribbon = htmlspecialchars($lx_title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $lx_len = function_exists('mb_strlen') ? mb_strlen($lx_title, 'UTF-8') : strlen($lx_title);
+    $lx_size = $lx_len > 22 ? ' xs' : ($lx_len > 14 ? ' s' : '');
+}
+$lx_script = isset($_SERVER['SCRIPT_NAME']) ? basename((string)$_SERVER['SCRIPT_NAME']) : '';
+$lx_close = (!empty($user_id) && $lx_script !== 'index.php' && $lx_script !== 'main.php')
+    ? '<a class="lx-x" href="/?" title="В меню"></a>' : '';
 echo '
 <div class="lx-app" id="lx-app">
 <i class="lx-corner tl"></i><i class="lx-corner tr"></i><i class="lx-corner bl"></i><i class="lx-corner br"></i>
-<div class="lx-banner-wrap"><div class="lx-banner"><b>miniage <i>ru</i></b></div></div>
+<div class="lx-banner-wrap"><div class="lx-banner' . $lx_size . '"><b>' . $lx_ribbon . '</b></div></div>' . $lx_close . '
 <table class="lx-frame" cellspacing="0" cellpadding="0"><tr><td class="centertd">';
 ///////////////////
 }

@@ -24,10 +24,13 @@ include($path.'inc/zag.php');
 
 
 
+// город: плитки вместо ссылок-иконок (оформление: theme/fantasy.css, раздел 10; разметка: inc/lin2_ui.php)
+include_once $path.'inc/lin2_ui.php';
+
 if ($udata['karma']>10) // если большая карма
 {
-echo" <center><img src='roz/karma.jpg'  width='330' height='130' alt='' style='margin-right:10px;border:1px solid #383838' class='dot'></div><hr/>";
-echo "<b><font color=#FF6A00>Стой..стой..стой... У тебя слишком большая карма, я не могу пропустить тебя в город. Иди и отмойся в окрестностьх на монстрах.</font><hr/>";
+echo '<div class="lx-view"><img src="/pic/roz/karma.jpg" alt="" onerror="this.parentNode.style.display=\'none\'"/></div>';
+echo '<div class="lx-hint"><b>Стой..стой..стой...</b> У тебя слишком большая карма, я не могу пропустить тебя в город. Иди и отмойся в окрестностях на монстрах.</div>';
 
 }else{
 
@@ -35,17 +38,15 @@ echo "<b><font color=#FF6A00>Стой..стой..стой... У тебя сли�
 $req = mysql_query("SELECT * FROM `zamok` WHERE `city` = '$udata[city]' LIMIT 1");
 
 ////////////////////////////
+$city = array('clan'=>'not');
 $avto=mysql_num_rows($req);
 if($avto==1){
 $city = mysql_fetch_array($req);
 if($city['clan']!='not'){
-echo'<div class=bt></div>';
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider`='$city[clan]'");
 //////////////////
 $clan = mysql_fetch_array($req);
-echo"<font color=\"af9878\"><b><i>Город под контролем клана:</i></b> </font><a href=\"clan.php?id=$clan[id]\">$clan[name]</a>";
-echo "<br/>";
-echo "<br/>";
+$clan_note = '<div class="lx-hint"><b>Город под контролем клана:</b> <a href="clan.php?id='.(int)$clan['id'].'">'.lin2_ui_h($clan['name']).'</a></div>';
 }
 }
 //////////////
@@ -58,46 +59,32 @@ if(!empty($wh['emblema'])){
 $pic = "<img src=\"/pic/clan/$wh[emblema]\" alt=\"cl\"/>";}
 ////////]!='shop_z////------------------------------------	ГОРОД	------------------------------------
 
-
-
-if($_GET['pl']!='shop_zone'){
+if(!isset($_GET['pl']) or $_GET['pl']!='shop_zone'){
 /*include($path.'inc/include.php');*/
 
-echo' <center><font color=#f4d06e><i>Город:</i><b><i> '.$udata['city'].'</i></center></b></div>';
-echo "<br/>"; 
-echo' <a href="job.php?"><center><img src="pic/gorod/Trof.png" alt=""/> Квест </font></a>';
-if($udata['klas']=="wizard"){echo' <a href="akademmag.php?"> <img src="pic/gorod/Shlem.png" alt=""/>  Акад </a>';}
-if($udata['klas']=="fighert"){echo'<a href="akademwar.php?"><img src="pic/gorod/Shlem.png" alt=""/>  Акад  </a>';}
-echo'<a href="home.php?"><img src="pic/gorod/кланс.png" alt=""/> Клан </a>';
-echo'<a href="sklad.php?"> <img src="pic/gorod/Склад.png" alt=""/> Склад </a>';
-echo'<a href="hram.php?"> <img src="pic/gorod/Загс.png" alt="">  Загс </a>';
-/*echo''.$pic.'<a href="bonus.php?">  bonus</a><br/>';*/
+echo lin2_ui_place('Город', $udata['city']);
+if (isset($clan_note)) {echo $clan_note;}
+
+// картинка города
+$town_pic = array(
+'Северный полюс'=>'/pic/roz/gorod.jpg', 'Hunter Village'=>'/pic/town/дварвен.png', 'Dark Elven Village'=>'/pic/town/даркелф.png',
+'Oren Town'=>'/pic/town/глудио.png', 'Orc Village'=>'/pic/town/орк.png', 'Elven Village'=>'/pic/town/елвен.png',
+'Farm Zone'=>'/pic/roz/gorod.jpg', 'Rune Township'=>'/pic/town/рунее.png', 'Kamael Village'=>'/pic/town/даркелф.png',
+'Talking Island Village'=>'/pic/town/хуман.png', 'Godard Town'=>'/pic/town/годарт.png', 'Gludio Village'=>'/pic/town/глудин.png',
+'Giran Castle Town'=>'/pic/town/гиран.png', 'Dwarven Village'=>'/pic/town/гном.png', 'Dion Town'=>'/pic/town/дион.png',
+'Shtutgart Town'=>'/pic/town/даркелф.png', 'Aden Castle Town'=>'/pic/town/аден.png', 'Casino Royal'=>'/pic/roz/gorod.jpg',
+);
+if (isset($town_pic[$udata['city']])) {
+echo '<div class="lx-view"><img src="'.lin2_ui_h($town_pic[$udata['city']]).'" alt="" onerror="this.parentNode.style.display=\'none\'"/></div>';
+}
+
 $gallery =mysql_result(mysql_query("SELECT COUNT(*) FROM `gallery`"), 0);
-echo'<a href="gallery.php?"><img src="pic/gorod/fotoa.png" alt="">  Фото </a></center>';
-if ($udata['city']=='Северный полюс') echo" <center><img src='/pic/roz/gorod.jpg'  alt='' </div>"; 
-if ($udata['city']=='Hunter Village') echo" <center><img src='/pic/town/дварвен.png'  alt='' </div>"; 
-if ($udata['city']=='Dark Elven Village') echo" <center><img src='/pic/town/даркелф.png'  alt='' </div>";  
-if ($udata['city']=='Oren Town') echo" <center><img src='/pic/town/глудио.png'  alt='' </div>"; 
-if ($udata['city']=='Orc Village') echo" <center><img src='/pic/town/орк.png'  alt='' </div>"; 
-if ($udata['city']=='Elven Village') echo" <center><img src='/pic/town/елвен.png'  alt='' </div>"; 
-if ($udata['city']=='Farm Zone') echo" <center><img src='/pic/roz/gorod.jpg' alt='' </div>"; 
-if ($udata['city']=='Rune Township') echo" <center><img src='/pic/town/рунее.png'  alt='' </div>"; 
-if ($udata['city']=='Kamael Village') echo" <center><img src='/pic/town/даркелф.png'  alt='' </div>"; 
-if ($udata['city']=='Talking Island Village') echo" <center><img src='/pic/town/хуман.png'  </div>"; 
-if ($udata['city']=='Godard Town') echo" <center><img src='/pic/town/годарт.png'  alt='' </div>"; 
-if ($udata['city']=='Gludio Village') echo" <center><img src='/pic/town/глудин.png'  alt='' </div>"; 
-if ($udata['city']=='Giran Castle Town') echo" <center><img src='/pic/town/гиран.png' alt='' </div>"; 
-if ($udata['city']=='Dwarven Village') echo" <center><img src='/pic/town/гном.png'  alt='' </div>"; 
-if ($udata['city']=='Dion Town') echo" <center><img src='/pic/town/дион.png'  alt='' </div>"; 
-if ($udata['city']=='Shtutgart Town') echo" <center><img src='/pic/town/даркелф.png'  alt='' </div>"; 
-if ($udata['city']=='Aden Castle Town') echo" <center><img src='/pic/town/аден.png'  alt='' </div>"; 
-if ($udata['city']=='Casino Royal') echo" <center><img src='/pic/roz/gorod.jpg'  alt='' style='margin-right:10px;border:1px solid #383838' class='dot'></div>"; 
 $blog =mysql_result(mysql_query("SELECT COUNT(*) FROM `blog`"), 0); 
-echo'<a href="bank.php?"><center><img src="pic/gorod/bank.png" alt=""> Банк </a>';
-echo'<a href="portal.php?"> <img src="pic/gorod/телепорт.png" alt=""> ТП </a>';
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////////// Сколько на арене
+$timeou = time() - 150;
+$arer = 0;
 $reqav = mysql_query("SELECT * FROM `mesto` WHERE `place` = 'arena'");
 ////////////////////////////
 if(mysql_num_rows($reqav)>=1)
@@ -107,14 +94,24 @@ While($arena = mysql_fetch_array($reqav))
 
 $asd2 = mysql_query("SELECT laikas, usr FROM online WHERE laikas > '$timeou' and usr = '$arena[usr]'");
 $are = mysql_num_rows($asd2);
-if ($arer==1){$arer=$arer+$are;}else{$arer=$are;}
+$arer = $arer + $are;
 }}
-if (empty($arer)){$arer=0;}
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-echo'<a href="arena.php?"> <img src="pic/gorod/пвп.png" alt=""> ПвП <font color=#ffffff></font></a>';
-echo'<a href="pitomec.php?"> <img src="pic/gorod/pitomec.png" alt=""> Пит </a>';
-echo'<a href="baf_vip.php?"> <img src="pic/gorod/baff.png" alt=""> ВИП Баф </a></center><br/>';
+$tiles = array(array('job.php?', 'quest', 'Квест'));
+if($udata['klas']=="wizard"){$tiles[] = array('akademmag.php?', 'akadem', 'Академия');}
+if($udata['klas']=="fighert"){$tiles[] = array('akademwar.php?', 'akadem', 'Академия');}
+$tiles[] = array('home.php?', 'clan', 'Клан');
+$tiles[] = array('sklad.php?', 'sklad', 'Склад');
+$tiles[] = array('hram.php?', 'zags', 'Загс');
+$tiles[] = array('gallery.php?', 'foto', 'Фото');
+$tiles[] = array('bank.php?', 'bank', 'Банк');
+$tiles[] = array('portal.php?', 'portal', 'Телепорт');
+$tiles[] = array('arena.php?', 'pvp', 'ПвП', array('cls'=>'hot', 'badge'=>$arer));   // красная бирка = игроки на арене сейчас
+$tiles[] = array('pitomec.php?', 'pet', 'Питомец');
+$tiles[] = array('baf_vip.php?', 'baf', 'ВИП Баф', array('cls'=>'vip'));
+echo lin2_ui_tiles($tiles);
+
 $d=date('YmdHi');
 $q=mysql_query("SELECT * FROM `tot_match` WHERE `s1`='nu' and `date` > $d");
 $as=mysql_num_rows($q);
@@ -122,50 +119,37 @@ if (empty($as)){$as=0;}
 //echo''.$pic.'<a href="/total/index.php?">  Тотализатор</a>('.$as.')<br/><br/>';
 
 //----------------------------------------------------------------------//
-echo "<br/>";
-echo "<br/>";
-echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
-echo "<a href=\"gorod.php?pl=shop_zone\">Торг площадь </a>";
-echo "<a href=\"lotomy.php?\">Казино </a>";
-echo "<a href=\"to_zamok.php?\">Замок </a>"; 
-echo "<a href=\"to_world.php?\">Окра </a>"; 
-echo "<a href=\"fish.php?\">Озеро </a>";
+echo lin2_ui_sub('Куда пойти');
+echo lin2_ui_tiles(array(
+array('gorod.php?pl=shop_zone', 'g-scales', 'Торговая площадь'),
+array('lotomy.php?', 'g-casino', 'Казино'),
+array('to_zamok.php?', 'g-city', 'Замок'),
+array('to_world.php?', 'g-world', 'Окрестности'),
+array('fish.php?', 'g-fish', 'Озеро'),
+));
 }else{
 
-echo'<font color=#f4d06e><i>Торговая площадь города:</i><b><i> '.$udata['city'].' </b></i></div>';
-echo "<br/>";
-echo' <center><a href="shop_lux.php?"><img src="pic/gorod/magaz.png" alt=""> Люкс Магазин</font></a>';
-echo' <a href="shop_vip.php?"><img src="pic/gorod/magaz.png" alt=""> VIP Shop</a>';
-echo' <a href="shop_gold.php?"><img src="pic/gorod/magaz.png" alt=""> Gold Bar</a>';
-echo' <a href="shopsoul.php?"><img src="pic/gorod/soul.png" alt=""> SoulShots</a>';
-echo'<center> <img src="pic/gorod/torg3.png" alt=""></center>';
-echo' <a href="bazar_vip.php?"><img src="pic/gorod/magaz.png" alt=""> Базар Шмота</a>';
+echo lin2_ui_place('Торговая площадь города', $udata['city']);
+
 $cbazvip = mysql_num_rows(mysql_query("SELECT * FROM `bazar_vip` WHERE city = '$udata[city]'"));
 
 $cbazwmr = mysql_num_rows(mysql_query("SELECT * FROM `bazar_wmr` WHERE `usr`!='$log'"));
 $cbazwmrvi = mysql_num_rows(mysql_query("SELECT * FROM `bazar_wmr` WHERE `usr`='$log'"));
 $count_res = mysql_result(mysql_query("SELECT COUNT(*) FROM `sell_res` WHERE `city` = '".$udata['city']."' AND `pers_id` != '".$active."'"),0);
-echo' <a href="shop.php?"><img src="pic/gorod/magaz.png" alt=""> Магазин шмота</a>';
-echo' <a href="col_bonus.php?"><img src="pic/gorod/npc.png" alt=""> NPC </font></a></center><br/><br/>';
 
-echo "<br/>";
-echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
-echo "<a href=\"gorod.php?\">Центр города </a>"; 
-echo' <a href="to_zamok.php?">  Замок</a><br/>';
+echo lin2_ui_tiles(array(
+array('shop.php?', 'g-bag', 'Магазин шмота', array('cls'=>'hot')),
+array('shop_lux.php?', 'g-diamond', 'Люкс Магазин'),
+array('shop_vip.php?', 'g-crown', 'VIP Shop', array('cls'=>'vip')),
+array('shop_gold.php?', 'g-bars', 'Gold Bar'),
+array('shopsoul.php?', 'g-crystal', 'SoulShots'),
+array('bazar_vip.php?', 'g-scales', 'Базар Шмота', array('badge'=>$cbazvip)),
+array('col_bonus.php?', 'g-coin', 'NPC'),
+));
+
+echo lin2_ui_go(array(array('gorod.php?', 'Центр города'), array('to_zamok.php?', 'Замок')));
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 ////////////////////////
 }
