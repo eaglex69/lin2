@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Draws the glyph icons of the "fantasy" theme: theme/fantasy/g-<name>.svg  (equipment slots, shop sections, footer tabs)
-and theme/fantasy/corner-steel.svg (frame bracket).
+Draws the glyph icons of the "fantasy" theme: theme/fantasy/g-<name>.svg  (equipment slots, shop sections, footer keys).
 
 The glyphs are plain SVG made of a few paths (no external resources, no fonts); gradients that a glyph does not use are
 left out of its file, so every file is about 1 KB.  Usage:  python3 tools/php8/art/make_glyphs.py [outdir]
@@ -198,16 +197,6 @@ G['casino'] = '''<rect x="8" y="8" width="38" height="38" rx="8" fill="url(#p)"/
 <circle cx="35" cy="19" r="3.6" fill="#8a1a10" stroke-width="1.4"/><circle cx="19" cy="35" r="3.6" fill="#8a1a10" stroke-width="1.4"/>
 <path d="M46 24 L58 30 L52 54 L26 46" fill="none" stroke-width="2"/>'''
 
-CORNER = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><defs>
-<linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f4"/><stop offset=".45" stop-color="#9aa2ab"/><stop offset="1" stop-color="#555d66"/></linearGradient>
-<radialGradient id="c" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#b9c0c7"/><stop offset="1" stop-color="#4b525a"/></radialGradient></defs>
-<g stroke="#1d1410" stroke-width="1.6" stroke-linejoin="round">
-<path d="M3 3 H31 C33 3 34 4 34 6 V13 H14 V34 H6 C4 34 3 33 3 31 Z" fill="url(#a)"/>
-<path d="M6 6 H29 M6 6 V29" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.2"/>
-<circle cx="9" cy="9" r="3.8" fill="url(#c)"/><circle cx="26" cy="8.5" r="2.3" fill="url(#c)"/><circle cx="8.5" cy="26" r="2.3" fill="url(#c)"/></g></svg>
-'''
-
-
 def main():
     os.makedirs(OUT, exist_ok=True)
     n = 0
@@ -215,9 +204,7 @@ def main():
         with open(os.path.join(OUT, 'g-%s.svg' % name), 'w', encoding='utf-8', newline='\n') as f:
             f.write(svg(body))
         n += 1
-    with open(os.path.join(OUT, 'corner-steel.svg'), 'w', encoding='utf-8', newline='\n') as f:
-        f.write(CORNER)
-    print('wrote %d glyphs + corner-steel.svg to %s' % (n, os.path.abspath(OUT)))
+    print('wrote %d glyphs to %s' % (n, os.path.abspath(OUT)))
 
 
 if __name__ == '__main__':

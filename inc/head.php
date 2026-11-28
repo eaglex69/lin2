@@ -48,15 +48,16 @@ echo "\n" . '<meta name="viewport" content="width=device-width, initial-scale=1"
 echo "\n" . '<link rel="stylesheet" href="' . lin2_ui_asset('fantasy.css') . '" type="text/css" />';
 echo "\n" . '<script type="text/javascript" src="' . lin2_ui_asset('ajax.js') . '" defer="defer"></script>';
 echo "\n" . '<script type="text/javascript" src="' . lin2_ui_asset('battle.js') . '" defer="defer"></script>';
+echo "\n" . '<script type="text/javascript" src="' . lin2_ui_asset('blocks.js') . '" defer="defer"></script>';
 /*------------------------------------------------------------------------------------------------------*/
 
 
 
 
 echo "\n" . '</head><body>';
-/* frame of every page: steel frame with rivets, red ribbon with the title of the page, one table cell for the content.
+/* frame of every page: dark window, copper title bar with the title of the page, one table cell for the content.
    The title is the page's own $textl ('Магазин', 'Инвентарь' ...); «miniage ru» when a page has none.
-   The round red cross (top right) leads to the main menu; the menu itself and the guest pages do not need it.
+   The small square cross (top right) leads to the main menu; the menu itself and the guest pages do not need it.
    The single-cell table is deliberate: the old pages print stray </div> tags and a table cell keeps them from
    closing the frame. inc/nogi.php closes it. */
 $lx_title = isset($textl) ? trim((string)$textl) : '';
@@ -73,7 +74,6 @@ $lx_close = (!empty($user_id) && $lx_script !== 'index.php' && $lx_script !== 'm
     ? '<a class="lx-x" href="/?" title="В меню"></a>' : '';
 echo '
 <div class="lx-app" id="lx-app">
-<i class="lx-corner tl"></i><i class="lx-corner tr"></i><i class="lx-corner bl"></i><i class="lx-corner br"></i>
 <div class="lx-banner-wrap"><div class="lx-banner' . $lx_size . '"><b>' . $lx_ribbon . '</b></div></div>' . $lx_close . '
 <table class="lx-frame" cellspacing="0" cellpadding="0"><tr><td class="centertd">';
 ///////////////////

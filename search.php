@@ -297,74 +297,13 @@ if ($usdata['st']==2) {$st='Рыцарь';}
 if ($usdata['st']==3) {$st='Маркиз';}
 
 
-if(!empty($usdata['clan'])){
-$req = mysql_query("SELECT `emblema` FROM `clan` WHERE `lider` = '$usdata[clan]'");
-$wh = mysql_fetch_array($req);
-
-if(!empty($wh['emblema'])){
-echo "<img src=\"pic/clan/$wh[emblema]\" alt=\"clan\"/> <font color=#f4d06e>$nick $st<br/>";}else{
-echo" <font color=#f4d06e>$nick [$st]<br/>";
-}
-}else{
-echo"<font color=#f4d06e><b> $nick <font color=#f4d06e> [$st]</b><br/>";}
-if($usdata['dostup']==5){
-echo"<font color=#ff4040><i> Создатель </i></font><br/>";
-}
-if($usdata['dostup']==4){
-echo"<font color=#6fcd72><i> Администратор </i></font><br/>";
-}
-if($usdata['dostup']==3){
-echo"<font color=#547ef4><i> Старший Модератор </i></font><br/>";
-}
-if($usdata['dostup']==2){
-echo"<font color=#547ef4><i> Модератор </i></font><br/>";
-}
-if($usdata['dostup']==1){
-echo"<font color=silver><i> Консультант </i></font><br/>";
-}
-
-if($udata['dostup']>1 and $udata['dostup']>=$usdata['dotup']){
-$acc=mysql_fetch_assoc(mysql_query("SELECT * FROM `account` WHERE `id` = '".$usdata['account']."' "));
-echo'Персонаж находится на аккаунте <b><font color=#f4d06e>'.$acc['nick'].'</b></br>';
-}
-
-echo'<font color=#ffffcc>Ресетов <font color=#f4d06e>'.$usdata['res'].' ';
-echo"<font color='#ffffcc'>";
+// ---- страница игрока: имя, «кукла» (надетые вещи по бокам), под ней здоровье, характеристики и сведения в блоках ----
+// (оформление: theme/fantasy.css, помощники: inc/lin2_ui.php; так же устроена страница персонажа pers.php)
+$rank_name = $st;
 if($usdata['klas']=="wizard"){$kl="m";$kln="Маг";}
 if($usdata['klas']=="fighert"){$kl="f";$kln="Воин";}
-
-if($usdata['storona']=="ork"){echo"Орк ";}
-if($usdata['storona']=="elf"){echo"Cветлый Эльф ";}
-if($usdata['storona']=="darkelf"){echo"Темный Эльф ";}
-if($usdata['storona']=="human"){echo"Человек ";}
-if($usdata['storona']=="gnom"){echo"Гном ";}
-if($usdata['storona']=="kamael"){echo"Камаэль ";}
-
-
-
-echo $kln;
-
-echo"</b></font></b>";
-
-$whiel = mysql_query("SELECT * FROM `msg_users` WHERE `user_id` = '$udata[id]'");
-$lists = mysql_fetch_array($whiel);
-
-if ($nick == $lists['contact']){echo "<br/>";} else{echo "<a href=\"search.php?go=adding&nick=$nick\"> + </a><br>";}
-// если есть бафы
-$reqi222 = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log' and 
-`tip` = 'bafat' or `usr` = '$log' and
-`tip` = 'bafkrit' or `usr` = '$log' and
-`tip` = 'bafzash' or `usr` = '$log' and
-`tip` = 'resp' or `usr` = '$log' and
-`tip` = 'bafzat' or `usr` = '$log' and
-`tip` = 'bafhp'");
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-//	статус 
-if (!empty($usdata['status'])){
-echo "<small><img src=\"pic/pers.png\" > <font color=#af9878><b><i> $udata[status] </i></b></center></font></small>";
-echo '</div>';
-}
+$races = array('ork' => 'Орк', 'elf' => 'Светлый Эльф', 'darkelf' => 'Тёмный Эльф', 'human' => 'Человек', 'gnom' => 'Гном', 'kamael' => 'Камаэль');
+$race = isset($races[$usdata['storona']]) ? $races[$usdata['storona']] : '';
 if($usdata['lvl']<20){
 $st="NG";}
 elseif($usdata['lvl']>=20 and $usdata['lvl']<40){
@@ -378,88 +317,111 @@ $st="A";}
 elseif($usdata['lvl']>=76){
 $st="S";}
 
-
-
-	echo '<table><tr>';
-if (is_file('foto/'.$usdata['usr'].'.gif'))
-{
-echo'<td><img src="foto/'.$usdata['usr'].'.gif" alt="pic" style="margin-right:10px;border:2px solid #383838"/></td>'; } else {
-echo"<td><img src='pic/avatar/$usdata[storona]/$kl/$usdata[pol]/$st.png' style='margin-right:10px;border:2px solid #383838'/></td>"; }
-echo '<td align="left">';
-
-if (!empty($usdata['zamujem'])){
-echo'<font color=#f4d06e><left><img src="pic/ring.png" alt=""/> В браке с <a href="/search.php?nick='.$usdata['zamujem'].'&go=go"><font color=#ffffcc>'.$usdata['zamujem'].'</left></a></font><br/>';
-echo '</div>';
-}
-echo"<img src=\"pic/life.png\" > <font color=#ff4040>Жизни : $usdata[hp]/$usdata[hpall]</font><br/>";
-echo"<img src=\"pic/energy.png\" > <font color=skyblue>Мана : $usdata[mp]/$usdata[mpall]</font><br/>";
-
-$reqbf = mysql_query("SELECT * FROM `baf` WHERE `usr`='$nick'");
-$avto=mysql_num_rows($reqbf);
-while($mag = mysql_fetch_array($reqbf))
-{
-$at=$mag['bafat']+$at;
-$df=$mag['pmdef']+$df;
-if (!empty($mag['bafat'])){$bafat="<font color=#FFffcc><small>+	[".number_format($at, 0, ',', "`")."]</small></font>";}
-if (!empty($mag['pmdef'])){$pmdef="<font color=#FFffcc><small>+	[".number_format($df, 0, ',', "`")."]</small></font>";}
-}
-echo"<img src=\"pic/ipvp.png\" > <font color=#f4d06e>Физ. защита :  <font color=#ffffcc>".number_format($usdata['pdef'], 0, ',', "`")."  $pmdef</font>";
-echo"<br/>";
-echo"<img src=\"pic/ipvp.png\" > <font color=#f4d06e>Маг. защита :  <font color=#ffffcc> ".number_format($usdata['mdef'], 0, ',', "`")."  $pmdef</font>";
-echo'<br/>';
-echo"<img src=\"pic/battles.png\" > <font color=#f4d06e>Физ. атака :  <font color=#ffffcc> ".number_format($usdata['patt'], 0, ',', "`")."  $bafat</font>";
-echo'<br/>';
-echo"<img src=\"pic/battles.png\" > <font color=#f4d06e>Маг. атака :  <font color=#ffffcc> ".number_format($usdata['matt'], 0, ',', "`")."  $bafat</font>";
-
+$clan = null;
+$emblem = '';
 if(!empty($usdata['clan'])){
 $req = mysql_query("SELECT * FROM `clan` WHERE `lider` = '$usdata[clan]' LIMIT 1");
 $clan = mysql_fetch_array($req);
-echo"<br/><img src=\"pic/iclan.png\" > <font color=#f4d06e>В клане : <b><a href=\"clan.php?id=$clan[id]\"><font color=#FFffcc>$clan[name]</a></b><br/>";}else{
-echo"<br/>";}
+if($clan && !empty($clan['emblema'])){$emblem = '<img src="/pic/clan/'.lin2_ui_h(rawurlencode($clan['emblema'])).'" alt=""/>';}
+}
+
+// имя, звание, уровень
+echo '<div class="lx-who"><div class="c1"><span class="nm1">'.$emblem.lin2_ui_h($usdata['usr']).'</span><small>'.lin2_ui_h($rank_name).'</small></div>'
+    .'<div class="c2"><b>'.(int)$usdata['lvl'].' ур.</b><small>'.lin2_ui_h(trim($race.' '.$kln)).'</small></div></div>';
+$roles = array(5 => array('Создатель', 'r5'), 4 => array('Администратор', 'r4'), 3 => array('Старший Модератор', 'r3'), 2 => array('Модератор', 'r3'), 1 => array('Консультант', 'r1'));
+if(isset($roles[(int)$usdata['dostup']])){
+echo '<div class="lx-roles"><i class="lx-role '.$roles[(int)$usdata['dostup']][1].'">'.$roles[(int)$usdata['dostup']][0].'</i></div>';
+}
+if($udata['dostup']>1 and $udata['dostup']>=$usdata['dotup']){
+$acc=mysql_fetch_assoc(mysql_query("SELECT * FROM `account` WHERE `id` = '".$usdata['account']."' "));
+echo lin2_ui_note('Персонаж находится на аккаунте <b>'.lin2_ui_h($acc['nick']).'</b>');
+}
+if (!empty($usdata['status'])){
+echo lin2_ui_note('<i>'.lin2_ui_h($usdata['status']).'</i>');
+}
+// если есть бафы
+$reqi222 = mysql_query("SELECT * FROM `mag` WHERE `usr` = '$log' and
+`tip` = 'bafat' or `usr` = '$log' and
+`tip` = 'bafkrit' or `usr` = '$log' and
+`tip` = 'bafzash' or `usr` = '$log' and
+`tip` = 'resp' or `usr` = '$log' and
+`tip` = 'bafzat' or `usr` = '$log' and
+`tip` = 'bafhp'");
+
+echo lin2_ui_tabs(array(array('Инфо', null), array('Снаряжение', 'search.php?go=shmot&nick='.rawurlencode($usdata['usr']))));
+// «кукла»: образ в середине, надетые вещи по бокам
+echo lin2_ui_doll(lin2_ui_worn($usdata['usr']), array('img' => lin2_ui_user_img($usdata, true), 'rank' => 'Грейд '.$st, 'info' => 'inventar.php?mod=in&id='));
+
+// бонусы от бафов
+$at = 0;
+$df = 0;
+$reqbf = mysql_query("SELECT * FROM `baf` WHERE `usr`='$nick'");
+while($mag = mysql_fetch_array($reqbf))
+{
+$at += (int)$mag['bafat'];
+$df += (int)$mag['pmdef'];
+}
+echo lin2_ui_panel('Здоровье',
+    lin2_ui_meter('lx-hp', 'Жизни '.(int)$usdata['hp'].' / '.(int)$usdata['hpall'], $usdata['hp'], $usdata['hpall'])
+    .lin2_ui_meter('lx-mp', 'Мана '.(int)$usdata['mp'].' / '.(int)$usdata['mpall'], $usdata['mp'], $usdata['mpall']), 'in');
+echo lin2_ui_panel('Характеристики', lin2_ui_kv(array(
+    array('att', 'Физ. атака', lin2_ui_num($usdata['patt']), $at > 0 ? '+'.number_format($at, 0, ',', ' ') : ''),
+    array('att', 'Маг. атака', lin2_ui_num($usdata['matt']), $at > 0 ? '+'.number_format($at, 0, ',', ' ') : ''),
+    array('def', 'Физ. защита', lin2_ui_num($usdata['pdef']), $df > 0 ? '+'.number_format($df, 0, ',', ' ') : ''),
+    array('def', 'Маг. защита', lin2_ui_num($usdata['mdef']), $df > 0 ? '+'.number_format($df, 0, ',', ' ') : ''),
+)), 'in kv');
+
+// сведения
+$rows = array();
+$rows[] = array('', 'Ресетов', lin2_ui_h($usdata['res']));
+if (!empty($usdata['zamujem'])){
+$rows[] = array('', 'В браке с', '<a href="/search.php?nick='.lin2_ui_h(rawurlencode($usdata['zamujem'])).'&amp;go=go">'.lin2_ui_h($usdata['zamujem']).'</a>');
+}
+if($clan){
+$rows[] = array('', 'В клане', '<a href="clan.php?id='.(int)$clan['id'].'">'.lin2_ui_h($clan['name']).'</a>');
+}
 $req = mysql_query("SELECT * FROM `karma` WHERE `usr` = '$nick'");
 $avto=mysql_num_rows($req);
-echo'<font color=#f4d06e><img src="pic/olymp.png" alt=""/> Рейтинг: <font color=#FFffcc>'.$avto.'</b><br/>';
 $req = mysql_query("SELECT * FROM `karma` WHERE `usr` = '$nick' and `from`='$log' LIMIT 1");
-$avto=mysql_num_rows($req);
-if($avto==0 and $udata['lvl']>=101 and $log!=$nick){
-echo"<a href=\"karma.php?usr=$nick\"><font color=#f4d06e>[увеличить рейтинг]</a><br/>";
-}
-echo'<br/> <font color=#f4d06e><img src="pic/battles.png" alt=""/> Побед : <font color=#FFffcc>'.$usdata['wins'].'<br/>';
-echo'<font color=#f4d06e><img src="pic/ipvp.png" alt=""/> Поражений : <font color=#FFffcc>'.$usdata['loses'].' <br/>';
-
-$reqs= mysql_query("SELECT id,name FROM `pit` WHERE `usr` = ''.$nick.'' and `status`='on'");
-$avtos=mysql_num_rows($reqs);
-if($avtos==1){
+$voted=mysql_num_rows($req);
+$rows[] = array('', 'Рейтинг', (string)$avto, '', ($voted==0 and $udata['lvl']>=101 and $log!=$nick) ? 'karma.php?usr='.rawurlencode($nick) : '', '+');
+$reqs = mysql_query("SELECT id,name FROM `pit` WHERE `usr` = '".mysql_real_escape_string($usdata['usr'])."' and `status`='on'");
+if($reqs and mysql_num_rows($reqs)==1){
 $pit = mysql_fetch_array($reqs);
-echo"<font color=#f4d06e> Питомец : <a href=\"pit.php?id=$pit[id]\"><font color=#FFffcc>$pit[name]</a></b><br/>";
+$rows[] = array('', 'Питомец', '<a href="pit.php?id='.(int)$pit['id'].'">'.lin2_ui_h($pit['name']).'</a>');
 }
+$whiel = mysql_query("SELECT * FROM `msg_users` WHERE `user_id` = '$udata[id]'");
+$lists = mysql_fetch_array($whiel);
+if ($nick != $lists['contact']){
+$rows[] = array('', 'Контакты', '<a href="search.php?go=adding&amp;nick='.lin2_ui_h(rawurlencode($nick)).'">добавить</a>');
+}
+echo lin2_ui_panel('Сведения', lin2_ui_kv($rows), 'in kv');
+echo lin2_ui_panel('Бои', lin2_ui_kv(array(
+    array('win', 'Побед', lin2_ui_num($usdata['wins'])),
+    array('lose', 'Поражений', lin2_ui_num($usdata['loses'])),
+)), 'in kv');
+
+// где сейчас
 $laikas = 150;
 $dabar = time();
 $timeout = $dabar - $laikas;
 $asd = mysql_num_rows(mysql_query("SELECT laikas, usr FROM online WHERE laikas > '$timeout' AND usr='$nick'"));
-////////////////////////////
 if($asd==0 && $usdata['dostup']<3){
-echo"<font color=#f4d06e>Статус : <font color=#ff4040><b>Offline</b></font><br/>";
-echo"<font color=#f4d06e>Последнее посещение : <font color=#FFffcc>$usdata[lvisit]<br/><br/>";
+echo lin2_ui_panel('Статус', lin2_ui_kv(array(
+    array('', 'Статус', '<span class="lx-off">Offline</span>'),
+    array('', 'Последнее посещение', lin2_ui_h($usdata['lvisit'])),
+)), 'in kv');
 }else{
 $reqs = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$nick' LIMIT 1");
 $mesto = mysql_fetch_array($reqs);//место
-if($mesto['city']==0){
-echo"<font color=#f4d06e>Локация : <font color=#FFffcc>Город</b><br/>";
-}elseif($mesto['city']==1){
-$reqs = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$nick' LIMIT 1");
-$wor = mysql_fetch_array($reqs);//место
-echo"<font color=#f4d06e>Локация : <font color=#FFffcc>$wor[mesto] </b><br/>";
-}else{
-echo"<font color=#f4d06e>Локация: <font color=#FFffcc>Замок</b><br/>";
+if($mesto['city']==0){$loc = 'Город';}
+elseif($mesto['city']==1){$loc = (string)$mesto['mesto'];}
+else{$loc = 'Замок';}
+echo lin2_ui_panel('Статус', lin2_ui_kv(array(
+    array('', 'Локация', lin2_ui_h($loc)),
+    array('', 'Статус', '<span class="lx-on">Online</span>'),
+)), 'in kv');
 }
-echo"<font color=#f4d06e>Статус : <font color=#6fcd72><b>Online</b></font><br/><br/>";
-}
-
-echo'</td></tr></table>';
-
-
-						echo "<hr/>";
 
 $reqvip = mysql_query("SELECT * FROM `vip` WHERE `usr` = '$nick' LIMIT 1");
 $avto=mysql_num_rows($reqvip);
@@ -1099,101 +1061,25 @@ break;
 
 
 case 'shmot':
-echo "<div class=silka>";
 $req = mysql_query("SELECT * FROM `users` WHERE `usr` = '$nick'");
 $usdata = mysql_fetch_array($req);
-
-echo"<b>Снаряжение игрока $nick:</b><br/><br/>";
-$i=1;
-while($i<=13){
-switch($i){
-case '1':
-$tip='Шлем';
-$gt='golova';
+if (!$usdata) {
+echo lin2_ui_note('Нет такого игрока!');
 break;
-case '2':
-$tip='Доспех';
-$gt='body';
-break;
-case '3':
-$tip='Оружие';
-$gt='weapon';
-break;
-case '4':
-$tip='Рукавицы';
-$gt='ruki';
-break;
-case '5':
-$tip='Штаны';
-$gt='pants';
-break;
-case '6':
-$tip='Сапоги';
-$gt='nogi';
-break;
-case '7':
-$tip='Щит';
-$gt='shit';
-break;
-case '8':
-$tip='Амулет';
-$gt='amulet';
-break;
-case '9':
-$tip='Левая серьга';
-$gt='poyas';
-break;
-case '10':
-$tip='Правая серьга';
-$gt='rpoyas';
-break;
-case '11':
-$tip='Левое кольцо';
-$gt='kolco';
-break;
-case '12':
-$tip='Правое кольцо';
-$gt='rkolco';
-break;
-case '13':
-$tip='Плащ';
-$gt='plash';
-break;
-
 }
-$req = mysql_query("SELECT id,name FROM `item` WHERE `usr` = '$nick' and `tip`='$gt' and `image`='yes'");
-$mag = mysql_fetch_array($req);
-$u = explode("*",$mag['name']);
-if($gt!='skolco'){
-//echo"$tip: ";
-$req = mysql_query("SELECT id,name FROM `item` WHERE `usr` = '$nick' and `tip`='$gt' and `image`='yes'");
-$avto=mysql_num_rows($req);
-if($avto==0){
-echo"<img src=\"shmot/pusto/$gt.gif\" alt=\"pic\"/>  Ничего не одето <hr/>";
-}else{
-$mag = mysql_fetch_array($req);
-echo"<a href='inventar.php?mod=in&amp;id=$mag[id]'> <img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b></a><hr/>";
-}}else{
-$req = mysql_query("SELECT id,name FROM `item` WHERE `usr` = '$nick' and `tip`='$gt' and `image`='yes'");
-$avto=mysql_num_rows($req);
-if($avto==0){
-echo"<img src=\"shmot/pusto/$gt.gif\" alt=\"pic\"/>  Ничего не одето<hr/> ";
-echo"<img src=\"shmot/pusto/$gt.gif\" alt=\"pic\"/>  Ничего не одето<hr/> ";
-}elseif($avto==1){
-$mag = mysql_fetch_array($req);
-echo"<a href='inventar.php?mod=in&amp;id=$mag[id]'> <img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$mag[name]</b></a><hr/>";
-echo"<img src=\"shmot/pusto/$gt.gif\" alt=\"pic\"/>  Ничего не одето<hr/> ";
-}elseif($avto==2){
-While($best = mysql_fetch_array($req))
-{		$u = explode("*",$best['name']);
-echo"<a href='inventar.php?mod=in&amp;id=$best[id]'> <img src=\"shmot/$u[0].png\" alt=\"pic\"/> <b>$best[name]</b></a><hr/>";
+$lv = (int)$usdata['lvl'];
+$st = $lv < 20 ? 'NG' : ($lv < 40 ? 'D' : ($lv < 52 ? 'C' : ($lv < 62 ? 'B' : ($lv < 76 ? 'A' : 'S'))));
+echo lin2_ui_tabs(array(array('Инфо', 'search.php?go=go&nick='.rawurlencode($usdata['usr'])), array('Снаряжение', null)));
+$worn = lin2_ui_worn($usdata['usr']);
+echo lin2_ui_doll($worn, array('img' => lin2_ui_user_img($usdata, true), 'rank' => 'Грейд '.$st, 'info' => 'inventar.php?mod=in&id='));
+$any = false;
+foreach (array('weapon', 'golova', 'body', 'pants', 'ruki', 'nogi', 'plash', 'shit', 'amulet', 'poyas', 'rpoyas', 'kolco', 'rkolco') as $t) {
+if (!isset($worn[$t])) {continue;}
+if (!$any) {echo lin2_ui_sub('Снаряжение игрока '.$usdata['usr']); $any = true;}
+echo lin2_ui_item_row($worn[$t], 'inventar.php?mod=in&id='.(int)$worn[$t]['id']);
 }
-}
-}
-$i++;
-}
-echo"<br/><a href=\"search.php?go=go&amp;nick=$nick\">Назад</a>";
-echo "</div>";
+if (!$any) {echo lin2_ui_empty('Ничего не надето');}
+echo lin2_ui_go(array(array('search.php?go=go&nick='.rawurlencode($usdata['usr']), 'Назад')));
 break;
 
 

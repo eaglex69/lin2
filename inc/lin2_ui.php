@@ -540,4 +540,131 @@ function lin2_ui_pager($page, $pages, $base)
     return $h . '</div>';
 }
 
+/**
+ * Panel with a title (every piece of information on the new pages lives in one): $title = plain text, $body = html,
+ * $cls = '' (copper leather) | 'in' (dark recessed), add 'kv' when the body is made of stat rows (no padding), $note = plain text at the right of the title.
+ */
+function lin2_ui_panel($title, $body, $cls = '', $note = '')
+{
+    return '<div class="lx-pn' . ($cls !== '' ? ' ' . lin2_ui_h($cls) : '') . '"><div class="lx-pt">' . lin2_ui_h($title)
+        . ($note !== '' ? '<em>' . lin2_ui_h($note) . '</em>' : '') . '</div><div class="lx-pb">' . $body . '</div></div>';
+}
+
+/**
+ * Stat rows (label on the left, value on the right): array(array($icon, $label, $valueHtml[, $bonusText[, $plusHref[, $plusLabel]]]), ...)
+ * $icon: '' | att def hp mp coin gem bar xp st win lose (small picture before the label); $label and $bonusText are plain text,
+ * $valueHtml is html (the caller escapes what comes from the database); $plusHref = small gold «+» button at the end of the row.
+ * $g2 = two columns.
+ */
+function lin2_ui_kv($rows, $g2 = false)
+{
+    $h = '<div class="lx-kv' . ($g2 ? ' g2' : '') . '">';
+    foreach ($rows as $r) {
+        $ic = isset($r[0]) ? (string)$r[0] : '';
+        $h .= '<div class="r' . ($ic !== '' ? ' ' . lin2_ui_h($ic) : '') . '">' . ($ic !== '' ? '<u></u>' : '') . '<i>' . lin2_ui_h($r[1]) . '</i><b>' . $r[2];
+        if (isset($r[3]) && $r[3] !== '') {
+            $h .= '<em>' . lin2_ui_h($r[3]) . '</em>';
+        }
+        $h .= '</b>';
+        if (!empty($r[4])) {
+            $h .= '<a class="lx-plus" href="' . lin2_ui_h($r[4]) . '">' . lin2_ui_h(isset($r[5]) ? $r[5] : '+') . '</a>';
+        }
+        $h .= '</div>';
+    }
+    return $h . '</div>';
+}
+
+/** bar with the numbers inside (HP / MP / EXP), optionally with a gold «+» button: $cls = 'lx-hp' | 'lx-mp' | 'lx-xp' */
+function lin2_ui_meter($cls, $text, $cur, $max, $plusHref = '', $plusLabel = '+')
+{
+    $h = '<div class="lx-mt"><div class="lx-bar ' . lin2_ui_h($cls) . '"><i style="width:' . lin2_ui_pct($cur, $max) . '%"></i><b>' . lin2_ui_h($text) . '</b></div>';
+    if ($plusHref !== '') {
+        $h .= '<a class="lx-plus" href="' . lin2_ui_h($plusHref) . '">' . lin2_ui_h($plusLabel) . '</a>';
+    }
+    return $h . '</div>';
+}
+
+/** worn items of a player: array(tip => row of `item`), one query; a slot that holds nothing is missing from the array */
+function lin2_ui_worn($usr)
+{
+    $out = array();
+    $u = function_exists('mysql_real_escape_string') ? mysql_real_escape_string((string)$usr) : addslashes((string)$usr);
+    $q = mysql_query("SELECT * FROM `item` WHERE `usr` = '" . $u . "' and `image` = 'yes' ORDER BY `id`");
+    if ($q) {
+        while ($r = mysql_fetch_array($q)) {
+            if (!isset($out[$r['tip']])) {
+                $out[$r['tip']] = $r;
+            }
+        }
+    }
+    return $out;
+}
+
+/**
+ * One slot of the doll.  $row = row of `item` or null (empty slot).
+ * $o: 'info' = url that ends with 'id=' (page of the item), 'take' = url that ends with 'tip=' (take off: the red cross), '' = no cross,
+ *     'bag' = url that ends with 'o=' (an empty slot opens that part of the bag), '' = not a link.
+ */
+function lin2_ui_slot($tip, $row, $o)
+{
+    $name = lin2_ui_tip_name($tip);
+    if ($row) {
+        $h = '<div class="lx-sl on s-' . lin2_ui_h($tip) . '"><a class="lx-slot" href="' . lin2_ui_h($o['info'] . (int)$row['id']) . '" title="' . lin2_ui_h($name . ': ' . $row['name']) . '">'
+            . lin2_ui_item_pic($row['name'], $tip) . '</a>' . lin2_ui_grade_mark(isset($row['nlvl']) ? $row['nlvl'] : 0);
+        if ($o['take'] !== '') {
+            $h .= '<a class="lx-un" href="' . lin2_ui_h($o['take'] . $tip) . '" title="Снять">&times;</a>';
+        }
+        return $h . '</div>';
+    }
+    $pic = lin2_ui_item_pic_empty($tip);
+    if ($o['bag'] !== '') {
+        return '<div class="lx-sl empty s-' . lin2_ui_h($tip) . '"><a class="lx-slot" href="' . lin2_ui_h($o['bag'] . $tip) . '" title="' . lin2_ui_h($name . ': пусто') . '">' . $pic . '</a></div>';
+    }
+    return '<div class="lx-sl empty s-' . lin2_ui_h($tip) . '"><span class="lx-slot" title="' . lin2_ui_h($name . ': пусто') . '">' . $pic . '</span></div>';
+}
+
+/** only the glyph of an equipment type, in an item frame (no picture file is asked for) */
+function lin2_ui_item_pic_empty($tip)
+{
+    static $glyph = array(
+        'weapon' => 'g-weapon', 'golova' => 'g-golova', 'body' => 'g-body', 'pants' => 'g-pants', 'nogi' => 'g-nogi',
+        'ruki' => 'g-ruki', 'shit' => 'g-shit', 'plash' => 'g-plash', 'poyas' => 'g-earring', 'rpoyas' => 'g-earring',
+        'amulet' => 'g-amulet', 'kolco' => 'g-ring', 'rkolco' => 'g-ring',
+    );
+    return '<span class="lx-ic ' . (isset($glyph[$tip]) ? $glyph[$tip] : 'g-bag') . '"></span>';
+}
+
+/**
+ * The doll: the character in the middle, worn items on both sides (weapon on top, six slots on the left, six on the right).
+ * $worn = lin2_ui_worn(...).  $o: 'img' = picture of the character, 'rank' = text under the figure,
+ * 'info' (default 'inventar.php?mod=info&id='), 'take' (url + 'tip=' of the take-off link or ''), 'bag' (url + 'o=' or '').
+ */
+function lin2_ui_doll($worn, $o = array())
+{
+    $o = $o + array('img' => '', 'rank' => '', 'info' => 'inventar.php?mod=info&id=', 'take' => '', 'bag' => '');
+    $left = array('golova', 'body', 'pants', 'ruki', 'nogi', 'plash');
+    $right = array('shit', 'amulet', 'poyas', 'rpoyas', 'kolco', 'rkolco');
+    $h = '<div class="lx-doll"><div class="lx-dtop">' . lin2_ui_slot('weapon', isset($worn['weapon']) ? $worn['weapon'] : null, $o) . '</div><div class="lx-dcol">';
+    foreach ($left as $t) {
+        $h .= lin2_ui_slot($t, isset($worn[$t]) ? $worn[$t] : null, $o);
+    }
+    $h .= '</div><div class="lx-fig">' . ($o['img'] !== '' ? '<img src="' . lin2_ui_h($o['img']) . '" alt=""/>' : '')
+        . ($o['rank'] !== '' ? '<span class="rk">' . lin2_ui_h($o['rank']) . '</span>' : '') . '</div><div class="lx-dcol">';
+    foreach ($right as $t) {
+        $h .= lin2_ui_slot($t, isset($worn[$t]) ? $worn[$t] : null, $o);
+    }
+    return $h . '</div></div>';
+}
+
+/** «3 Дн. 4 Ч. 5 М. 6 С.» for a number of seconds (timers of the character page) */
+function lin2_ui_left($sec)
+{
+    $sec = max(0, (int)$sec);
+    $d = (int)floor($sec / 86400);
+    $h = (int)floor(($sec % 86400) / 3600);
+    $m = (int)floor(($sec % 3600) / 60);
+    $s = $sec % 60;
+    return $d . ' Дн. ' . $h . ' Ч. ' . $m . ' М. ' . $s . ' С.';
+}
+
 }

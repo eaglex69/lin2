@@ -184,6 +184,9 @@
       try { s.parentNode.replaceChild(n, s); } catch (e) { /* script removed with its parent */ }
     });
 
+    // the page is built: loose text goes into blocks (theme/blocks.js) BEFORE the scroll position is restored, the height changes
+    if (LX.blocks) { try { LX.blocks(); } catch (e) { /* the page works without blocks */ } }
+
     // history (opening the page we are already on replaces the entry instead of stacking a duplicate)
     if (opts.push === 'replace' || (opts.push !== false && url === location.href)) { history.replaceState({ lx: 1, y: 0 }, '', url); }
     else if (opts.push !== false) { history.pushState({ lx: 1, y: 0 }, '', url); }

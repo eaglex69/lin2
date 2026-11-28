@@ -53,7 +53,7 @@ break;
 case 'add_conts':
 echo "<form action=\"msg.php?mod=save_conts\" method=\"post\">Игрок:<br/>";
 echo "<input type=\"text\" value=\"$nk\" name=\"nick\"><br/>";
-echo "<input type=\"submit\" value=\"Поиск\" class=\"button_medium3\"></form>";
+echo "<input type=\"submit\" value=\"Поиск\"></form>";
 
 echo "<br/><a href=\"msg.php?\">Назад</a>";
 break;

@@ -142,6 +142,9 @@ node ajax_test.mjs                                    # переходы без 
 node battle_test.mjs [каталог-для-скриншотов]         # бой с монстром: без JavaScript и с ним, удар, ответ, победа, поражение (18)
 node duel_test.mjs [каталог-для-скриншотов]           # pk.php, combat.php, fight.php и перенос полос между страницами (7)
 node shop_test.mjs                                    # город (плитки), магазины, покупка, инвентарь, 16 страниц на 360 px (78 проверок)
+node pers_test.mjs                                    # страница персонажа («кукла», статы под образом, очки навыков), страница игрока, «блоки» (47 проверок)
+node outline.mjs /to_gorod.php? /bank.php?            # каркас страницы (теги, классы, текст) - чем «обёрнуты» куски текста; DEPTH=8 LINES=100
+node structure.mjs /bank.php? /job.php?               # дети ячейки td.centertd (прозрачные обёртки раскрываются)
 node seed.mjs                                         # наполнить сумку Tester'а вещами, ресурсами, питомцами (41 запрос) - для скриншотов
 AS=Tester W=390 node probe.mjs /gorod.php "document.title"   # выполнить выражение JS на странице и напечатать результат (JSON)
 node shots.mjs /tmp/shots --w 540 / /pers.php         # скриншоты страниц (--as Admin1, --guest, --maxh 4000)
@@ -154,11 +157,12 @@ BASE=http://127.0.0.1:8081 node ajax_test.mjs         # те же проверк
 `/_demo/reset` и `node seed.mjs`. Код выхода 1, если проверка не прошла или в консоли браузера
 появилась ошибка JavaScript. Описание того, что проверяется, - в `THEME.md`.
 
-Картинки-значки темы (`theme/fantasy/g-*.svg`, `corner-steel.svg`) рисует скрипт, а не человек:
+Значки и текстуры темы рисуют скрипты, а не человек:
 
 ```sh
-python3 tools/php8/art/make_glyphs.py            # перерисовать в theme/fantasy/ (или укажите каталог: ... make_glyphs.py /tmp/glyphs)
+python3 tools/php8/art/make_glyphs.py              # значки theme/fantasy/g-*.svg (или другой каталог: ... make_glyphs.py /tmp/glyphs); только Python 3
+python3 tools/php8/art/make_textures.py            # текстуры theme/fantasy/tx-bg.jpg, tx-copper.jpg, tx-gold.jpg; нужны numpy и Pillow
+python3 tools/php8/art/make_btn.py /tmp/cormorant-cyr.ttf   # медная кнопка «Отправить» (btn-send.png); Pillow и TTF-файл шрифта (в самом скрипте - как его получить)
 ```
 
-Нужен только Python 3 (без сторонних пакетов). Список значков и их рисунки - в самом скрипте; имя `g-<имя>` используется в плитках
-(`lin2_ui_tiles()` в `inc/lin2_ui.php`).
+Список значков и их рисунки - в `make_glyphs.py`; имя `g-<имя>` используется в плитках (`lin2_ui_tiles()` в `inc/lin2_ui.php`).
