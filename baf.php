@@ -281,6 +281,8 @@ $text = "
 mysql_query("INSERT INTO `baf_log` SET `usr` = '$nick', `text` = '$text'");
 }
 		  
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'baf_use', 1);
 echo"Вы использовали <b>$magiya[name]</b> $sms  на $tt секунд!<br/>";
 }}}
  echo"<br/><div class=silka><a href=\"baf.php?&nick=$nick\">Назад</a>";

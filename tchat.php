@@ -211,15 +211,10 @@ exit;}}*/
 //////////////////////////////////////////////////////////////////////////////////
 
 
-$msg = preg_replace('~(l 2 s e r v a k . r u|l2mobi.h1r.biz|darklineage.ru|l2mir.h1r.biz|l2perchiki.tk|l2pirates.ru|l2servak.ru|l2mobile.ru|wapl2pvp.ru|wapl2pvp.tk|l3mobile.ru|game-l2.ru|game-l2.ru|l2war.mobi|war-lin.ru|barbars.su|l2full.ru|miru.mobi|waplin.ru|l2mobi.su|l3waps.ru|l2mobi.su|l2servak|l2wap.ru|l3pvp.ru|l3new.ru|wapl2pvp|l3new.tk|l2mo.ru|lineage|. mobi|. info|ln8.ru|. org|. net|. com|l3pvp|l3new|. ua|. tk|. ru|mobi|line|ln8|lin|war|la2|la3|l2|l3)~is', 'Реклама запрещена', $msg);
-$msg = preg_replace('~(l 2 s e r v a k . r u|l2mobi.h1r.biz|darklineage.ru|l2mir.h1r.biz|l2perchiki.tk|l2pirates.ru|l2servak.ru|l2mobile.ru|wapl2pvp.ru|wapl2pvp.tk|l3mobile.ru|game-l2.ru|game-l2.ru|l2war.mobi|war-lin.ru|barbars.su|l2full.ru|miru.mobi|waplin.ru|l2mobi.su|l3waps.ru|l2mobi.su|l2servak|l2wap.ru|l3pvp.ru|l3new.ru|wapl2pvp|l3new.tk|l2mo.ru|lineage|. mobi|. info|ln8.ru|. org|. net|. com|l3pvp|l3new|. ua|. tk|. ru|mobi|line|ln8|lin|war|la2|la3|l2|l3)~is', 'Реклама запрещена', $msg);
+include_once($path . 'inc/antimat.php');
+$msg = lin2_chat_filter($msg);
 
-$msg=preg_replace('~(БАЛЬНИК|АХХУЕН|ДРАЦХИ|БЛАТЬ|БЛЙАД|БЛЙАТ|БЛИАД|БЛИАТ|ПИДОР|ПИДАР|НИДОР|НИДАР|ДРАЧИ|ЗАЛУП|ДАРАС|СЦУКА|СУКА|ИПАЛ|ПИТБ|АХУЕ|ОХУЕ|ХУЕЛ|ОХУИ|ОХУУ|ОХИУ|ОХУЮ|АХУИ|АХИИ|АХИЕ|АХУУ|АХИУ|ПИЗД|ПИСД|ПЫЗД|ПЫСД|ПИЦД|ПЕЗД|ПЕСД|БЛЯД|БЛАД|БЛЯТ|АЙОБ|АИОБ|УЙОБ|УИОБ|МУДИ|МУДА|ЧЛЕН|ЧЛЕП|ПЕДИ|ТВАЮ|САСИ|ЕДРИ|ПИДО|ГОНД|МАНД|ОТХУ|СУЧЕ|СРАН|МУДО| ЛОХ| ЛОШ|ХУЙ|ХУИ|ХУЁ|ХУЕ|ИБА|ХУЯ|ХУУ|БЛЯ|ЙОБ|ИОБ|ЪЕБ|АЁБ|АЁП|АЕБ|ОЁБ|ОЕБ|УЁБ|УЁП|УЕБ|ИЕБ|ЫЕБ|ЧМО|ЖОП|ПОЦ|ПОХ|ХЕР| ЁБ| ЁП| ЕБ)~is', '***', $msg);
-$msg=preg_replace('~(бальник|аххуен|драчун|блять|блйад|блйат|блиад|блиат|уёбок|уебок|пидор|пидар|нидор|нидар|педик|драчи|залуп|сучка|дарас|сцука|сука|ипал|питв|ахуе|охуе|хуел|охуи|ахие|пизд|писд|пызд|пысд|пицд|пезд|песд|бляд|блят|уйоб|член|члеп|дроч|саси|пидо|гонд|хуй|хуи|хеё|хуе|иба|хуя|бля|чмо|пох|лох|хер)~is', '***', $msg);
-
-
-
-$msg=substr($msg, 0, 512);
+$msg=mb_substr($msg, 0, 512, 'UTF-8');
 $msg=stripslashes(htmlspecialchars($msg));
 $msg=str_replace("\r\n","<br />",$msg);
 $msg=str_replace("\r","<br />",$msg);
@@ -235,6 +230,8 @@ $time = date("H:i");
 if($data_dbr >= $data_kom && $msg != "")
 {
 mysql_query("INSERT INTO tchat SET nick = '$log', komentaras = '$msg', kada = '$data', time = '$time'");
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'chat_msg', 1);
 $rand = rand(1000,9999);
 //start
 function smiles($string){

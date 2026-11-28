@@ -12,7 +12,7 @@ if (isset ($_SESSION['nick']) && isset ($_SESSION['password'])) {
 // авторизаци¤ по COOKIE                                   //
 // //////////////////////////////////////////////////////////
  elseif (isset ($_COOKIE['nick']) && isset ($_COOKIE['password'])) {
-    $udata1['usr'] = $_COOKIE['nick'];
+    $udata1['usr'] = rawurldecode((string)$_COOKIE['nick']);
     $_SESSION['nick'] = $udata1['usr'];
     $pas = $_COOKIE['password'];
     $_SESSION['password'] = $pas;

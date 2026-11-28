@@ -413,6 +413,8 @@ echo "<div style=\"text-align:center;margin:10 auto\"><div class=\"pic\">";
 echo "<a href=\"moder_event.php?\">Эвенты от МД </a>"; 
 echo "<a href=\"event.php?\">Ежедневные </a>"; 
 echo "<a href=\"event_w.php?\">Недельные </a>"; 
+echo "<a href=\"job.php?\">Задания </a>"; 
+echo "<a href=\"promo.php?\">Акции и бонусы </a>"; 
 //-----
 
 echo'<hr/><font color=#af9878><b><i> Рейтинги </i></b><br/><br/>';

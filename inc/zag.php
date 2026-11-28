@@ -390,26 +390,11 @@ echo'<div class="info" align="center">';
 echo"<a href=\"combat.php?\"><b>В бой</b></a>";
 echo'</div>';
 }
-$q = mysql_query("SELECT COUNT(*) FROM `msg_r` WHERE `user_to` = '$log' AND `user_from`!='Система' AND `user_from`!='Рассылка от администрации' AND `read` = '1';");
-$new_mail = mysql_result($q, 0);
-if($new_mail > 0){
-echo'<div class=silka>';
-echo"<center><a href=\"/msg.php?mod=read\"><img src=\"pic/roz/смс.png\" alt=\"\"><font color=#f4d06e> Сообщения <font color=#ff4040>+$new_mail </font></b></a></div></div>";
-echo"</div>";}
-
-$qras = mysql_query("SELECT COUNT(*) FROM `msg_r` WHERE `user_to` = '$log' AND `user_from`='Рассылка от администрации' AND `read` = '1';");
-$new_ras = mysql_result($qras, 0);
-if($new_ras > 0){
-echo'<div class=silka>';
-echo"<center><a href=\"/msg.php?mod=ras\"><img src=\"pic/roz/смс.png\" alt=\"\"><font color=#f4d06e> Рассылки <font color=#ff4040>+$new_ras </font></b></a></div></div>";
-echo"</div>";}
-
-$qsys = mysql_query("SELECT COUNT(*) FROM `msg_r` WHERE `user_to` = '$log' AND `user_from`='Система' AND `read` = '1';");
-$new_sys = mysql_result($qsys, 0);
-if($new_sys > 0){
-echo'<div class=silka>';
-echo"<center><a href=\"/msg.php?mod=sys\"><img src=\"pic/roz/смс.png\" alt=\"\"><font color=#f4d06e> Системные <font color=#ff4040>+$new_sys </font></b></a></div></div>";
-echo"</div>";}
+// Значок почты с индикатором непрочитанных писем выведен наверх в шапку (inc/head.php: a.lx-mail).
+if (!empty($log)) {
+    include_once($path . 'inc/quests_promo.php');
+    lin2_qp_touch_daily_visit($log);
+}
 
 
 

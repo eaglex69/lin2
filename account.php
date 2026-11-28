@@ -34,7 +34,7 @@ echo '<div class="account_reg">';
 echo '<form action="account.php?mod=goreg" method="post">';
 
 echo '<br />';
-echo '<font color=#6fcd72>Ник: <br /></font><small>от 3 до 10 латинских букв и цифр</small></font> <br />
+echo '<font color=#6fcd72>Ник: <br /></font><small>от 3 до 10 букв (рус/лат) и цифр</small></font> <br />
 <input class="input" type="text" size="10" name="nick" maxlength="15" />';
 echo '<br />';
 
@@ -64,7 +64,7 @@ echo'<a href="index.php">Назад</a><hr/>';
 function goreg()
 {
 
-if(preg_match('/[^a-z0-9-]/i',$_POST['nick']))
+if(preg_match('~[^a-zа-яё0-9_-]~iu',$_POST['nick']))
 {
 echo"Логин содержит запрещенные символы.<br/>
 <a href=\"account.php?\">Вернуться к регистрации</a><br/>"; 
@@ -101,7 +101,7 @@ echo "<a href=\"account.php?\">Назад</a></div>";
 include($path.'inc/end.php');
 exit;
 }
-if (@preg_replace("[A-za-zА-яа-я0-9-_]+", "", $reg_nick)){
+if (preg_match('~[^a-zа-яё0-9_-]~iu', $reg_nick)){
     
 echo "Используете запрещённые символы в логине!<br/>";
 echo "<a href=\"account.php?\">Назад</a></div>";

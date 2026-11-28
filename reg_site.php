@@ -98,7 +98,7 @@ echo"В мире $regsite героев пришедших с сайта <b>$_GET
 function goreg()
 {
 
-if(preg_match('/[^a-z0-9-]/i',$_POST['nick']))
+if(preg_match('~[^a-zа-яё0-9_-]~iu',$_POST['nick']))
 {
 echo"Логин содержит запрещенные символы.<br/>
 <a href=\"reg_site.php?site=$_GET[site]\">Вернуться к регистрации</a><br/>"; 
@@ -242,7 +242,7 @@ if ($avto == 1) {
         `pol` = '$_POST[pol]',
         `storona` = '$_POST[storona]',
         `lvl` = '0',
-        `money` = '3000',
+        `money` = '1000',
         `almaz` = '0',
         `skill` = '3',
         `hp` = '$hp',
@@ -272,7 +272,7 @@ if ($avto == 1) {
         `pol` = '$_POST[pol]',
         `storona` = '$_POST[storona]',
         `lvl` = '0',
-        `money` = '3000',
+        `money` = '1000',
         `almaz` = '0',
         `skill` = '3',
         `hp` = '$hp',

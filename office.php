@@ -28,7 +28,8 @@ include($path.'inc/end.php');
 exit;
 }
 
-$case=htmlspecialchars(trim($_GET['a']));
+$case_raw = isset($_GET['a']) && $_GET['a'] !== '' ? $_GET['a'] : (isset($_GET['act']) ? $_GET['act'] : '');
+$case=htmlspecialchars(trim((string)$case_raw));
 
 switch($case){
 
@@ -159,8 +160,8 @@ echo '<div class="account_reg">';
 echo '<form action="office.php?a=add" method="post">';
 
 echo '<br />';
-echo 'Имя персонажа: <br /> <small>min 4, max 10, A-z-А-я-0-9</small> <br />
-<input class="input" type="text" size="10" name="name" maxlength="15" />';
+echo 'Имя персонажа: <br /> <small>от 4 до 10 символов: кириллица, латиница, цифры</small> <br />
+<input class="input" type="text" size="10" name="name" maxlength="10" />';
 echo '<br />';
 
 echo "Укажите ваш пол:<br/>
@@ -193,7 +194,7 @@ break;
 case 'add':
 $my_pers = mysql_result(mysql_query("SELECT COUNT(*) FROM `users` WHERE `account` = '$uid'"),0);
 if($my_pers>6){echo'Регистрировать более 7 персонажей ЗАПРЕЩЕНО';break;}
-$name = $_POST['name'];
+$name = isset($_POST['name']) ? trim((string)$_POST['name']) : '';
 $storona = $_POST['storona'];
 $class = $_POST['klas'];
 $pol = $_POST['pol'];
@@ -212,8 +213,11 @@ echo "<a href=\"reg.php\">Назад</a></div>";
 if(!$name){
 echo '<div class="error">Выберите Ник!</div>';
 break;
-}elseif(mb_strlen($name) < 4 || mb_strlen($name) > 10) {
+}elseif(mb_strlen($name, 'UTF-8') < 4 || mb_strlen($name, 'UTF-8') > 10) {
 echo'Ошибка! Ник должен быть не менее 4-х символов но не более 10';
+break;
+}elseif(is_numeric($name)) {
+echo '<div class="error">Ник не должен состоять только из цифр!</div>';
 break;
 }
 
@@ -265,7 +269,8 @@ $pdef = 68;
 $mdef = 49;
 }
 
-if(!preg_match('~[^a-z0-9]+~iu', $name)) {
+if(!preg_match('~[^a-zа-яё0-9_-]+~iu', $name)) {
+    $name = mysql_real_escape_string($name);
     mysql_query("INSERT INTO
         `users` SET
         `usr` = '".$name."',
@@ -275,7 +280,7 @@ if(!preg_match('~[^a-z0-9]+~iu', $name)) {
         `pol` = '".$pol."',
         `storona` = '".$storona."',
         `lvl` = '0',
-        `money` = '10000000000',
+        `money` = '1000',
         `almaz` = '0',
         `skill` = '3',
         `hp` = '".$hp."',

@@ -47,3 +47,92 @@ ALTER TABLE `clan_shop`
 
 ALTER TABLE `clan_shop`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+-- --------------------------------------------------------
+-- Ежедневные / еженедельные задания, акции и бонусы (job.php, promo.php, adm_panel.php)
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `lin2_qp_meta` (
+  `k` varchar(40) NOT NULL DEFAULT '',
+  `v` varchar(120) NOT NULL DEFAULT '',
+  PRIMARY KEY (`k`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `lin2_quests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `period` varchar(16) NOT NULL DEFAULT 'daily',
+  `title` varchar(160) NOT NULL DEFAULT '',
+  `descr` varchar(255) NOT NULL DEFAULT '',
+  `metric` varchar(40) NOT NULL DEFAULT 'mob_kill',
+  `target` bigint(20) NOT NULL DEFAULT '1',
+  `min_lvl` int(11) NOT NULL DEFAULT '0',
+  `rew_adena` bigint(20) NOT NULL DEFAULT '0',
+  `rew_exp` bigint(20) NOT NULL DEFAULT '0',
+  `rew_col` int(11) NOT NULL DEFAULT '0',
+  `rew_vip` int(11) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `sort_order` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `lin2_quest_counters` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usr` varchar(40) NOT NULL DEFAULT '',
+  `period_key` varchar(24) NOT NULL DEFAULT '',
+  `metric` varchar(40) NOT NULL DEFAULT '',
+  `val` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `lin2_quest_claims` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usr` varchar(40) NOT NULL DEFAULT '',
+  `quest_id` int(11) NOT NULL DEFAULT '0',
+  `period_key` varchar(24) NOT NULL DEFAULT '',
+  `claimed_at` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `lin2_promos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(160) NOT NULL DEFAULT '',
+  `descr` text NOT NULL,
+  `badge` varchar(64) NOT NULL DEFAULT '',
+  `exp_pct` int(11) NOT NULL DEFAULT '100',
+  `adena_pct` int(11) NOT NULL DEFAULT '100',
+  `gift_adena` bigint(20) NOT NULL DEFAULT '0',
+  `gift_exp` bigint(20) NOT NULL DEFAULT '0',
+  `gift_col` int(11) NOT NULL DEFAULT '0',
+  `starts_at` int(11) NOT NULL DEFAULT '0',
+  `ends_at` int(11) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `lin2_bonuses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(160) NOT NULL DEFAULT '',
+  `descr` varchar(255) NOT NULL DEFAULT '',
+  `code` varchar(64) NOT NULL DEFAULT '',
+  `cooldown_type` varchar(16) NOT NULL DEFAULT 'once',
+  `min_lvl` int(11) NOT NULL DEFAULT '0',
+  `rew_adena` bigint(20) NOT NULL DEFAULT '0',
+  `rew_exp` bigint(20) NOT NULL DEFAULT '0',
+  `rew_col` int(11) NOT NULL DEFAULT '0',
+  `rew_vip` int(11) NOT NULL DEFAULT '0',
+  `max_claims` int(11) NOT NULL DEFAULT '0',
+  `claims_count` int(11) NOT NULL DEFAULT '0',
+  `ends_at` int(11) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `lin2_bonus_claims` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `usr` varchar(40) NOT NULL DEFAULT '',
+  `bonus_id` int(11) NOT NULL DEFAULT '0',
+  `claim_key` varchar(40) NOT NULL DEFAULT '',
+  `claimed_at` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+

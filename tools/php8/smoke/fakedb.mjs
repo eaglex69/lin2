@@ -6,7 +6,8 @@
 //    (that is how "guest / not found" situations are simulated)
 // It is NOT a SQL engine: it is only meant to let PHP pages run far enough to expose runtime errors.
 import mysql from 'mysql2';
-import { readFileSync, appendFileSync } from 'node:fs';
+import { readFileSync, appendFileSync, existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 export function parseSchema(sqlText) {
   const tables = {};
@@ -287,6 +288,8 @@ function writeOkPacket(conn, { affectedRows = 0, insertId = 0 } = {}) {
 //                      by all pages, so one page's INSERT would change what every other page sees.
 export function startFakeDb({ schemaPath, port = 0, logFile = null, host = '127.0.0.1', debugPackets = false, profile = 'dummy', stateful = null, remember = false }) {
   const schema = parseSchema(readFileSync(schemaPath, 'utf8'));
+  const extraPath = join(dirname(schemaPath), 'shema_extra.sql');
+  if (!stateful && existsSync(extraPath)) Object.assign(schema, parseSchema(readFileSync(extraPath, 'utf8')));
   const stats = { queries: 0, unknownTables: {}, selects: 0, writes: 0 };
   let insertId = 100;
   const written = new Set();       // remember mode: normally-empty tables that have a row now

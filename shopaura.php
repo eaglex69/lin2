@@ -120,6 +120,8 @@ exit;
 $req1 = mysql_query("SELECT * FROM `item_aura` WHERE `usr` = '$log' and `lat_name` = '$mag[lat_name]'");
 $res = mysql_fetch_array($req1);
 $avto1=mysql_num_rows($req1);
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'shop_buy', 1);
 if($avto1==0){
 mysql_query("INSERT INTO
         `item_aura` SET

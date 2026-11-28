@@ -104,6 +104,8 @@ mysql_query("DELETE FROM `pk_log` WHERE usr='$log'");//чистим логи
 $reqm = mysql_query("SELECT * FROM `mesto` WHERE `usr` = '$log' LIMIT 1");
 $mm = mysql_fetch_array($reqm);
 
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'pvp_win', 1);
 echo"Вы победили в бою с $he[usr]!<br/>";
 echo"+$exp опыта<br/>";
 if($money>0){

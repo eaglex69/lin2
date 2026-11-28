@@ -69,6 +69,10 @@ echo' <a href="msg_all.php?">&#187; Рассылка сообщений</a>';
 echo' <a href="msg_adm.php?">&#187; Рассылка сообщений всей администрации</a>';
 echo' <a href="lvl_new.php?">&#187; Добавить уровней</a>';
 echo' <a href="ava.php?">&#187; Аватарки</a>';
+echo' <a href="/adm_panel.php?mod=quests">&#187; Управление квестами</a>';
+echo' <a href="/adm_panel.php?mod=promos">&#187; Управление акциями</a>';
+echo' <a href="/adm_panel.php?mod=bonuses">&#187; Управление бонусами</a>';
+echo' <a href="/adm_panel.php?mod=images">&#187; Замена картинок сайта</a>';
 echo "</div>";
 
 

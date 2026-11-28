@@ -198,6 +198,8 @@ mysql_query("INSERT INTO fish_log SET usr='$log',ids='$udata[id]',skoko='$co'");
 
 
 //	---	//	---	//	---	//	//	 	ЗАДАНИЯ		//	//	---	//	---	//	---	//
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'fish_catch', max(1, (int)$co));
 if ($udata['lvl']>49){
 $reqev = mysql_query("SELECT * FROM job_fish WHERE `usr` = '$log' Limit 1");
 ////////////////////////////

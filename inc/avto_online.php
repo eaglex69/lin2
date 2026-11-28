@@ -36,6 +36,10 @@ $sek = $onl['sek'] + $seknew; // резулт
 
 $udatatime = $udata['time']+$seknew; // секунд всего
 $udatatimebon = $udata['time_bon']+$seknew; // секунд бонус
+if (!empty($log) && $seknew >= 60) {
+    include_once((isset($path) ? $path : '') . 'inc/quests_promo.php');
+    lin2_qp_progress($log, 'online_min', (int)floor($seknew / 60));
+}
 
 /*										*/
 

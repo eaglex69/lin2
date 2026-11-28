@@ -136,7 +136,7 @@ echo "seeded\\n";
 // ---------------------------------------------------------------------------------------------------------------------
 const readBody = req => new Promise((res, rej) => { const a = []; req.on('data', c => a.push(c)); req.on('end', () => res(Buffer.concat(a))); req.on('error', rej); });
 const parseCookies = h => Object.fromEntries(String(h || '').split(/;\s*/).filter(Boolean).map(c => { const i = c.indexOf('='); return [c.slice(0, i), c.slice(i + 1)]; }));
-const loginCookies = nick => [`nick=${nick}; Path=/; Max-Age=31536000`, `password=${md5(PASSWORD)}; Path=/; Max-Age=31536000`, 'demo_seen=1; Path=/; Max-Age=31536000'];
+const loginCookies = nick => [`nick=${encodeURIComponent(nick)}; Path=/; Max-Age=31536000`, `password=${md5(PASSWORD)}; Path=/; Max-Age=31536000`, 'PHPSESSID=; Path=/; Max-Age=0', 'demo_seen=1; Path=/; Max-Age=31536000'];
 
 function sendStatic(res, file, req) {
   const st = statSync(file);

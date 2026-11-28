@@ -72,9 +72,25 @@ if ($lx_title === '') {
 $lx_script = isset($_SERVER['SCRIPT_NAME']) ? basename((string)$_SERVER['SCRIPT_NAME']) : '';
 $lx_close = (!empty($user_id) && $lx_script !== 'index.php' && $lx_script !== 'main.php')
     ? '<a class="lx-x" href="/?" title="В меню"></a>' : '';
+$lx_mail = '';
+if (!empty($user_id) && !empty($log)) {
+    $lx_log_esc = mysql_real_escape_string((string)$log);
+    $lx_mr_p = (int)mysql_result(mysql_query("SELECT COUNT(*) FROM `msg_r` WHERE `user_to` = '$lx_log_esc' AND `user_from` != 'Система' AND `user_from` != 'Рассылка от администрации' AND `read` = '1'"), 0);
+    $lx_mr_r = (int)mysql_result(mysql_query("SELECT COUNT(*) FROM `msg_r` WHERE `user_to` = '$lx_log_esc' AND `user_from` = 'Рассылка от администрации' AND `read` = '1'"), 0);
+    $lx_mr_s = (int)mysql_result(mysql_query("SELECT COUNT(*) FROM `msg_r` WHERE `user_to` = '$lx_log_esc' AND `user_from` = 'Система' AND `read` = '1'"), 0);
+    $lx_mr_tot = $lx_mr_p + $lx_mr_r + $lx_mr_s;
+    $lx_mr_href = '/msg.php?mod=read';
+    if ($lx_mr_p === 0 && $lx_mr_r > 0) {
+        $lx_mr_href = '/msg.php?mod=ras';
+    } elseif ($lx_mr_p === 0 && $lx_mr_s > 0) {
+        $lx_mr_href = '/msg.php?mod=sys';
+    }
+    $lx_mr_badge = $lx_mr_tot > 0 ? '<i class="bd">' . ($lx_mr_tot > 99 ? '99+' : $lx_mr_tot) . '</i>' : '';
+    $lx_mail = '<a class="lx-mail" href="' . $lx_mr_href . '" title="Почта' . ($lx_mr_tot > 0 ? ' (+' . $lx_mr_tot . ')' : '') . '">' . $lx_mr_badge . '</a>';
+}
 echo '
 <div class="lx-app" id="lx-app">
-<div class="lx-banner-wrap"><div class="lx-banner' . $lx_size . '"><b>' . $lx_ribbon . '</b></div></div>' . $lx_close . '
+<div class="lx-banner-wrap">' . $lx_mail . '<div class="lx-banner' . $lx_size . '"><b>' . $lx_ribbon . '</b></div></div>' . $lx_close . '
 <table class="lx-frame" cellspacing="0" cellpadding="0"><tr><td class="centertd">';
 ///////////////////
 }

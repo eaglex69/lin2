@@ -98,7 +98,11 @@ $arer = $arer + $are;
 }}
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-$tiles = array(array('job.php?', 'quest', 'Квест'));
+include_once($path . 'inc/quests_promo.php');
+$lx_ready_q = !empty($log) ? lin2_qp_ready_quest_count($log, $udata['lvl']) : 0;
+$tiles = array(
+    array('job.php?', 'quest', 'Квест', $lx_ready_q > 0 ? array('badge' => $lx_ready_q) : array()),
+);
 if($udata['klas']=="wizard"){$tiles[] = array('akademmag.php?', 'akadem', 'Академия');}
 if($udata['klas']=="fighert"){$tiles[] = array('akademwar.php?', 'akadem', 'Академия');}
 $tiles[] = array('home.php?', 'clan', 'Клан');
@@ -122,6 +126,7 @@ if (empty($as)){$as=0;}
 echo lin2_ui_sub('Куда пойти');
 echo lin2_ui_tiles(array(
 array('gorod.php?pl=shop_zone', 'g-scales', 'Торговая площадь'),
+array('promo.php?', 'g-gift', 'Акции и бонусы'),
 array('lotomy.php?', 'g-casino', 'Казино'),
 array('to_zamok.php?', 'g-city', 'Замок'),
 array('to_world.php?', 'g-world', 'Окрестности'),

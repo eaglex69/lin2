@@ -331,11 +331,13 @@ exit;
 }
 
 $msg=$_POST['zin'];
+include_once($path . 'inc/antimat.php');
+$msg = lin2_chat_filter($msg);
 
 // пишем защиту от повтора сообщений
 $pov = mysql_fetch_array(mysql_query("SELECT * FROM komentarai WHERE nick = '$log' ORDER BY id DESC LIMIT 1"));
 
-if ($pov['komentaras']==$msg){
+if ($pov && $pov['komentaras']==$msg){
 echo "<b>Спам. Запрещенно писать одинаковые сообщения! </b>";
 					echo"<br/><br/><a href=\"chat.php?\">Назад</a>";
 include($path.'inc/down.php');
@@ -344,19 +346,19 @@ exit;
 
 ////////	Добавляем плюс в чат 	///////////////////
 $ch_o = explode(",", $msg);
+$ch_target = mysql_real_escape_string(trim($ch_o[0]));
 
-
-$avt_usr = mysql_num_rows(mysql_query("SELECT usr FROM users WHERE usr = '$ch_o[0]'"));
-$avt_cha = mysql_num_rows(mysql_query("SELECT usr FROM chat_otv WHERE usr = '$ch_o[0]'"));
+$avt_usr = mysql_num_rows(mysql_query("SELECT usr FROM users WHERE usr = '$ch_target'"));
+$avt_cha = mysql_num_rows(mysql_query("SELECT usr FROM chat_otv WHERE usr = '$ch_target'"));
 if ($avt_usr > 0 and  $avt_cha == 0){
-mysql_query("INSERT INTO `chat_otv` (`id`, `usr`, `time`) VALUES (NULL, '$ch_o[0]', '$timec' )");
+mysql_query("INSERT INTO `chat_otv` (`id`, `usr`, `time`) VALUES (NULL, '$ch_target', '$timec' )");
 }
 
 
 //////////////////////////////////////////////////
 
 
-$msg=substr($msg, 0, 512);
+$msg=mb_substr($msg, 0, 512, 'UTF-8');
 $msg=stripslashes(htmlspecialchars($msg));
 $msg=str_replace("\r\n","<br />",$msg);
 $msg=str_replace("\r","<br />",$msg);
@@ -373,6 +375,8 @@ if($data_dbr >= $data_kom && $msg != "")
 {
 mysql_query("INSERT INTO komentarai SET nick = '$log', komentaras = '$msg', kada = '$data', time = '$time'");
 mysql_query("UPDATE `users` SET `post` = `post` + 1 WHERE `usr` = '".$log."'");
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'chat_msg', 1);
 $rand = rand(1000,9999);
 //start
 function smiles($string){

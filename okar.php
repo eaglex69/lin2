@@ -185,6 +185,8 @@ header ('Location: arena.php?');exit;
 
 
 //	---	//	---	//	---	//	//	 	ЗАДАНИЯ		//	//	---	//	---	//	---	//
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'pvp_win', 1);
 if ($udata['lvl']>49){
 $reqev = mysql_query("SELECT * FROM job_pvp WHERE `usr` = '$log' Limit 1");
 ////////////////////////////

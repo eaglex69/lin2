@@ -287,6 +287,15 @@ mysql_query("UPDATE `res` SET `kol` = '$nk' WHERE `usr` = '$log' and `lat_name` 
 }
 if ($mob['sm']==0){$mob['sm']=100;} // сделано так, потому, что создано половина мобов с рандом 0. Потом переписан бал рандом, мобов лень переписывать хД (iNoY.GM)
 $smshans=rand(1,100);
+include_once($path . 'inc/quests_promo.php');
+$lx_qp_rates = lin2_qp_rates();
+if ($lx_qp_rates['exp_pct'] !== 100) {
+    $mob['exp'] = (int)round($mob['exp'] * $lx_qp_rates['exp_pct'] / 100);
+}
+if ($lx_qp_rates['adena_pct'] !== 100) {
+    $mob['money'] = (int)round($mob['money'] * $lx_qp_rates['adena_pct'] / 100);
+}
+
 if($smshans<=$mob['sm']){
 $nmoney = $mob['money'];
 }
@@ -414,6 +423,14 @@ mysql_query("INSERT INTO eve_mob SET usr='$log',ids='$udata[id]',skoko='1'"); //
 
 
 //	---	//	---	//	---	//	//	 	ЗАДАНИЯ		//	//	---	//	---	//	---	//
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'mob_kill', 1);
+if ((int)$mob['lvl'] >= 20 || $mob['tip'] === 'boss' || $mob['tip'] === 'rb') {
+    lin2_qp_progress($log, 'mob_strong', 1);
+}
+if (!empty($nmoney) && $mob['money'] > 0) {
+    lin2_qp_progress($log, 'adena_farm', max(1, (int)round($mob['money'] / $pat)));
+}
 if ($udata['lvl']>76){
 $reqev = mysql_query("SELECT * FROM job_mob WHERE `usr` = '$log' LIMIT 1");
 ////////////////////////////

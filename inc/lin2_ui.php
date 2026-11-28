@@ -186,7 +186,7 @@ function lin2_ui_duel($o)
  * ---- markup of the menu / shop / inventory pages (css: theme/fantasy.css, section 10) -------------------------
  * Every function takes PLAIN text and plain URLs ('a.php?x=1&y=2'): it escapes them itself, so a caller must not
  * pass '&amp;' or html.  Painted pictures and glyphs are CSS classes (t-<name> = theme/fantasy/t-<name>.jpg,
- * g-<name> = theme/fantasy/g-<name>.svg), so the pages work from any URL prefix and need no extra requests.
+ * g-<name> = theme/fantasy/g-<name>.png), so the pages work from any URL prefix and need no extra requests.
  */
 
 /** «ГОРОД  /  Orc Village» */

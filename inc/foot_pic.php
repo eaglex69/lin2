@@ -8,7 +8,7 @@ if ($avto_chat == 0) {$chat_otvet = '4at.jpg';}else{$chat_otvet = '4at2.JPG';}
 
 
 echo '</div></div>';
-// нижнее меню: круглые медальоны с золотым кольцом (рисунки: theme/fantasy/g-*.svg, не зависят от pic/down/*);
+// нижнее меню: круглые медальоны с золотым кольцом (рисунки: theme/fantasy/g-*.png, не зависят от pic/down/*);
 // 4-й элемент = страницы, на которых вкладка подсвечена; красная точка на «Чат» = вам ответили
 $lx_here = isset($_SERVER['SCRIPT_NAME']) ? basename((string)$_SERVER['SCRIPT_NAME']) : '';
 echo '<div class="lx-nav">';

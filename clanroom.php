@@ -294,11 +294,9 @@ case 'add':
 $msg=$_POST['msg'];
 
 if ($msg == "" || strlen($msg) > 2500 || strlen($msg) < 3) { echo"Сообщение длинное или короткое!<br/> &#187 5 - 2`500 символов.<br/>"; }else{
-/*
-$msg=preg_replace('~((https?|ftp|http)://[[:alnum:]_=/-]+(\\.[[:alnum:]_=/-]+)*(/[[:alnum:]+&._=/%]*(\\?[[:alnum:]?+&_=/%]*)?)?).(ru|org|net|info|com)~is', 'Реклама запрещена', $msg);
-$msg=preg_replace('~([[:alnum:]_=/-]+(\\.[[:alnum:]_=/-]+)*(/[[:alnum:]+&._=/%]*(\\?[[:alnum:]?+&_=/%]*)?)?).(ru|su|org|net|info|com)~is', 'Реклама запрещена', $msg);
-*/
+include_once($path . 'inc/antimat.php');
 $msg=stripslashes($msg);
+$msg=lin2_chat_filter($msg);
 $msg=htmlspecialchars($msg);
 $msg=str_replace("\\","",$msg);
 $msg=str_replace("/","",$msg);
@@ -313,6 +311,8 @@ $log=str_replace("#","",$log);
 $times222 = date("H:i:s");
 $date222 = date("d.m.Y");
 mysql_query("INSERT INTO clanchat SET usr='$log',clan='$udata[clan]',msg='$msg',time='$times222 / $date222'");
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'chat_msg', 1);
 
 echo"Сообщение добавлено!<br/>";}
 echo"<br/><a href=\"clanroom.php?\">Продолжить</a>"; 

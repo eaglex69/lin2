@@ -178,6 +178,8 @@ $text = "
 mysql_query("INSERT INTO `baf_log` SET `usr` = '$nick', `text` = '$text'");
 }
 		  
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'baf_use', 1);
 echo"Вы использовали БАФ <b> $sms </b>  на $times секунд!<br/> $u[1]";
 }}else{echo "<p><font color=red>Ошибка! Такого типа нет бафов $_GET[tip]</font></p>";}
 

@@ -10,7 +10,7 @@ function str2gradient($text,$from='',$to='', $mode="hex")
     if( empty($text) ) 
         return ''; 
     else 
-        $levels=strlen($text); 
+        $levels=mb_strlen($text, 'UTF-8'); 
 
     if (empty($from)) 
                 $from = array(0,0,255); 
@@ -40,7 +40,7 @@ function str2gradient($text,$from='',$to='', $mode="hex")
 
                         if (strlen($rgb[$ii]) < 2) $rgb[$ii] = "0$rgb[$ii]"; 
                 } 
-           $output .= ''.$rgb[0].$rgb[1].$rgb[2].'' == '000000' ? '' . mb_substr($text, ($i-1), 1) . '' : "<font color=\"#".$rgb[0].$rgb[1].$rgb[2]."\">" . mb_substr($text, ($i-1), 1) ."</font>"; 
+           $output .= ''.$rgb[0].$rgb[1].$rgb[2].'' == '000000' ? '' . mb_substr($text, ($i-1), 1, 'UTF-8') . '' : "<font color=\"#".$rgb[0].$rgb[1].$rgb[2]."\">" . mb_substr($text, ($i-1), 1, 'UTF-8') ."</font>"; 
         } 
         return $output; 
 } 

@@ -157,20 +157,18 @@ echo lin2_ui_doll(lin2_ui_worn($log), array(
     'bag' => 'inventar.php?mod=item&o=',
 ));
 
-// ---- под образом: здоровье и характеристики ----
-$exp_pct = isset($exp) ? max(0, min(100, (int)$exp)) : 0;
-echo lin2_ui_panel('Здоровье',
-    lin2_ui_meter('lx-hp', 'Жизни '.(int)$udata['hp'].' / '.(int)$udata['hpall'], $udata['hp'], $udata['hpall'], $skill > 0 ? 'pers.php?hp' : '', '+30')
-    .lin2_ui_meter('lx-mp', 'Мана '.(int)$udata['mp'].' / '.(int)$udata['mpall'], $udata['mp'], $udata['mpall'], $skill > 0 ? 'pers.php?mp' : '', '+30')
-    .lin2_ui_meter('lx-xp', 'Опыт '.$exp_pct.'%', $exp_pct, 100),
-    'in');
-
-echo lin2_ui_panel('Характеристики', lin2_ui_kv(array(
+// ---- под образом: характеристики (блок «Здоровье» убран — HP / MP / EXP отображаются наверху в шапке) ----
+$stat_rows = array(
     array('att', 'Физ. атака', lin2_ui_num($udata['patt']), $at_sum > 0 ? '+'.number_format($at_sum, 0, ',', ' ') : '', $skill > 0 ? 'pers.php?patt' : '', '+3'),
     array('att', 'Маг. атака', lin2_ui_num($udata['matt']), $at_sum > 0 ? '+'.number_format($at_sum, 0, ',', ' ') : '', $skill > 0 ? 'pers.php?matt' : '', '+3'),
     array('def', 'Физ. защита', lin2_ui_num($udata['pdef']), $df_sum > 0 ? '+'.number_format($df_sum, 0, ',', ' ') : '', $skill > 0 ? 'pers.php?pdef' : '', '+3'),
     array('def', 'Маг. защита', lin2_ui_num($udata['mdef']), $df_sum > 0 ? '+'.number_format($df_sum, 0, ',', ' ') : '', $skill > 0 ? 'pers.php?mdef' : '', '+3'),
-)), 'in kv', $skill > 0 ? 'Очков навыков: '.$skill : '');
+);
+if ($skill > 0) {
+    $stat_rows[] = array('hp', 'Макс. жизни', lin2_ui_num($udata['hpall']), '', 'pers.php?hp', '+30');
+    $stat_rows[] = array('mp', 'Макс. мана', lin2_ui_num($udata['mpall']), '', 'pers.php?mp', '+30');
+}
+echo lin2_ui_panel('Характеристики', lin2_ui_kv($stat_rows), 'in kv', $skill > 0 ? 'Очков навыков: '.$skill : '');
 
 if ($skill >= 5) {
     echo lin2_ui_panel('Повысить навык',

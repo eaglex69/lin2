@@ -404,7 +404,7 @@ function lin2i_create_admin($link, $nick, $pass, $email, &$error)
     $hp = 120 + 50;
     $mp = 80 + 50;
     if (!lin2i_exec($link, "INSERT INTO `users` SET `usr` = '$n', `pass` = '$hash', `email` = '{$e['email']}', `ip` = '{$e['ip']}', "
-        . "`pol` = 'm', `storona` = 'human', `lvl` = '0', `money` = '10000000000', `almaz` = '0', `skill` = '3', "
+        . "`pol` = 'm', `storona` = 'human', `lvl` = '0', `money` = '1000', `almaz` = '0', `skill` = '3', "
         . "`hp` = '$hp', `hpall` = '$hp', `mp` = '$mp', `mpall` = '$mp', `exp` = '0', "
         . "`patt` = '55', `matt` = '21', `pdef` = '68', `mdef` = '49', `klas` = 'fighert', "
         . "`city` = 'Talking Island Village', `lvisit` = '$now', `account` = '$accId', `dostup` = '5'", $error)) {
@@ -603,8 +603,8 @@ function lin2i_validate($in)
         $err[] = 'Пароль MySQL слишком длинный (до 255 символов).';
     }
     if ($in['db_mode'] === 'fresh') {
-        if (!preg_match('~^[A-Za-z0-9]{4,10}$~', $in['admin_nick'])) {
-            $err[] = 'Ник администратора: от 4 до 10 латинских букв и цифр (как у персонажей в игре).';
+        if (!preg_match('~^[A-Za-zА-Яа-яЁё0-9]{4,10}$~u', $in['admin_nick'])) {
+            $err[] = 'Ник администратора: от 4 до 10 букв (русских или латинских) и цифр (как у персонажей в игре).';
         } elseif (is_numeric($in['admin_nick'])) {
             // enter.php принимает числовой логин за номер аккаунта (is_numeric): войти под таким ником было бы нельзя
             $err[] = 'Ник администратора не должен состоять только из цифр и не должен выглядеть как число (например, 1e5): форма входа принимает такой логин за номер аккаунта.';

@@ -61,6 +61,10 @@ echo"<a href=\"adm_panel.php?mod=new15\">Добавить новость</a>";
 echo"<a href=\"adm_panel.php?mod=teh_news\">Добавить техническую новость</a>";
 //echo"<a href=\"adm_panel.php?mod=16\">Библиотека</a>";
 
+echo'<hr/> <a href="adm_panel.php?mod=quests">&#187; Квесты (ежедневные и недельные)</a>';
+echo' <a href="adm_panel.php?mod=promos">&#187; Акции и рейты</a>';
+echo' <a href="adm_panel.php?mod=bonuses">&#187; Бонусы и промокоды</a>';
+echo' <a href="adm_panel.php?mod=images">&#187; Замена любых картинок сайта</a>';
 echo'<hr/> <a href="gm/ava.php?">&#187; Аватарки</a>';
 
 
@@ -1564,6 +1568,26 @@ echo '<input type="text" name="text" value="Введите причину" />';
 echo '<input type="submit" name="submit" value="Заблокировать" />';
 echo '</form>';
 }
+break;
+
+case 'quests':
+include_once($path . 'inc/adm_modules.php');
+lin2_adm_quests();
+break;
+
+case 'promos':
+include_once($path . 'inc/adm_modules.php');
+lin2_adm_promos();
+break;
+
+case 'bonuses':
+include_once($path . 'inc/adm_modules.php');
+lin2_adm_bonuses();
+break;
+
+case 'images':
+include_once($path . 'inc/adm_modules.php');
+lin2_adm_images();
 break;
 }
 

@@ -97,7 +97,7 @@ echo'<a href="index.php">Назад</a><hr/>';
 function goreg()
 {
 
-if(preg_match('/[^a-z0-9-]/i',$_POST['nick']))
+if(preg_match('~[^a-zа-яё0-9_-]~iu',$_POST['nick']))
 {
 echo"Логин содержит запрещенные символы.<br/>
 <a href=\"reg.php?\">Вернуться к регистрации</a><br/>"; 
@@ -241,7 +241,7 @@ if ($avto == 1) {
         `pol` = '$_POST[pol]',
         `storona` = '$_POST[storona]',
         `lvl` = '0',
-        `money` = '30000000',
+        `money` = '1000',
         `almaz` = '0',
         `skill` = '3',
         `hp` = '$hp',
@@ -271,7 +271,7 @@ if ($avto == 1) {
         `pol` = '$_POST[pol]',
         `storona` = '$_POST[storona]',
         `lvl` = '0',
-        `money` = '30000000',
+        `money` = '1000',
         `almaz` = '0',
         `skill` = '3',
         `hp` = '$hp',

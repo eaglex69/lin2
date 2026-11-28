@@ -45,7 +45,7 @@ img[src*="pic/roz/"]{display:block;margin:6px auto;border-radius:8px;border:2px 
 hr{
   display:block;height:18px;width:100%;margin:8px 0;
   background:
-    url(fantasy/fl-orn.svg) center no-repeat,
+    url(fantasy/fl-orn.png) center/160px 22px no-repeat,
     linear-gradient(90deg,rgba(214,140,70,0),rgba(214,140,70,.55) 18%,rgba(214,140,70,.55) 82%,rgba(214,140,70,0)) center/100% 1px no-repeat;
 }
 small{font-size:11px}
@@ -380,7 +380,7 @@ input[type=text]:hover,input[type=password]:hover,input:not([type]):hover{backgr
 ::placeholder{color:#a58565}
 select{
   height:auto;display:inline-block;max-width:100%;width:100%;padding:7px 28px 7px 8px;-webkit-appearance:none;-moz-appearance:none;appearance:none;
-  background:#f6e4d0 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23863f10' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 9px center/12px 8px no-repeat;
+  background:#f6e4d0 url(fantasy/ic-chevron.png) right 9px center/12px 8px no-repeat;
 }
 select:hover{color:#3a1c08;text-decoration:none}
 textarea{width:100%;min-height:60px;resize:vertical}
@@ -470,39 +470,41 @@ label{cursor:pointer}
 .lx-foot p{margin:6px 0}
 .lx-foot span{color:inherit}
 
-/* glyph icons (theme/fantasy/g-*.svg): equipment slots, shop sections, footer keys */
-.g-weapon{background-image:url(fantasy/g-weapon.svg)}
-.g-golova{background-image:url(fantasy/g-golova.svg)}
-.g-body{background-image:url(fantasy/g-body.svg)}
-.g-pants{background-image:url(fantasy/g-pants.svg)}
-.g-nogi{background-image:url(fantasy/g-nogi.svg)}
-.g-ruki{background-image:url(fantasy/g-ruki.svg)}
-.g-shit{background-image:url(fantasy/g-shit.svg)}
-.g-plash{background-image:url(fantasy/g-plash.svg)}
-.g-earring{background-image:url(fantasy/g-earring.svg)}
-.g-amulet{background-image:url(fantasy/g-amulet.svg)}
-.g-ring{background-image:url(fantasy/g-ring.svg)}
-.g-crystal{background-image:url(fantasy/g-crystal.svg)}
-.g-ore{background-image:url(fantasy/g-ore.svg)}
-.g-scroll{background-image:url(fantasy/g-scroll.svg)}
-.g-paw{background-image:url(fantasy/g-paw.svg)}
-.g-potion{background-image:url(fantasy/g-potion.svg)}
-.g-bag{background-image:url(fantasy/g-bag.svg)}
-.g-diamond{background-image:url(fantasy/g-diamond.svg)}
-.g-crown{background-image:url(fantasy/g-crown.svg)}
-.g-bars{background-image:url(fantasy/g-bars.svg)}
-.g-scales{background-image:url(fantasy/g-scales.svg)}
-.g-coin{background-image:url(fantasy/g-coin.svg)}
-.g-menu{background-image:url(fantasy/g-menu.svg)}
-.g-city{background-image:url(fantasy/g-city.svg)}
-.g-world{background-image:url(fantasy/g-world.svg)}
-.g-hero{background-image:url(fantasy/g-hero.svg)}
-.g-backpack{background-image:url(fantasy/g-backpack.svg)}
-.g-chat{background-image:url(fantasy/g-chat.svg)}
-.g-clan{background-image:url(fantasy/g-clan.svg)}
-.g-casino{background-image:url(fantasy/g-casino.svg)}
-.g-quest{background-image:url(fantasy/g-quest.svg)}
-.g-fish{background-image:url(fantasy/g-fish.svg)}
+/* glyph icons (theme/fantasy/g-*.png): equipment slots, shop sections, footer keys */
+.g-weapon{background-image:url(fantasy/g-weapon.png)}
+.g-golova{background-image:url(fantasy/g-golova.png)}
+.g-body{background-image:url(fantasy/g-body.png)}
+.g-pants{background-image:url(fantasy/g-pants.png)}
+.g-nogi{background-image:url(fantasy/g-nogi.png)}
+.g-ruki{background-image:url(fantasy/g-ruki.png)}
+.g-shit{background-image:url(fantasy/g-shit.png)}
+.g-plash{background-image:url(fantasy/g-plash.png)}
+.g-earring{background-image:url(fantasy/g-earring.png)}
+.g-amulet{background-image:url(fantasy/g-amulet.png)}
+.g-ring{background-image:url(fantasy/g-ring.png)}
+.g-crystal{background-image:url(fantasy/g-crystal.png)}
+.g-ore{background-image:url(fantasy/g-ore.png)}
+.g-scroll{background-image:url(fantasy/g-scroll.png)}
+.g-paw{background-image:url(fantasy/g-paw.png)}
+.g-potion{background-image:url(fantasy/g-potion.png)}
+.g-bag{background-image:url(fantasy/g-bag.png)}
+.g-diamond{background-image:url(fantasy/g-diamond.png)}
+.g-crown{background-image:url(fantasy/g-crown.png)}
+.g-bars{background-image:url(fantasy/g-bars.png)}
+.g-scales{background-image:url(fantasy/g-scales.png)}
+.g-coin{background-image:url(fantasy/g-coin.png)}
+.g-menu{background-image:url(fantasy/g-menu.png)}
+.g-city{background-image:url(fantasy/g-city.png)}
+.g-world{background-image:url(fantasy/g-world.png)}
+.g-hero{background-image:url(fantasy/g-hero.png)}
+.g-backpack{background-image:url(fantasy/g-backpack.png)}
+.g-chat{background-image:url(fantasy/g-chat.png)}
+.g-clan{background-image:url(fantasy/g-clan.png)}
+.g-casino{background-image:url(fantasy/g-casino.png)}
+.g-quest{background-image:url(fantasy/g-quest.png)}
+.g-fish{background-image:url(fantasy/g-fish.png)}
+.g-mail{background-image:url(fantasy/g-mail.png)}
+.g-gift{background-image:url(fantasy/g-gift.png)}
 
 /* ===== 10. tiles, chips, goods, sheets (city, shops, inventory) ========================================== */
 /* place bar: «Город: X» */
@@ -814,18 +816,18 @@ a.lx-un:hover{-webkit-filter:brightness(1.2);filter:brightness(1.2);text-shadow:
 .lx-kv .r b em{margin-left:5px;font-style:normal;font-size:12px;color:#86e09c}
 .lx-kv .r b a:link,.lx-kv .r b a:visited{color:#ffd980}
 .lx-kv .r u{flex:0 0 auto;display:block;width:18px;height:18px;margin-right:7px;text-decoration:none;background:center/contain no-repeat}
-.lx-kv .r.att u{background-image:url(fantasy/ic-sword.svg)}
-.lx-kv .r.def u{background-image:url(fantasy/ic-shield.svg)}
-.lx-kv .r.hp u{background-image:url(fantasy/ic-heart.svg)}
-.lx-kv .r.mp u{background-image:url(fantasy/ic-mana.svg)}
+.lx-kv .r.att u{background-image:url(fantasy/ic-sword.png)}
+.lx-kv .r.def u{background-image:url(fantasy/ic-shield.png)}
+.lx-kv .r.hp u{background-image:url(fantasy/ic-heart.png)}
+.lx-kv .r.mp u{background-image:url(fantasy/ic-mana.png)}
 .lx-kv .r.coin u{border-radius:50%;background:radial-gradient(circle at 36% 28%,#fff6c4,#f7bf3c 52%,#b4690f);box-shadow:0 0 0 1px #6a3c08}
 .lx-kv .r.gem u{border-radius:3px;-webkit-transform:rotate(45deg) scale(.74);transform:rotate(45deg) scale(.74);background:linear-gradient(135deg,#d8f8ff,#35b8ee 50%,#1a62c2);box-shadow:0 0 0 1px #0f4a6a}
 .lx-kv .r.bar u{border-radius:2px;background:linear-gradient(135deg,#fff0b0,#d99a2a 55%,#8a5a08);box-shadow:0 0 0 1px #6a3c08}
 .lx-kv .r.xp u{background:none;font:800 17px/18px 'Nunito',Tahoma,sans-serif;text-align:center;color:#ffd84a;text-shadow:0 0 4px rgba(255,190,60,.7),0 1px 0 #3a1a06}
 .lx-kv .r.xp u:before{content:"\2605"}
 .lx-kv .r.st u{border-radius:50%;background:radial-gradient(circle at 36% 28%,#d8f8ff,#35b8ee 55%,#1a62c2);box-shadow:0 0 0 1px #0f4a6a}
-.lx-kv .r.win u{background-image:url(fantasy/ic-sword-gold.svg)}
-.lx-kv .r.lose u{background-image:url(fantasy/ic-shield.svg);opacity:.75}
+.lx-kv .r.win u{background-image:url(fantasy/ic-sword-gold.png)}
+.lx-kv .r.lose u{background-image:url(fantasy/ic-shield.png);opacity:.75}
 a.lx-plus,a.lx-plus:link,a.lx-plus:visited{
   flex:0 0 auto;display:inline-block;min-width:30px;height:24px;margin-left:8px;padding:0 6px;box-sizing:border-box;border-radius:4px;text-align:center;font:800 12px/22px 'Nunito',Tahoma,sans-serif;color:#3a2004;text-shadow:0 1px 0 rgba(255,240,170,.85);
   background:linear-gradient(180deg,rgba(255,255,235,.6) 0,rgba(255,255,235,.2) 47%,rgba(0,0,0,0) 48%,rgba(100,50,0,.22) 100%),url(fantasy/tx-gold.jpg) 0 0/160px #e3a920;
@@ -891,10 +893,10 @@ a.lx-plus:active{-webkit-transform:translateY(2px);transform:translateY(2px)}
 .lx-stats{display:flex;justify-content:space-between;margin-top:7px;font:700 13px Tahoma,Verdana,sans-serif;color:#f4e4c6;text-shadow:0 1px 1px #000}
 .lx-stats span{display:flex;align-items:center}
 .lx-stats u{display:inline-block;width:16px;height:16px;margin-right:6px;background:center/contain no-repeat;text-decoration:none}
-.lx-st-att u{background-image:url(fantasy/ic-sword.svg)}
-.lx-st-def u{background-image:url(fantasy/ic-shield.svg)}
-.lx-st-hp u{background-image:url(fantasy/ic-heart.svg)}
-.lx-st-mp u{background-image:url(fantasy/ic-mana.svg)}
+.lx-st-att u{background-image:url(fantasy/ic-sword.png)}
+.lx-st-def u{background-image:url(fantasy/ic-shield.png)}
+.lx-st-hp u{background-image:url(fantasy/ic-heart.png)}
+.lx-st-mp u{background-image:url(fantasy/ic-mana.png)}
 .lx-name{
   margin:12px 0 9px;text-align:center;font:700 25px/1.1 'Cormorant SC',Georgia,'Times New Roman',serif;letter-spacing:.04em;color:#ffe29a;
   text-shadow:0 2px 0 #2a1004,0 0 12px rgba(255,190,70,.4);
@@ -942,7 +944,7 @@ a.lx-plus:active{-webkit-transform:translateY(2px);transform:translateY(2px)}
   text-shadow:0 0 2px #000,1px 2px 0 #000,-1px 2px 0 #000,0 0 14px rgba(255,170,0,.85);
   -webkit-animation:lx-float 1.6s ease-out forwards;animation:lx-float 1.6s ease-out forwards;
 }
-.lx-fl.atk:before{content:"";display:inline-block;width:.86em;height:.86em;margin-right:.22em;vertical-align:-.08em;background:url(fantasy/ic-sword-gold.svg) center/contain no-repeat}
+.lx-fl.atk:before{content:"";display:inline-block;width:.86em;height:.86em;margin-right:.22em;vertical-align:-.08em;background:url(fantasy/ic-sword-gold.png) center/contain no-repeat}
 .lx-fl.card{top:26%}
 .lx-fl.me{top:-12px;left:76%;font-size:28px;color:#ff5d5d;text-shadow:0 0 2px #000,1px 2px 0 #000,-1px 2px 0 #000,0 0 14px rgba(255,40,40,.85)}
 .lx-fl.heal{color:#6bf08e;text-shadow:0 0 2px #000,1px 2px 0 #000,-1px 2px 0 #000,0 0 14px rgba(60,230,120,.85)}
@@ -958,7 +960,7 @@ a.lx-plus:active{-webkit-transform:translateY(2px);transform:translateY(2px)}
   -webkit-animation:lx-pulse 1.9s ease-in-out infinite;animation:lx-pulse 1.9s ease-in-out infinite;
   -webkit-transition:-webkit-transform .12s;transition:transform .12s;
 }
-.lx-atk:before{content:"";position:absolute;left:13px;top:13px;right:13px;bottom:13px;background:url(fantasy/ic-attack.svg) center/contain no-repeat;-webkit-filter:drop-shadow(0 2px 2px rgba(0,0,0,.7));filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
+.lx-atk:before{content:"";position:absolute;left:13px;top:13px;right:13px;bottom:13px;background:url(fantasy/ic-attack.png) center/contain no-repeat;-webkit-filter:drop-shadow(0 2px 2px rgba(0,0,0,.7));filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
 .lx-atk:hover{color:transparent;text-shadow:none;-webkit-filter:brightness(1.12);filter:brightness(1.12)}
 .lx-atk:active{-webkit-transform:scale(.93);transform:scale(.93)}
 .lx-atk.off{
@@ -1025,6 +1027,50 @@ html.lx-busy .lx-app{opacity:.72;-webkit-transition:opacity .2s .15s;transition:
 @-webkit-keyframes lx-in{0%{opacity:.4}100%{opacity:1}}
 @keyframes lx-in{0%{opacity:.4}100%{opacity:1}}
 #lx-toast{position:fixed;left:50%;bottom:16px;z-index:99999;max-width:90%;padding:9px 16px;border-radius:6px;font-size:13px;color:#fff3d0;background:rgba(40,12,16,.95);border:1px solid #ff6b6b;-webkit-transform:translateX(-50%);transform:translateX(-50%)}
+
+/* small square mail button (top left): opens player mail + unread count badge */
+a.lx-mail,a.lx-mail:link,a.lx-mail:visited{
+  position:absolute;z-index:6;left:8px;top:8px;width:32px;height:32px;box-sizing:border-box;border-radius:4px;
+  background:linear-gradient(180deg,rgba(255,236,200,.28) 0,rgba(255,236,200,.06) 48%,rgba(0,0,0,.14) 100%),url(fantasy/tx-copper.jpg) 10px 14px/256px,#7a3f16;
+  border:1px solid #e0a468;box-shadow:0 2px 0 #2a1306,0 3px 5px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,235,200,.5);
+}
+a.lx-mail:before{
+  content:"";position:absolute;left:3px;top:3px;right:3px;bottom:3px;
+  background:url(fantasy/g-mail.png) center/contain no-repeat;
+}
+a.lx-mail:hover{-webkit-filter:brightness(1.15);filter:brightness(1.15);text-shadow:none}
+a.lx-mail:active{-webkit-transform:translateY(1px);transform:translateY(1px)}
+a.lx-mail .bd{
+  position:absolute;right:-6px;top:-6px;min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;
+  font:800 10px/15px 'Nunito',Tahoma,sans-serif;font-style:normal;text-align:center;color:#fff;
+  background:linear-gradient(#ff6f5d,#c91c22);border:1px solid #ffd5c2;box-shadow:0 1px 4px rgba(0,0,0,.75);
+}
+
+/* quests, promotions, bonuses & admin image manager */
+.lx-qdesc{margin:0 0 6px;font-size:12.5px;color:#e8d3ae}
+.lx-qrew{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px}
+.lx-qchip{
+  display:inline-block;padding:2px 8px;border-radius:10px;font:700 11.5px/1.35 'Nunito',Tahoma,sans-serif;
+  color:#ffe59e;background:rgba(0,0,0,.38);border:1px solid #8a5628;
+}
+.lx-qchip.col{color:#a8ecff;border-color:#2673a8}
+.lx-qchip.exp{color:#c5f5a4;border-color:#4b8a34}
+.lx-qdone{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:4px;font:800 12px/1.3 'Nunito',Tahoma,sans-serif;color:#86e09c;background:rgba(36,105,46,.32);border:1px solid #529c58}
+.lx-qlock{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:4px;font:700 11.5px/1.3 Tahoma,sans-serif;color:#d6a78a;background:rgba(90,34,20,.32);border:1px solid #7d402a}
+.lx-img-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}
+.lx-img-card{
+  padding:8px;border-radius:7px;background:rgba(0,0,0,.32);border:1px solid #7c4a26;display:flex;flex-direction:column;justify-content:space-between;
+}
+.lx-img-prev{
+  display:flex;align-items:center;justify-content:center;height:78px;margin-bottom:6px;padding:4px;border-radius:5px;
+  background:repeating-conic-gradient(#1f120b 0% 25%,#140b06 0% 50%) 50%/14px 14px;border:1px solid #4a2a14;overflow:hidden;
+}
+.lx-img-prev img{max-width:100%;max-height:70px;width:auto;height:auto;margin:0;border:0;box-shadow:none;object-fit:contain}
+.lx-img-path{font:700 11px/1.25 monospace;color:#ffe29a;word-break:break-all;margin-bottom:3px}
+.lx-img-meta{font-size:10.5px;color:#bda07c;margin-bottom:6px}
+@media (max-width:420px){
+  .lx-img-grid{grid-template-columns:1fr}
+}
 
 /* ===== 14. small screens ================================================================================== */
 @media (max-width:420px){

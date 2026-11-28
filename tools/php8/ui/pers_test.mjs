@@ -43,7 +43,7 @@ check('P3 the weapon slot is above the portrait', wr && fig && wr.b <= fig.t + 6
 check('P3 the slots are square and about the same size', await ev(() => [...document.querySelectorAll('.lx-doll .lx-dcol .lx-sl')].every((e) => { const r = e.getBoundingClientRect(); return Math.abs(r.width - r.height) < 2 && r.width >= 44 && r.width <= 60; })));
 const panelTop = await ev(() => { const p = [...document.querySelectorAll('.lx-pn .lx-pt')].map((e) => [e.textContent.replace(/\s+/g, ' ').trim(), e.getBoundingClientRect().top + scrollY]); return p; });
 const hp = panelTop.find((p) => /^Здоровье/.test(p[0])), ch = panelTop.find((p) => /^Характеристики/.test(p[0]));
-check('P3 stats are in blocks UNDER the portrait (health, then characteristics)', hp && ch && fig && hp[1] >= fig.b && ch[1] > hp[1], JSON.stringify({ figBottom: fig && fig.b, panelTop }));
+check('P3 stats are in blocks UNDER the portrait (characteristics, no duplicate health block)', !hp && ch && fig && ch[1] >= fig.b, JSON.stringify({ figBottom: fig && fig.b, panelTop }));
 check('P3 every part of the page is a block: no loose text on the window', (await ev(() => { const bad = []; const cell = document.querySelector('td.centertd'); const SURF = /(^|\s)(msg|dot|inoy|pic|silka|info|event|news|forum|inf|pkboy|lich|head|down|down2|adm|admin|foot|navigation|zagolovok|paty|logtext|chattext|chat2|lx-[\w-]+)(\s|$)/; const w = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!/\S/.test(n.nodeValue.replace(/\u00a0/g, ' ')) || n.parentElement.closest('script,style,noscript')) continue; let el = n.parentElement, ok = false; while (el && el !== cell) { if (SURF.test(typeof el.className === 'string' ? el.className : '')) { ok = true; break; } el = el.parentElement; } if (!ok) bad.push(n.nodeValue.trim().slice(0, 30)); } return bad; })).length === 0);
 check('P3 no sideways scroll', await noOverflow());
 
@@ -56,9 +56,9 @@ check('P4 every worn slot has its grade mark', links.every((l) => /^(NG|D|C|B|A|
 const me = (await sql(`SELECT patt,matt,pdef,mdef,money,hp,hpall,mp,mpall,almaz,gold FROM users WHERE usr='Tester'`)).rows[0];
 const stat = await ev(() => { const o = {}; document.querySelectorAll('.lx-kv .r').forEach((r) => { o[r.querySelector('i').textContent.trim()] = r.querySelector('b').textContent.replace(/\s+/g, ' ').trim(); }); return o; });
 check('P5 the numbers are the player\'s own (attack, defence, money, Coin of Luck)', num(stat['Физ. атака']) === me[0] && num(stat['Маг. атака']) === me[1] && num(stat['Физ. защита']) === me[2] && num(stat['Маг. защита']) === me[3] && num(stat['Аден']) === me[4] && num(stat['Coin of Luck']) === me[9], JSON.stringify(stat) + ' vs ' + JSON.stringify(me));
-check('P5 health and mana bars show hp / mp', (await texts('.lx-mt .lx-bar b')).join('|').includes(`Жизни ${me[5]} / ${me[6]}`) && (await texts('.lx-mt .lx-bar b')).join('|').includes(`Мана ${me[7]} / ${me[8]}`), (await texts('.lx-mt .lx-bar b')).join('|'));
+check('P5 health and mana bars show hp / mp in the top header', (await texts('.lx-head .lx-bar b')).join('|').includes(`HP ${me[5]}/${me[6]}`) && (await texts('.lx-head .lx-bar b')).join('|').includes(`MP ${me[7]}/${me[8]}`), (await texts('.lx-head .lx-bar b')).join('|'));
 const blocks = await texts('.lx-pn .lx-pt');
-check('P5 blocks: Здоровье, Характеристики, Богатство, Сведения, Бои, Время, Подарки', ['Здоровье', 'Характеристики', 'Богатство', 'Сведения', 'Бои', 'Время', 'Подарки'].every((t) => blocks.some((b) => b.startsWith(t))), blocks.join(','));
+check('P5 blocks: Характеристики, Богатство, Сведения, Бои, Время, Подарки (without Здоровье)', !blocks.some((b) => b.startsWith('Здоровье')) && ['Характеристики', 'Богатство', 'Сведения', 'Бои', 'Время', 'Подарки'].every((t) => blocks.some((b) => b.startsWith(t))), blocks.join(','));
 
 // take an item off: the red cross of the shield
 await ev(() => { window.__m = 1; });

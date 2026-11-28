@@ -38,6 +38,8 @@ exit;
 
 $ncena2222 = $mag['cena']*100000; // продажа в ломбард
 
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'shop_buy', 1);
 mysql_query("INSERT INTO
         `item` SET
         `usr` = '$log',

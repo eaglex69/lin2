@@ -110,6 +110,8 @@ $avto1=mysql_num_rows($req1);
 if($avto1==0){
 
 
+include_once($path . 'inc/quests_promo.php');
+lin2_qp_progress($log, 'shop_buy', 1);
 mysql_query("INSERT INTO `soulshots` (`id` ,
 `usr` ,
 `kol` ,
